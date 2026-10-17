@@ -1,0 +1,23 @@
+name: Demo availability
+on:
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: demo-availability
+  cancel-in-progress: true
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # No /api requests while the backend is Codespaces: monitoring must not
+      # defeat its idle timeout. Enable backend probes only after host migration.
+      - name: Check static frontend availability and security headers
+        run: python -m scripts.uptime_check --url https://gp-code.vercel.app --backend-kind codespaces
