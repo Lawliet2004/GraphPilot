@@ -18,7 +18,8 @@ The complete stack can be started in a GitHub Codespace using the included dev
 container and `python3 scripts/cloud_demo.py start`. It keeps isolated private
 configuration and persistent volumes, and uses the forwarded HTTPS origin.
 Codespaces has a finite free allowance and idle shutdown; it is for scheduled
-demos, not permanent hosting. Account authorization is still required.
+demos, not permanent hosting. The first public cloud deployment is verified;
+see the cloud report for its URL, checks and remaining account setup.
 
 Optional read-only MCP tools use expiring per-user bearer credentials at
 `/api/mcp/`; existing repository permissions apply. No model or paid API is needed.

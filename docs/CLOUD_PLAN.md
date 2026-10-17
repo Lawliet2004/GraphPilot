@@ -10,18 +10,18 @@ without a payment card, while keeping existing authentication and permissions.
    explicit revocation and a portable local bridge for compatible MCP clients.
 3. **Implemented:** a free QA runner and GitHub workflow for deployment health, access
    restrictions and browser checks, with reports and no model/API subscription.
-4. **Locally verified:** migrations, authorization boundaries, real MCP discovery/tool calls,
-   container startup and browser journeys. Record evidence, not just configuration.
-5. Publish reviewed source changes and verify CI. Leave account-specific actions
-   to the user when the account cannot authorize them here.
+4. **Verified in the actual cloud:** public HTTPS, secure login, admin API/page,
+   worker indexing, graph/source/branch browser journeys, actual HTTP/stdio MCP
+   calls and immediate token revocation. Foreign-origin and anonymous access fail.
+5. **Published:** source changes and CI checks. The account owner authorized
+   Codespaces; a 2-core workspace runs with a 30-minute idle timeout. Browser
+   access and cloud SSH work. Paid Codespaces usage remains blocked at $0.
 
-Current external blockers:
+Remaining account-specific steps:
 
-- The GitHub CLI is signed in as Lawliet2004 but lacks the `codespace` scope.
-  Creating/listing Codespaces returns HTTP 403. The account owner must authorize
-  that scope or create the workspace in GitHub's web interface.
-- Chrome's computer-use connection fails to load its request-header policy before
-  any tab can be read or opened. No browser changes have been made.
+- Create your own cloud account and choose its administrator password through
+  the documented trusted-terminal command.
+- Select an MCP client and issue a separate expiring token for it.
 - No Azure student verification, external SMTP account or application model has
   been supplied. These are optional for the first cloud demo.
 
@@ -32,5 +32,5 @@ Verification: 120 backend/release tests, three read-only browser checks, one ful
 Docker browser repository journey, actual HTTP/stdio MCP calls, token revocation,
 and Docker stop/resume with retained sessions, graph and source evidence pass.
 Ruff, frontend build, Actionlint, Python dependency audit and candidate-only secret
-scan pass. See `CLOUD_VERIFICATION.json` for the exact local scope. The actual
-Codespace and its public HTTPS behavior still require account authorization.
+scan pass. See `CLOUD_VERIFICATION.json` for the separate local and actual-cloud
+evidence. QA uses disposable labeled accounts; no paid agent/model is running.

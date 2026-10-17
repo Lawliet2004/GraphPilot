@@ -2,7 +2,14 @@
 
 ## Start the cloud demo
 
-Open [GraphPilot in Codespaces](https://codespaces.new/Lawliet2004/GraphPilot),
+The account's first **GraphPilot demo** Codespace has been created on the 2-core
+machine, with a 30-minute idle timeout and port 18080 public. Open the existing
+workspace from [your Codespaces dashboard](https://github.com/codespaces) to resume
+it; avoid creating a duplicate for every demo. The exact public URL is recorded
+in `CLOUD_VERIFICATION.json`. GitHub displays a one-time development-port notice
+before the website. Choose **Continue** for your own demo.
+
+For a separate new demo, open [GraphPilot in Codespaces](https://codespaces.new/Lawliet2004/GraphPilot),
 choose the **2-core** machine and create the workspace on `main`. The dev container
 installs Docker support and starts the complete stack automatically. The first
 build may take several minutes. If needed, run:
@@ -40,6 +47,11 @@ Development `.env`, the native stack and the existing Quick Tunnel deployment ar
 separate. Private generated configuration lives under `.data/cloud-demo/`.
 The controller needs Python 3 and Docker only. `--build` rebuilds changed source.
 For local validation, choose another `--project graphpilot-cloud-check --port 18081`.
+Later starts preserve an existing HTTPS URL even when SSH omits Codespaces
+environment variables. The gateway restores Codespaces' rewritten browser origin
+only for the configured forwarded host and same-origin Fetch Metadata. Foreign
+and missing browser origins remain restricted. The web gateway has its own health
+check and is recreated on start so updated configuration is applied.
 
 Codespaces is an on-demand development/demo environment, not permanent hosting.
 GitHub Free currently includes 120 core-hours (60 hours on 2 cores) and 15 GB-month
@@ -49,6 +61,11 @@ idle timeout before an interview; it can be up to four hours. Your computer may
 be off while the Codespace runs, but its URL stops serving when it stops. After
 resuming, check the port's visibility again. Do not use keepalive tricks to defeat
 provider limits.
+
+The current account's GitHub Pro benefit provides 180 core-hours (90 hours on
+2 cores) and 20 GB-month storage. Its Codespaces paid budget was verified at **$0,
+usage blocked** before creation, with no usage recorded this month. Keep that
+budget in place; free compute and storage allowances are finite.
 
 Sources: [GitHub billing](https://docs.github.com/en/billing/concepts/product-billing/github-codespaces),
 [public ports](https://docs.github.com/en/codespaces/developing-in-a-codespace/forwarding-ports-in-your-codespace),
@@ -140,11 +157,11 @@ dependency and image audits on pushes.
 
 ## Steps the account owner still needs to do
 
-1. Create/authorize the GitHub Codespace. The current CLI credential lacks the
-   `codespace` scope; either use the web link or approve `gh auth refresh -h github.com -s codespace`.
-2. Verify the free allowance in GitHub billing, open the app, create your account
-   and deliberately share port 18080 when ready.
-3. Choose your administrator email and MCP client; issue its token privately.
+1. Open the demo and create your own account/password. Temporary QA credentials
+   are removed after verification; no shared administrator password is shipped.
+2. In the cloud terminal, run the administrator command above using your email.
+   Enter the password yourself. Your cloud accounts are separate from local ones.
+3. Choose your MCP client and issue its own expiring token privately if needed.
 4. If password-reset email is required, create/verify an SMTP sender and configure
    the private deployment file. External inbox delivery still requires testing.
 

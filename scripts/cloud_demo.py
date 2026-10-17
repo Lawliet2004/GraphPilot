@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def public_url(port, explicit=None, environ=None):
+def public_url(port, explicit=None, environ=None, previous=None):
     env = os.environ if environ is None else environ
     if explicit:
         url = explicit.rstrip("/")
@@ -29,6 +29,9 @@ def public_url(port, explicit=None, environ=None):
         if not re.fullmatch(r"[a-z0-9-]+", name) or not re.fullmatch(r"[a-z0-9.-]+", domain):
             raise ValueError("Invalid Codespaces hostname")
         url = f"https://{name}-{port}.{domain}"
+    elif previous and previous.startswith("https://"):
+        # SSH shells may omit Codespaces environment variables on later starts.
+        url = previous
     else:
         url = f"http://127.0.0.1:{port}"
     parsed = urlparse(url)
@@ -100,6 +103,22 @@ def prepare(state, address, port):
     )
     save_private(env_file, "\n".join(f"{k}={v}" for k, v in values.items()) + "\n")
     gateway = (ROOT / "app/nginx.conf").read_text()
+    if urlparse(address).hostname.endswith(".app.github.dev"):
+        # Codespaces rewrites a same-origin browser Origin to its local upstream
+        # and supplies the original public Host separately. Require that exact
+        # pair plus browser same-origin metadata; preserve all other Origins.
+        host = urlparse(address).netloc
+        gateway = (
+            "map_hash_bucket_size 256;\n"
+            'map "$http_x_forwarded_host|$http_origin|$http_sec_fetch_site" $graphpilot_origin {\n'
+            "  default $http_origin;\n"
+            f'  "{host}|http://localhost:{port}|same-origin" "{address}";\n'
+            "}\n" + gateway
+        )
+        gateway = gateway.replace(
+            "proxy_set_header Host $http_host;",
+            f"proxy_set_header Host {host};\n    proxy_set_header Origin $graphpilot_origin;",
+        )
     if secure:
         gateway = gateway.replace(
             "proxy_set_header X-Forwarded-Proto $scheme;",
@@ -117,6 +136,12 @@ def prepare(state, address, port):
                 "services": {
                     "web": {
                         "volumes": [f"{state / 'nginx.conf'}:/etc/nginx/conf.d/default.conf:ro"],
+                        "healthcheck": {
+                            "test": ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"],
+                            "interval": "5s",
+                            "timeout": "3s",
+                            "retries": 20,
+                        },
                     }
                 }
             }
@@ -161,7 +186,17 @@ def main():
     env_file = state / "compose.env"
     address = None
     if args.action == "start":
-        address = public_url(args.port, args.public_url)
+        previous = None
+        if env_file.exists():
+            previous = next(
+                (
+                    line.split("=", 1)[1]
+                    for line in env_file.read_text().splitlines()
+                    if line.startswith("GP_PUBLIC_URL=")
+                ),
+                None,
+            )
+        address = public_url(args.port, args.public_url, previous=previous)
         env_file = prepare(state, address, args.port)
     elif not env_file.exists():
         parser.error("This demo has not been started")
@@ -252,7 +287,7 @@ def main():
         print("PostgreSQL and FalkorDB ready. Public browser checks are separate.")
         return
     command = {
-        "start": ["up", "-d", "--wait", "--wait-timeout", "240"],
+        "start": ["up", "-d", "--wait", "--wait-timeout", "240", "api", "worker"],
         "stop": ["stop"],
         "status": ["ps"],
     }[args.action]
@@ -260,6 +295,26 @@ def main():
         command.append("--build")
     subprocess.run(docker(base + command), cwd=ROOT, env=env, check=True)
     if args.action == "start":
+        # Atomic config replacement leaves an existing file bind mount on its
+        # previous inode. Recreate only the gateway so repeated starts apply it.
+        web_command = [
+            "up",
+            "-d",
+            "--wait",
+            "--wait-timeout",
+            "240",
+            "--no-deps",
+            "--force-recreate",
+            "web",
+        ]
+        if args.build:
+            web_command.append("--build")
+        subprocess.run(
+            docker(base + web_command),
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
         print(f"GraphPilot: {address}")
         print("MCP endpoint: " + address + "/api/mcp/ (requires a per-user token)")
         print(

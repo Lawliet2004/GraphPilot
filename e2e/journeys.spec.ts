@@ -1,9 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdir } from "node:fs/promises";
+import { prepareCodespaces } from "../demo-tests/provider";
 const email = `e2e-${randomUUID()}@graphpilot.invalid`;
 const password = "test-" + randomUUID() + "-long-password";
 const screenshotDir = ".impeccable/review";
+
+test.beforeEach(async ({ page, baseURL }) => {
+  await prepareCodespaces(page, baseURL);
+});
 
 test("real repository journey, source evidence, settings, restrictions and responsive layouts", async ({
   page,

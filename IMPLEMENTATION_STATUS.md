@@ -9,15 +9,19 @@ implemented. Current local verification passes **120 backend/release tests**,
 three read-only browser checks and one full Docker repository browser journey.
 Real SDK HTTP/stdio tool calls and whole-stack stop/resume persistence pass.
 See [cloud verification](docs/CLOUD_VERIFICATION.json) and the
-[setup and account handoff](docs/CLOUD_DEMO.md). Actual cloud creation remains
-blocked by the missing GitHub `codespace` authorization; this is not a claim of
-a running cloud deployment. The evidence below records the earlier release.
+[setup and account handoff](docs/CLOUD_DEMO.md). The account owner has authorized
+Codespaces and the actual public cloud deployment now passes HTTPS login, admin
+API/browser, worker indexing, the full repository journey and authenticated MCP
+HTTP/stdio checks with token revocation. The 2-core demo uses a 30-minute idle
+timeout; paid Codespaces usage is blocked at $0. This is an on-demand demo.
+The evidence below records the earlier release.
 
 The unchanged specification is in `docs/REQUIREMENTS.md`. The native application,
 container deployment path and remote CI are verified. The repository is published
 on `main` at https://github.com/Lawliet2004/GraphPilot under the user's own identity.
-Hosting/domain setup is explicitly deferred; public HTTPS and external SMTP inbox
-delivery remain unverified. Graph-only mode remains selected.
+Public HTTPS is verified on the provider's demo hostname. Custom-domain hosting
+and external SMTP inbox delivery remain optional unfinished work. Graph-only mode
+remains selected.
 
 ## Current evidence
 

@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-17T08:14:05.655258+00:00",
-  "scope": "Local verification of the cloud demo controller, MCP and QA additions. Actual Codespaces/public cloud hosting is not yet verified.",
+  "timestamp": "2026-10-17T09:17:31.469118+00:00",
+  "scope": "Local release evidence plus actual GitHub Codespaces public HTTPS deployment verification.",
   "backend_release_tests": {
     "passed": 120,
     "duration_seconds": 16.63
@@ -95,14 +95,115 @@
     "audited_packages": 61,
     "known_vulnerabilities": 0
   },
-  "devcontainer_configuration": "Passed @devcontainers/cli 0.89.0 read-configuration with merged configuration; actual cloud runtime still requires account authorization",
+  "devcontainer_configuration": "Actual initial cloud build and stack startup passed. SSH installed in the running workspace; official sshd feature added for future builds and merged configuration validated with devcontainers CLI 0.89.0.",
   "plugin_package": "JSON manifests parsed; real stdio bridge tested; host-specific installation not performed",
-  "cloud_workspace_created": false,
-  "cloud_https_auth_verified": false,
-  "blockers": [
-    "GitHub CLI lacks codespace scope; account owner must authorize or create the workspace in the web UI.",
-    "Chrome browser control failed before page access; the in-app browser is unavailable."
-  ],
+  "cloud_workspace_created": true,
+  "cloud_https_auth_verified": true,
+  "blockers": [],
   "cost_boundary": "No paid service, model provider or recurring agent was enabled.",
-  "validation_cleanup": "Only the owned graphpilot-cloud-check deployment was stopped; its volumes were preserved. Native app and Quick Tunnel unchanged."
+  "validation_cleanup": "Only the owned graphpilot-cloud-check deployment was stopped; its volumes were preserved. Native app and Quick Tunnel unchanged.",
+  "cloud": {
+    "name": "graphpilot-demo-4jq4pvw4j7w9374gp",
+    "public_url": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev",
+    "editor_url": "https://graphpilot-demo-4jq4pvw4j7w9374gp.github.dev/",
+    "machine": "2 cores, 8 GB RAM",
+    "idle_timeout_minutes": 30,
+    "paid_spending_budget": "$0; paid usage blocked, verified in GitHub billing before creation",
+    "http_checks": {
+      "status": "passed",
+      "scope": "Read-only public deployment checks; not a full user journey",
+      "checks": [
+        {
+          "path": "/",
+          "status": 200,
+          "duration_ms": 721.4
+        },
+        {
+          "path": "/assets/index-CWJfPZUt.js",
+          "status": 200,
+          "duration_ms": 2033.5
+        },
+        {
+          "path": "/api/health/ready",
+          "status": 200,
+          "duration_ms": 1101.9
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401,
+          "duration_ms": 668.2
+        },
+        {
+          "path": "/api/admin/users",
+          "status": 401,
+          "duration_ms": 678.1
+        },
+        {
+          "path": "/api/repositories/00000000-0000-0000-0000-000000000000/graph",
+          "status": 401,
+          "duration_ms": 678.1
+        },
+        {
+          "path": "/api/mcp/",
+          "status": 401,
+          "duration_ms": 679.1
+        }
+      ]
+    },
+    "read_only_browser_checks": {
+      "passed": 3,
+      "duration_seconds": 16.2
+    },
+    "full_repository_browser_journey": {
+      "passed": 1,
+      "duration_seconds": 38.6,
+      "scope": "Actual public GitHub indexing, exact source evidence, graph-only retrieval, impact, branch snapshots, settings, admin denial, logout and login"
+    },
+    "account_and_mcp_checks": {
+      "foreign_origins_denied": true,
+      "secure_https_login": true,
+      "admin_api": true,
+      "cloud_worker_indexing": true,
+      "mcp": {
+        "status": "passed",
+        "direct_streamable_http": {
+          "tool_count": 5,
+          "accessible_repository_count": 1,
+          "read_only": true,
+          "symbol_search": true,
+          "nonempty_source_evidence": true,
+          "indexing_status": true
+        },
+        "stdio_bridge": {
+          "tool_count": 5,
+          "accessible_repository_count": 1,
+          "read_only": true,
+          "symbol_search": true,
+          "nonempty_source_evidence": true,
+          "indexing_status": true
+        },
+        "scope": "Real MCP SDK discovery and read-only tool calls; no OAuth/client installation claim"
+      },
+      "mcp_immediate_revocation": true,
+      "logout_revoked_session": true,
+      "status": "passed"
+    },
+    "admin_browser": {
+      "status": "passed",
+      "cloud_admin_browser": true,
+      "worker_heartbeat_recent": true,
+      "configuration_form": true,
+      "logout": true
+    },
+    "provider_origin_handling": "Only the configured forwarded host, rewritten localhost origin and browser same-origin Fetch Metadata are restored. Foreign origins, null origins and cross-site localhost origins returned 403.",
+    "startup_regression_tests": {
+      "passed": 3
+    },
+    "permanent_hosting": false
+  },
+  "remaining_owner_steps": [
+    "Create own cloud account and choose own administrator password",
+    "Choose MCP client and issue its own expiring token",
+    "Optional external SMTP sender/inbox delivery and optional model provider"
+  ]
 }

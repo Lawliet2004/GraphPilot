@@ -1,4 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { prepareCodespaces } from "./provider";
+
+test.beforeEach(async ({ page, baseURL }) => {
+  await prepareCodespaces(page, baseURL);
+});
 
 test("public landing renders without JavaScript errors", async ({ page }) => {
   const errors: string[] = [];

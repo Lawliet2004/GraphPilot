@@ -23,6 +23,21 @@ def test_cloud_demo_isolated_configuration_preserves_secrets_and_https(tmp_path)
     assert json.loads(updated["GP_ORIGINS"]) == ["https://resumed-18080.app.github.dev"]
     assert "X-Forwarded-Proto https" in (state / "nginx.conf").read_text()
     assert "Strict-Transport-Security" in (state / "nginx.conf").read_text()
+    gateway = (state / "nginx.conf").read_text()
+    assert "default $http_origin;" in gateway
+    assert (
+        '"resumed-18080.app.github.dev|http://localhost:18080|same-origin" '
+        '"https://resumed-18080.app.github.dev";' in gateway
+    )
+    assert "proxy_set_header Host resumed-18080.app.github.dev;" in gateway
+
+
+def test_other_gateways_do_not_rewrite_origins(tmp_path):
+    state = tmp_path / "demo"
+    prepare(state, "https://demo.example.com", 18081)
+    gateway = (state / "nginx.conf").read_text()
+    assert "$graphpilot_origin" not in gateway
+    assert "proxy_set_header Host $http_host;" in gateway
 
 
 def test_codespace_url_and_http_restrictions():
@@ -31,6 +46,14 @@ def test_codespace_url_and_http_restrictions():
         == "https://my-demo-18080.app.github.dev"
     )
     assert public_url(18080, environ={}) == "http://127.0.0.1:18080"
+    previous = "https://original-18080.app.github.dev"
+    assert public_url(18080, environ={}, previous=previous) == previous
+    assert public_url(18080, "https://explicit.example", environ={}, previous=previous) == (
+        "https://explicit.example"
+    )
+    assert public_url(18080, environ={"CODESPACE_NAME": "resumed"}, previous=previous) == (
+        "https://resumed-18080.app.github.dev"
+    )
     for url in [
         "http://public.example",
         "https://user:secret@example.com",
