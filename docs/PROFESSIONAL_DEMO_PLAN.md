@@ -15,7 +15,8 @@ The owner has a college email and can verify Azure for Students eligibility.
 College-account portal sign-in is complete, but Microsoft student verification
 rejected the university ID. The official GitHub Education redemption returned to
 the same verification form. Student activation and spending protection remain
-unverified; the account/subscription support workflow is being reviewed.
+unverified. The approved free Microsoft account/subscription support request
+has been created and is Open; academic activation awaits resolution.
 The proposed host is a small Linux VM running the existing Docker Compose stack,
 with persistent volumes, a public HTTPS gateway and restart policies. Firebase
 continues to manage authentication. PostgreSQL, FalkorDB and source artifacts

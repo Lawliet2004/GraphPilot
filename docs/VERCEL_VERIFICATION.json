@@ -164,7 +164,7 @@
     "state": "GitHub Confirm access requires the account holder's emailed code. Callback has not been saved; fresh short-domain OAuth is not verified."
   },
   "remaining": [
-    "Microsoft academic verification rejected the university ID; resolve eligibility, verify student subscription/spending limit, then provision and migrate",
+    "Microsoft academic verification rejected the university ID; free support case is Open, student subscription remains unapproved, provisioning and migration pending",
     "GitHub Confirm access, save short-domain callback and verify fresh browser OAuth",
     "Final-host reboot, full backend monitoring and recovery checks after migration"
   ],
@@ -175,7 +175,12 @@
     "academic_verification": "rejected: Unable to confirm your University ID",
     "student_subscription_verified": false,
     "github_education_redemption": "Returned to the same academic form; no alternate verification provided",
-    "support_request_sent": false,
-    "date_of_birth_stored_in_evidence": false
+    "support_request_sent": true,
+    "date_of_birth_stored_in_evidence": false,
+    "support_case_status": "Open",
+    "support_plan": "Basic (free)",
+    "support_status_verified": true,
+    "status_checked_at": "2026-10-17T18:00:58.620463+00:00",
+    "student_subscription_approved": false
   }
 }

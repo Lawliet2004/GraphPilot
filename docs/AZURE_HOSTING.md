@@ -10,9 +10,12 @@ Codespaces URL is an on-demand demo and can stop after inactivity.
 The account holder reports this is their first Azure Students claim. Their
 existing GitHub Education benefits are active, but following the official Azure
 redemption link returned to the same academic-verification form. It did not
-provide an alternate verification method or activate a subscription. The official
-account/subscription support workflow is being reviewed; no support request has
-been sent. MFA and the date-of-birth field are no longer the blocker.
+provide an alternate verification method or activate a subscription. Microsoft
+has now created the approved account/subscription support request. Its status is
+**Open**, on the free Basic support plan. The case ID and contact email remain in
+private operator records. Student activation remains unapproved; no subscription
+or resources have been created. MFA and the date-of-birth field are no longer
+the blocker.
 
 Azure for Students advertises no credit card and a finite credit allowance.
 Eligibility, regional capacity and the actual subscription's spending protection
