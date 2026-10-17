@@ -73,7 +73,7 @@ def local_path(value: str) -> Path:
     return path
 
 
-def git(path: Path, *args, timeout=30, raw=False):
+def git(path: Path, *args, timeout=30, raw=False, auth_token=None):
     env = {
         **os.environ,
         "GIT_TERMINAL_PROMPT": "0",
@@ -81,6 +81,18 @@ def git(path: Path, *args, timeout=30, raw=False):
         "GIT_CONFIG_GLOBAL": "/dev/null",
         "GIT_LFS_SKIP_SMUDGE": "1",
     }
+    if auth_token:
+        import base64
+
+        # Credentials never enter command arguments, URLs or persisted Git config.
+        env.update(
+            {
+                "GIT_CONFIG_COUNT": "1",
+                "GIT_CONFIG_KEY_0": "http.https://github.com/.extraHeader",
+                "GIT_CONFIG_VALUE_0": "Authorization: Basic "
+                + base64.b64encode(("x-access-token:" + auth_token).encode()).decode(),
+            }
+        )
     # Disable hooks, external filters, filesystem monitor and protocol helpers.
     command = [
         "git",
@@ -193,7 +205,7 @@ def extract_zip(archive: Path, destination: Path):
         raise SourceError("Upload a valid, unencrypted ZIP archive") from None
 
 
-def snapshot(source_type: str, source: str, branch: str, destination: Path):
+def snapshot(source_type: str, source: str, branch: str, destination: Path, *, github_token=None):
     """Return commit, branch and safe immutable text files. Never checkout local trees."""
     cfg = settings()
     destination.mkdir(parents=True, exist_ok=True)
@@ -225,6 +237,7 @@ def snapshot(source_type: str, source: str, branch: str, destination: Path):
                 url,
                 f"refs/heads/{branch}:refs/heads/{branch}",
                 timeout=cfg.job_timeout_seconds,
+                auth_token=github_token,
             )
             if (
                 sum(p.stat().st_size for p in repo.rglob("*") if p.is_file())

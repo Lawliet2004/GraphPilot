@@ -81,9 +81,25 @@ class ConnectRepository(BaseModel):
     branch: str = Field(default="main", pattern=r"^[A-Za-z0-9_][A-Za-z0-9_./-]{0,199}$")
 
 
-def add_repository(db, user, source_type, source, branch, name):
+def add_repository(
+    db,
+    user,
+    source_type,
+    source,
+    branch,
+    name,
+    *,
+    github_repository_id=None,
+    github_connection_user_id=None,
+):
     repo = Repository(
-        name=name[:100], owner_id=user.id, source_type=source_type, source=source, branch=branch
+        name=name[:100],
+        owner_id=user.id,
+        source_type=source_type,
+        source=source,
+        branch=branch,
+        github_repository_id=github_repository_id,
+        github_connection_user_id=github_connection_user_id,
     )
     db.add(repo)
     db.flush()

@@ -158,6 +158,14 @@ from api.routes.context import router as context_router  # noqa: E402
 app.include_router(admin_router)
 app.include_router(context_router)
 
+from api.routes.github_connection import router as github_connection_router  # noqa: E402
+
+app.include_router(github_connection_router)
+
+from api.routes.cli_access import router as cli_router  # noqa: E402
+
+app.include_router(cli_router)
+
 # A separate bearer gate protects every MCP request; browser cookie sessions are
 # never accepted here. The trailing slash is part of the client endpoint.
 app.mount("/api/mcp", mcp_app)

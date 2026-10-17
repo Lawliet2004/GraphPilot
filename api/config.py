@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     llm_model: str = ""
     llm_api_key: str = Field("", repr=False)
     github_token: str = Field("", repr=False)
+    github_client_id: str = ""
+    github_client_secret: str = Field("", repr=False)
+    github_app_slug: str = ""
+    credential_key: str = Field("", repr=False)
     smtp_host: str = ""
     smtp_port: int = Field(587, ge=1, le=65535)
     smtp_username: str = Field("", repr=False)
@@ -105,6 +109,16 @@ class Settings(BaseSettings):
             raise ValueError("Configure both LLM base URL and model, or neither")
         if self.llm_base_url and urlparse(self.llm_base_url).scheme not in {"http", "https"}:
             raise ValueError("LLM endpoint must use HTTP(S)")
+        github_fields = [self.github_client_id, self.github_client_secret, self.github_app_slug]
+        if any(github_fields) and not all(github_fields + [self.credential_key]):
+            raise ValueError("GitHub App requires its client ID, secret, slug and credential key")
+        if self.credential_key:
+            from cryptography.fernet import Fernet
+
+            try:
+                Fernet(self.credential_key.encode())
+            except (ValueError, TypeError):
+                raise ValueError("Credential key must be a valid Fernet key") from None
         return self
 
 

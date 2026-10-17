@@ -10,6 +10,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { api, post, type Capabilities, type Repo } from "../lib/api";
 import { ErrorNotice, Heading } from "../components/ui";
+import { GitHubConnection } from "../components/GitHubConnection";
 export function Connect() {
   const [type, setType] = useState<"github" | "local" | "archive">("github");
   const [source, setSource] = useState("");
@@ -61,6 +62,7 @@ export function Connect() {
       />
       <div className="connect-layout">
         <section className="form-panel">
+          <GitHubConnection />
           <div
             className="source-tabs"
             role="group"

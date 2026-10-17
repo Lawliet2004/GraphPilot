@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api, post, date, type Capabilities } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { ErrorNotice, Heading, Loading } from "../components/ui";
+import { CliCredentials } from "./CliAccess";
 export function Settings() {
   const { user, refresh, provider, emailVerified } = useAuth();
   const cache = useQueryClient();
@@ -154,6 +155,7 @@ export function Settings() {
               )}
             </button>
           </form>
+          <CliCredentials />
           <h2>Connected services</h2>
           {caps.isPending ? (
             <Loading />

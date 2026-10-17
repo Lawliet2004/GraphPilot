@@ -27,6 +27,11 @@ A stdio client bridge, an optional QA agent profile and read-only deployment
 checks are included. See the [cloud demo, MCP and QA guide](docs/CLOUD_DEMO.md)
 and [implementation plan](docs/CLOUD_PLAN.md).
 
+The [GitHub account and CLI guide](docs/GITHUB_AND_CLI.md) covers selected private
+repositories and browser-approved command-line access. Live GitHub access needs
+the operator's App registration and installation. The [student hosting runbook](docs/AZURE_HOSTING.md)
+describes the always-awake deployment pending Azure academic verification.
+
 ## What works now
 
 - Argon2id registration/login, hashed expiring sessions, HttpOnly cookies, origin

@@ -70,6 +70,44 @@ class Login(BaseModel):
 
 
 def current_session(request: Request, db: Session = Depends(db_session)):
+    authorization = request.headers.get("authorization", "")
+    if authorization:
+        from api.models import AgentToken
+        from api.services.agent_tokens import authenticate_token
+
+        if not authorization.startswith("Bearer "):
+            raise HTTPException(401, "Use a valid bearer credential")
+        raw = authorization.removeprefix("Bearer ")
+        user = authenticate_token(db, raw)
+        credential = db.get(AgentToken, digest(raw))
+        path = request.url.path
+        # CLI credentials never reach profile, sessions, administration or GitHub authorization.
+        allowed = path in {
+            "/api/auth/session",
+            "/api/capabilities",
+            "/api/cli/logout",
+        } or path.startswith(("/api/repositories", "/api/jobs/"))
+        allowed = (
+            allowed
+            or (
+                request.method == "GET"
+                and (
+                    path == "/api/integrations/github"
+                    or path.startswith("/api/integrations/github/installations")
+                )
+            )
+            or (path == "/api/integrations/github/repositories" and request.method == "POST")
+        )
+        if not allowed:
+            raise HTTPException(403, "This credential cannot access that feature")
+        if (
+            request.method not in {"GET", "HEAD", "OPTIONS"}
+            and path != "/api/cli/logout"
+            and "repositories:write" not in credential.scopes
+        ):
+            raise HTTPException(403, "This credential has read-only access")
+        request.state.user, request.state.agent_token = user, credential
+        return user
     token = request.cookies.get("gp_session", "")
     session = db.get(LoginSession, digest(token)) if token else None
     user = db.get(User, session.user_id) if session else None

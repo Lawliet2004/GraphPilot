@@ -59,6 +59,35 @@ class AgentToken(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    scopes: Mapped[list] = mapped_column(JSON, default=lambda: ["read"])
+
+
+class GitHubConnection(Base):
+    __tablename__ = "github_connections"
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    github_user_id: Mapped[str] = mapped_column(String(30), unique=True)
+    login: Mapped[str] = mapped_column(String(100))
+    access_token: Mapped[str] = mapped_column(Text)
+    refresh_token: Mapped[str | None] = mapped_column(Text)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class AuthorizationRequest(Base):
+    __tablename__ = "authorization_requests"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    kind: Mapped[str] = mapped_column(String(10))
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    session_id: Mapped[str | None] = mapped_column(String(64))
+    verifier: Mapped[str] = mapped_column(Text)
+    code: Mapped[str | None] = mapped_column(String(12), unique=True)
+    scopes: Mapped[list] = mapped_column(JSON, default=list)
+    name: Mapped[str] = mapped_column(String(80), default="CLI")
+    status: Mapped[str] = mapped_column(String(12), default="pending")
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    last_poll_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class Repository(Base):
@@ -76,6 +105,8 @@ class Repository(Base):
     sync_state: Mapped[dict] = mapped_column(JSON, default=dict)
     indexed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    github_repository_id: Mapped[str | None] = mapped_column(String(30))
+    github_connection_user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"))
 
 
 class Membership(Base):

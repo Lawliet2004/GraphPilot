@@ -52,6 +52,10 @@ def run_index(job_id: str, worker_id: str):
             )
         ).all()
         old_files = {row.path: row.parsed for row in old_rows}
+        github_user, github_repository_id = (
+            repo.github_connection_user_id,
+            repo.github_repository_id,
+        )
     # Carry forward only published history, never staged pages from an
     # interrupted GitHub sync that has not published its graph.
     old_nodes, old_edges = manifest(previous_graph) if previous_graph else ([], [])
@@ -73,7 +77,21 @@ def run_index(job_id: str, worker_id: str):
         checkpoint(job_id, worker_id, 5, "Reading a safe source snapshot")
         if work.exists():
             shutil.rmtree(work)
-        commit, branch = snapshot(source_type, source, branch, tree)
+        source_credentials = {}
+        if github_user:
+            from fastapi import HTTPException
+
+            from api.services.github_connection import repository_token
+
+            try:
+                source_credentials["github_token"] = repository_token(
+                    github_user, github_repository_id
+                )
+            except HTTPException:
+                raise SourceError(
+                    "GitHub access changed. Reconnect the account and check selected repositories."
+                ) from None
+        commit, branch = snapshot(source_type, source, branch, tree, **source_credentials)
         text_files = read_files(tree)
         checkpoint(job_id, worker_id, 20, f"Analyzing {len(text_files)} text files")
         files, changed, skipped = {}, [], 0

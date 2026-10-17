@@ -290,8 +290,24 @@ def run_sync(job_id, worker_id):
         )
         previous_graph = repo.graph_name
         cursors = dict(repo.sync_state.get("cursors", {}))
+        github_user, github_repository_id = (
+            base_repo.github_connection_user_id,
+            base_repo.github_repository_id,
+        )
     old_nodes, old_edges = store.manifest(previous_graph)
-    api = GitHub(settings().github_token)
+    token = settings().github_token
+    if github_user:
+        from fastapi import HTTPException
+
+        from api.services.github_connection import repository_token
+
+        try:
+            token = repository_token(github_user, github_repository_id)
+        except HTTPException:
+            raise SourceError(
+                "GitHub access changed. Reconnect the account and check selected repositories."
+            ) from None
+    api = GitHub(token)
     base = f"/repos/{project}"
     rid = stable_id(repo.id, repo.branch, "Repository", repo.id)
     bid = stable_id(repo.id, repo.branch, "Branch", repo.branch)

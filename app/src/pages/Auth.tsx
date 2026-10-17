@@ -22,13 +22,17 @@ export function Auth({
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const token = params.get("token");
+  const requestedNext = params.get("next") || "";
+  const next = /^\/cli\/authorize\?code=[A-Fa-f0-9-]{8,9}$/.test(requestedNext)
+    ? requestedNext
+    : "/workspace";
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const [message, setMessage] = useState("");
-  if (auth.user && !reset) return <Navigate to="/workspace" replace />;
+  if (auth.user && !reset) return <Navigate to={next} replace />;
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -46,7 +50,7 @@ export function Auth({
           signup ? { email, name, password } : { email, password },
         );
         await auth.refresh();
-        navigate("/workspace", { replace: true });
+        navigate(next, { replace: true });
       }
     } catch (e) {
       setError(e);
@@ -180,7 +184,14 @@ export function Auth({
           {!reset && (
             <p className="auth-switch">
               {signup ? "Already have a workspace?" : "New to GraphPilot?"}{" "}
-              <Link to={signup ? "/login" : "/signup"}>
+              <Link
+                to={
+                  (signup ? "/login" : "/signup") +
+                  (next === "/workspace"
+                    ? ""
+                    : "?next=" + encodeURIComponent(next))
+                }
+              >
                 {signup ? "Log in" : "Create an account"}
               </Link>
             </p>

@@ -16,6 +16,7 @@ dependencies = [
   "python-multipart>=0.0.20,<1",
   "pathspec>=0.12,<1",
   "mcp>=1.26,<2",
+  "cryptography>=50.0.2,<51",
 ]
 [dependency-groups]
 dev = [

@@ -15,6 +15,7 @@ import { RepositoryPage } from "./pages/Repository";
 import { Settings } from "./pages/Settings";
 import { Admin } from "./pages/Admin";
 import { Activity } from "./pages/Activity";
+import { CliAccess } from "./pages/CliAccess";
 const cache = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, refetchOnWindowFocus: true },
@@ -31,6 +32,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/login" element={<Auth />} />
             <Route path="/signup" element={<Auth signup />} />
             <Route path="/reset-password" element={<Auth reset />} />
+            <Route path="/cli/authorize" element={<CliAccess />} />
             <Route element={<Protected />}>
               <Route element={<Shell />}>
                 <Route path="/workspace" element={<Dashboard />} />
