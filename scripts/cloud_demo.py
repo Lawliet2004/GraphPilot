@@ -221,8 +221,15 @@ def main():
         if args.action == "admin":
             if not args.email:
                 parser.error("Supply --email for your administrator")
+            managed = any(
+                line.startswith("GP_FIREBASE_PROJECT_ID=") and line.split("=", 1)[1].strip()
+                for line in env_file.read_text().splitlines()
+            )
             subprocess.run(
-                docker(base + cli + ["create-admin", args.email]), cwd=ROOT, env=env, check=True
+                docker(base + cli + ["promote-admin" if managed else "create-admin", args.email]),
+                cwd=ROOT,
+                env=env,
+                check=True,
             )
         elif args.action == "mcp-revoke":
             if not args.token_id or not re.fullmatch(r"[a-f0-9]{64}", args.token_id):

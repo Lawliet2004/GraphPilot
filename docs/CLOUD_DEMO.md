@@ -30,8 +30,10 @@ Create your account through the website. To make your own administrator:
 python3 scripts/cloud_demo.py admin --email you@example.com
 ```
 
-This prompts for a password locally; it does not ship a default account. It also
-replaces that account's password, so choose it deliberately. Admin status does
+With local authentication this prompts for a password and replaces that account's
+password. With [Firebase Authentication](FIREBASE_AUTH.md) configured, sign up first;
+the command only promotes the existing account and keeps its Firebase credentials.
+No default account is shipped. Admin status does
 not bypass repository membership. Connect a small public Python repository or
 upload `fixtures/reference` as a ZIP for an interview demonstration.
 

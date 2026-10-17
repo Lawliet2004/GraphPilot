@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-10-17T11:04:54.993087+00:00",
+  "firebase_project": "graphpilot-demo-20261017",
+  "plan": "Spark: no cost ($0/month), verified in Firebase console",
+  "firebase_cli": "15.34.0",
+  "official_firebase_mcp": {
+    "registered_in_codex": true,
+    "signed_in": true,
+    "tool_count": 20,
+    "scope": "auth plus Firebase core project tools",
+    "project_and_email_password_setup": "completed"
+  },
+  "cloud_url": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev",
+  "deployed_application_commit": "ba801c0432e2a8d0e8d154dc8bc908bdfedc1ca9",
+  "migration": "0009_firebase_identity",
+  "cloud_firebase_auth_and_repository_checks": {
+    "status": "passed",
+    "owner_admin": true,
+    "firebase_provider_verified": true,
+    "normal_user": true,
+    "normal_admin_access_denied": true,
+    "demo_repository": "https://github.com/pallets/itsdangerous",
+    "repository_id": "a1aaa55e-2eb9-427f-a895-294bf7639cfd",
+    "normal_sample_membership": "read",
+    "normal_repository_removal_denied": true,
+    "graph_nodes_visible": 80,
+    "exact_source_evidence": true
+  },
+  "graphpilot_mcp": {
+    "status": "passed",
+    "direct_streamable_http": {
+      "tool_count": 5,
+      "accessible_repository_count": 1,
+      "read_only": true,
+      "symbol_search": true,
+      "nonempty_source_evidence": true,
+      "indexing_status": true
+    },
+    "stdio_bridge": {
+      "tool_count": 5,
+      "accessible_repository_count": 1,
+      "read_only": true,
+      "symbol_search": true,
+      "nonempty_source_evidence": true,
+      "indexing_status": true
+    },
+    "scope": "Real MCP SDK discovery and read-only tool calls; no OAuth/client installation claim"
+  },
+  "backend_suite": {
+    "passed": 134,
+    "real_auth_emulator_included": true
+  },
+  "final_targeted_auth_checks": {
+    "passed": 13,
+    "scope": "Firebase adapter, explicit admin migration, real Firebase Auth emulator"
+  },
+  "frontend_build": "passed",
+  "ruff": "passed",
+  "ci": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39026956679",
+  "browser": "Normal demo Firebase login, workspace, Settings verification controls and real graph verified in Chrome",
+  "email_flow_evidence": "Verification and password reset passed against the official emulator. External inbox delivery not verified.",
+  "session_limit": "Firebase browser sessions expire after at most one hour; automatic refresh is not implemented.",
+  "cost_boundary": "No card or paid Firebase service enabled. Existing finite Codespaces hosting remains separate."
+}
