@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     public_url: str = "http://localhost:5173"
     cookie_secure: bool = False
     session_hours: int = Field(168, ge=1, le=720)
+    firebase_project_id: str = ""
+    firebase_api_key: str = Field("", repr=False)
+    firebase_emulator_host: str = ""
     data_dir: Path = Path(".data")
     allowed_local_roots: list[Path] = []
     falkor_host: str = "127.0.0.1"
@@ -48,6 +51,26 @@ class Settings(BaseSettings):
     def validate_settings(self):
         if not self.database_url.startswith("postgresql+psycopg://"):
             raise ValueError("GraphPilot requires a PostgreSQL psycopg DSN")
+        if bool(self.firebase_project_id) != bool(self.firebase_api_key):
+            raise ValueError("Configure both Firebase project ID and Web API key, or neither")
+        if self.firebase_project_id:
+            import re
+
+            if not re.fullmatch(r"[a-z][a-z0-9-]{4,28}[a-z0-9]", self.firebase_project_id):
+                raise ValueError("Invalid Firebase project ID")
+        if self.firebase_emulator_host:
+            emulator = urlparse("http://" + self.firebase_emulator_host)
+            if (
+                self.environment == "production"
+                or emulator.hostname not in {"127.0.0.1", "localhost", "::1"}
+                or not emulator.port
+                or emulator.username
+                or emulator.password
+                or emulator.path
+                or emulator.query
+                or emulator.fragment
+            ):
+                raise ValueError("Firebase emulator is limited to non-production loopback")
 
         def origin(value):
             parsed = urlparse(value)

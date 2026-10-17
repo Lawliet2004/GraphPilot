@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, GitBranch, Network } from "lucide-react";
-import { post } from "../lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { api, post } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { Brand, ErrorNotice } from "../components/ui";
 export function Auth({
@@ -12,6 +13,12 @@ export function Auth({
   reset?: boolean;
 }) {
   const auth = useAuth();
+  const provider = useQuery({
+    queryKey: ["auth-config"],
+    queryFn: () => api<{ provider: "local" | "firebase" }>("/auth/config"),
+    staleTime: 60000,
+    retry: false,
+  });
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const token = params.get("token");
@@ -90,7 +97,9 @@ export function Auth({
             {reset
               ? token
                 ? "Choose a new password for your account."
-                : "We’ll send a one-time link when email delivery is configured."
+                : provider.data?.provider === "firebase"
+                  ? "Firebase will email a one-time link to reset your password."
+                  : "We’ll send a one-time link when email delivery is configured."
               : signup
                 ? "Create your GraphPilot workspace."
                 : "Log in to pick up the thread."}
@@ -177,6 +186,12 @@ export function Auth({
             </p>
           )}
           <p className="auth-privacy">
+            {provider.data?.provider === "firebase" && (
+              <>
+                New accounts use Firebase Authentication.
+                <br />
+              </>
+            )}
             Your source stays behind repository permissions.
             <br />A model connection is optional.
           </p>

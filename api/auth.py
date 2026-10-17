@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from api.config import settings
 from api.db import db_session, utcnow
 from api.models import Audit, LoginSession, PasswordReset, User
+from api.services import firebase_auth
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 password_hasher = PasswordHasher(time_cost=2, memory_cost=19456, parallelism=1)
@@ -78,6 +79,14 @@ def current_session(request: Request, db: Session = Depends(db_session)):
         csrf = request.headers.get("x-csrf-token", "")
         if not csrf or not hmac.compare_digest(session.csrf_hash, digest(csrf)):
             raise HTTPException(403, "Invalid CSRF token. Refresh the page and try again.")
+    if user.firebase_identity:
+        provider = firebase_auth.account(request.cookies.get("gp_firebase", ""))
+        if (
+            provider["identity"] != user.firebase_identity
+            or int(session.created_at.timestamp()) < provider["valid_since"]
+        ):
+            raise HTTPException(401, "Please log in to continue")
+        request.state.firebase = provider
     request.state.user = user
     request.state.session = session
     return user
@@ -89,9 +98,11 @@ def admin(user: User = Depends(current_session)):
     return user
 
 
-def create_session(db, user, response, request):
+def create_session(db, user, response, request, firebase=None):
     token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
     expires = utcnow() + timedelta(hours=settings().session_hours)
+    if firebase:
+        expires = min(expires, utcnow() + timedelta(seconds=firebase["expires_in"]))
     db.add(
         LoginSession(
             id=digest(token),
@@ -111,6 +122,18 @@ def create_session(db, user, response, request):
             max_age=settings().session_hours * 3600,
             path="/",
         )
+    if firebase:
+        response.set_cookie(
+            "gp_firebase",
+            firebase["id_token"],
+            httponly=True,
+            secure=settings().cookie_secure,
+            samesite="lax",
+            max_age=firebase["expires_in"],
+            path="/",
+        )
+    else:
+        response.delete_cookie("gp_firebase", path="/")
     return {"user": public_user(user), "csrf": csrf}
 
 
@@ -137,7 +160,21 @@ def register(
     body: Registration, request: Request, response: Response, db: Session = Depends(db_session)
 ):
     auth_rate_limit(db, request)
-    user = User(email=body.email, name=body.name, password_hash=password_hasher.hash(body.password))
+    if db.scalar(select(User.id).where(User.email == body.email)):
+        raise HTTPException(409, "An account with that email already exists")
+    firebase = None
+    if firebase_auth.enabled():
+        firebase = firebase_auth.password_sign_in(body.email, body.password, create=True)
+        user = User(
+            email=body.email,
+            name=body.name,
+            password_hash="!firebase",
+            firebase_identity=firebase_auth.identity(firebase["uid"]),
+        )
+    else:
+        user = User(
+            email=body.email, name=body.name, password_hash=password_hasher.hash(body.password)
+        )
     db.add(user)
     try:
         db.flush()
@@ -145,8 +182,15 @@ def register(
         db.rollback()
         raise HTTPException(409, "An account with that email already exists") from None
     audit(db, user.id, "account.register", user.id)
-    result = create_session(db, user, response, request)
+    result = create_session(db, user, response, request, firebase)
     db.commit()
+    if firebase:
+        try:
+            firebase_auth.send_verification(firebase["id_token"])
+            result["verification_email_sent"] = True
+        except HTTPException:
+            # Account creation succeeded; email quotas/outages must not pretend it failed.
+            result["verification_email_sent"] = False
     return result
 
 
@@ -154,19 +198,47 @@ def register(
 def login(body: Login, request: Request, response: Response, db: Session = Depends(db_session)):
     auth_rate_limit(db, request)
     user = db.scalar(select(User).where(User.email == body.email.strip().lower()))
-    try:
-        password_hasher.verify(user.password_hash if user else DUMMY_HASH, body.password)
-    except (VerificationError, InvalidHashError):
-        raise HTTPException(401, "Email or password is incorrect") from None
+    firebase = None
+    # Existing native accounts keep their login until explicitly linked by the
+    # operator. A linked Firebase account can never fall back to a native hash.
+    if firebase_auth.enabled() and (not user or user.firebase_identity):
+        firebase = firebase_auth.password_sign_in(body.email, body.password)
+        provider = firebase_auth.account(firebase["id_token"])
+        user = db.scalar(select(User).where(User.firebase_identity == provider["identity"]))
+        if not user:
+            if db.scalar(select(User.id).where(User.email == provider["email"])):
+                raise HTTPException(409, "This account requires administrator-assisted linking")
+            user = User(
+                email=provider["email"],
+                name="Developer",
+                password_hash="!firebase",
+                firebase_identity=provider["identity"],
+            )
+            db.add(user)
+            try:
+                db.flush()
+            except IntegrityError:
+                db.rollback()
+                raise HTTPException(409, "Account setup changed. Please log in again.") from None
+        if user.disabled:
+            raise HTTPException(401, "Email or password is incorrect")
+    elif user and user.firebase_identity:
+        # A missing/misconfigured provider must not enable a legacy login bypass.
+        raise HTTPException(503, "Firebase authentication is not configured")
+    else:
+        try:
+            password_hasher.verify(user.password_hash if user else DUMMY_HASH, body.password)
+        except (VerificationError, InvalidHashError):
+            raise HTTPException(401, "Email or password is incorrect") from None
     if not user or user.disabled:
         raise HTTPException(401, "Email or password is incorrect")
-    if password_hasher.check_needs_rehash(user.password_hash):
+    if not firebase and password_hasher.check_needs_rehash(user.password_hash):
         user.password_hash = password_hasher.hash(body.password)
     # A login always rotates any previous token in this browser.
     old = request.cookies.get("gp_session")
     if old:
         db.execute(delete(LoginSession).where(LoginSession.id == digest(old)))
-    result = create_session(db, user, response, request)
+    result = create_session(db, user, response, request, firebase)
     audit(db, user.id, "session.login", user.id)
     db.commit()
     return result
@@ -174,7 +246,31 @@ def login(body: Login, request: Request, response: Response, db: Session = Depen
 
 @router.get("/session")
 def me(request: Request, user: User = Depends(current_session)):
-    return {"user": public_user(user), "csrf": request.cookies.get("gp_csrf", "")}
+    provider = getattr(request.state, "firebase", None)
+    return {
+        "user": public_user(user),
+        "csrf": request.cookies.get("gp_csrf", ""),
+        "auth_provider": "firebase" if user.firebase_identity else "local",
+        "email_verified": provider["email_verified"] if provider else None,
+    }
+
+
+@router.get("/config")
+def auth_config():
+    return {"provider": "firebase" if firebase_auth.enabled() else "local"}
+
+
+@router.post("/email-verification")
+def request_verification(
+    request: Request, user: User = Depends(current_session), db: Session = Depends(db_session)
+):
+    if not user.firebase_identity:
+        raise HTTPException(409, "This account is not linked to Firebase")
+    auth_rate_limit(db, request)
+    firebase_auth.send_verification(request.cookies.get("gp_firebase", ""))
+    audit(db, user.id, "account.verification_requested", user.id)
+    db.commit()
+    return {"message": "Verification email sent. Open the link in your inbox to verify your email."}
 
 
 @router.post("/logout")
@@ -189,6 +285,7 @@ def logout(
     db.commit()
     response.delete_cookie("gp_session", path="/")
     response.delete_cookie("gp_csrf", path="/")
+    response.delete_cookie("gp_firebase", path="/")
     return {"message": "Logged out"}
 
 
@@ -250,6 +347,10 @@ class ResetRequest(BaseModel):
 @router.post("/password-reset")
 def request_reset(body: ResetRequest, request: Request, db: Session = Depends(db_session)):
     cfg = settings()
+    if firebase_auth.enabled():
+        auth_rate_limit(db, request)
+        firebase_auth.send_password_reset(body.email.strip().lower())
+        return {"message": "If the account exists, a reset email has been sent."}
     if not cfg.smtp_host or not cfg.smtp_from:
         raise HTTPException(
             503, "Password reset email is not configured. Contact your administrator."
@@ -303,7 +404,7 @@ def confirm_reset(body: ResetPassword, db: Session = Depends(db_session)):
     if not token or token.expires_at <= utcnow():
         raise HTTPException(400, "Reset link is invalid or expired")
     user = db.get(User, token.user_id)
-    if not user or user.disabled:
+    if not user or user.disabled or user.firebase_identity:
         raise HTTPException(400, "Reset link is invalid or expired")
     user.password_hash = password_hasher.hash(body.password)
     db.execute(delete(LoginSession).where(LoginSession.user_id == user.id))

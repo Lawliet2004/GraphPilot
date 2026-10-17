@@ -27,6 +27,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(254), unique=True)
     name: Mapped[str] = mapped_column(String(80))
     password_hash: Mapped[str] = mapped_column(Text)
+    firebase_identity: Mapped[str | None] = mapped_column(String(200), unique=True)
     role: Mapped[str] = mapped_column(String(10), default="user")
     disabled: Mapped[bool] = mapped_column(Boolean, default=False)
     theme: Mapped[str] = mapped_column(String(10), default="system")

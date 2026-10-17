@@ -142,7 +142,7 @@ def capabilities(user=Depends(current_session)):
         "archive_upload": True,
         "llm_configured": bool(cfg.llm_base_url and cfg.llm_model),
         "github_authenticated": bool(cfg.github_token),
-        "password_reset_email": bool(cfg.smtp_host and cfg.smtp_from),
+        "password_reset_email": bool(cfg.firebase_project_id or cfg.smtp_host and cfg.smtp_from),
     }
 
 

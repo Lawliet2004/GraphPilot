@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Monitor, Moon, Sun } from "lucide-react";
 import { useState } from "react";
-import { api, date, type Capabilities } from "../lib/api";
+import { api, post, date, type Capabilities } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { ErrorNotice, Heading, Loading } from "../components/ui";
 export function Settings() {
-  const { user, refresh } = useAuth();
+  const { user, refresh, provider, emailVerified } = useAuth();
   const cache = useQueryClient();
   const [name, setName] = useState(user?.name || "");
   const [theme, setTheme] = useState(user?.theme || "system");
@@ -44,6 +44,9 @@ export function Settings() {
       api("/auth/sessions/" + id, { method: "DELETE" }),
     onSuccess: () => void cache.invalidateQueries({ queryKey: ["sessions"] }),
   });
+  const verification = useMutation({
+    mutationFn: () => post<{ message: string }>("/auth/email-verification"),
+  });
   return (
     <div className="page settings-page">
       <Heading
@@ -72,6 +75,42 @@ export function Settings() {
                 maxLength={80}
               />
             </label>
+            {provider === "firebase" && (
+              <div className="notice subtle">
+                <p>
+                  {emailVerified
+                    ? "Your email is verified with Firebase."
+                    : "Your email has not been verified yet."}
+                </p>
+                {!emailVerified && (
+                  <>
+                    {verification.error && (
+                      <ErrorNotice error={verification.error} />
+                    )}
+                    {verification.data && (
+                      <p role="status">{verification.data.message}</p>
+                    )}
+                    <button
+                      type="button"
+                      className="button"
+                      disabled={verification.isPending}
+                      onClick={() => verification.mutate()}
+                    >
+                      {verification.isPending
+                        ? "Sending…"
+                        : "Send verification email"}
+                    </button>
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={() => void refresh()}
+                    >
+                      Check verification
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
             <label>
               Email address
               <input value={user?.email || ""} disabled />

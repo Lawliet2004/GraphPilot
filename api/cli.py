@@ -18,6 +18,15 @@ def main():
     create = sub.add_parser("create-admin", help="Bootstrap or promote an administrator")
     create.add_argument("email")
     create.add_argument("--name", default="Administrator")
+    promote = sub.add_parser(
+        "promote-admin", help="Promote an existing account without changing credentials"
+    )
+    promote.add_argument("email")
+    link = sub.add_parser(
+        "link-firebase", help="Explicitly bind an existing account to a verified Firebase UID"
+    )
+    link.add_argument("email")
+    link.add_argument("uid")
     issue = sub.add_parser("create-mcp-token", help="Issue a read-only token for an existing user")
     issue.add_argument("email")
     issue.add_argument("--name", default="MCP client")
@@ -39,6 +48,44 @@ def main():
     )
     prune.add_argument("repository_id")
     args = parser.parse_args()
+    if args.command in {"promote-admin", "link-firebase"}:
+        from api.services import firebase_auth
+
+        with SessionLocal() as db:
+            user = db.scalar(select(User).where(User.email == args.email.strip().lower()))
+            if not user or user.disabled:
+                parser.error("An active existing user is required")
+            if args.command == "promote-admin":
+                user.role = "admin"
+                audit(db, user.id, "admin.promote", user.id)
+            else:
+                if not firebase_auth.enabled():
+                    parser.error("Configure Firebase before linking an account")
+                key = firebase_auth.identity(args.uid)
+                if user.firebase_identity and user.firebase_identity != key:
+                    parser.error("This account is already linked to another Firebase identity")
+                if db.scalar(
+                    select(User.id).where(User.firebase_identity == key, User.id != user.id)
+                ):
+                    parser.error("This Firebase identity is already linked")
+                user.firebase_identity = key
+                user.password_hash = "!firebase"
+                # Revoke old browser sessions and provider-independent agent tokens.
+                from sqlalchemy import delete, update
+
+                from api.db import utcnow
+                from api.models import AgentToken, LoginSession
+
+                db.execute(delete(LoginSession).where(LoginSession.user_id == user.id))
+                db.execute(
+                    update(AgentToken)
+                    .where(AgentToken.user_id == user.id)
+                    .values(revoked_at=utcnow())
+                )
+                audit(db, user.id, "admin.firebase_link", user.id)
+            db.commit()
+        print("Account permissions updated. Credentials were not printed.")
+        return
     if args.command in {"create-mcp-token", "revoke-mcp-token", "list-mcp-tokens"}:
         from api.models import AgentToken
         from api.services.agent_tokens import issue_token, revoke_token
@@ -98,6 +145,8 @@ def main():
     with SessionLocal() as db:
         user = db.scalar(select(User).where(User.email == validated.email))
         if user:
+            if user.firebase_identity:
+                parser.error("Firebase manages this password; use promote-admin to change its role")
             user.role = "admin"
             user.disabled = False
             user.password_hash = password_hasher.hash(password)

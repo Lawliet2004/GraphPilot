@@ -187,7 +187,12 @@ relationship data and citation IDs, never database credentials or shell tools.
 When unset/unavailable, context returns structured search results and an explicit
 notice. Actual successful inference with a real configured model remains unverified.
 
-Password resets use configured SMTP with STARTTLS (`GP_SMTP_*`, `GP_PUBLIC_URL`).
+Optional [Firebase Authentication](docs/FIREBASE_AUTH.md) manages email/password
+credentials, verification and password reset on the Spark plan. GraphPilot keeps
+its own administrator roles and repository permissions. Existing local accounts
+require explicit operator linking; email matches never grant account access.
+
+Local password resets use configured SMTP with STARTTLS (`GP_SMTP_*`, `GP_PUBLIC_URL`).
 Without email delivery the UI explains that reset is unavailable. Tests cover a
 one-time token and session invalidation. Real local SMTP/STARTTLS delivery with
 authentication now passes, including certificate/hostname validation and safe

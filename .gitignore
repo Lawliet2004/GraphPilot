@@ -1,4 +1,6 @@
 .env
+firebase-debug*.log
+*-debug.log
 .env.*
 !.env.example
 .venv/
