@@ -70,8 +70,8 @@ export function CliAccess() {
                   <li>Read repositories and source you can access.</li>
                   {request.data.scopes.includes("repositories:write") && (
                     <li>
-                      Connect repositories, upload source and request indexing
-                      or history sync.
+                      Connect repositories, upload source, request indexing or
+                      history sync, and remove repositories you own.
                     </li>
                   )}
                 </ul>

@@ -84,7 +84,9 @@ credential. Local credentials use mode 600 under
 `~/.config/graphpilot/session.json` (or `XDG_CONFIG_HOME`). No database access or
 Firebase password is needed by the CLI.
 
-CLI credentials obey repository membership and cannot use administrator APIs,
+Repository-management scope also permits removal of owned GraphPilot repositories
+through the API (it never deletes the GitHub repository). CLI credentials obey
+repository membership and cannot use administrator APIs,
 change browser sessions, or run shell commands. They are independently revocable
 GraphPilot credentials: Firebase browser-token expiry/password changes do not
 automatically revoke them. Disable the GraphPilot user or revoke credentials in

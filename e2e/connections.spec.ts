@@ -35,7 +35,7 @@ test("real browser CLI approval, signup return, scoped access and revocation", a
   await expect(page.getByText("Browser CLI verification")).toBeVisible();
   await expect(
     page.getByText(
-      "Connect repositories, upload source and request indexing or history sync.",
+      "Connect repositories, upload source, request indexing or history sync, and remove repositories you own.",
     ),
   ).toBeVisible();
   await mkdir(".data/professional-demo", { recursive: true });
