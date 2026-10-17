@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-10-16T17:53:32.713163+00:00",
+  "scope": "Native Nginx + real production-profile API/worker + PostgreSQL/FalkorDB, ephemeral locally trusted TLS. No container or public certificate claim.",
+  "nginx_version": "nginx version: nginx/1.28.3 (Ubuntu)",
+  "status": "passed",
+  "spa_and_csp": true,
+  "cookies_and_headers": true,
+  "origin_csrf_cors": true,
+  "api_body_limit": true,
+  "gateway_upload_limit": true,
+  "secure_cookie_withheld_over_http": true,
+  "api_restart_preserves_session_and_source": true,
+  "worker_indexing": true,
+  "exact_source_evidence": true,
+  "outsider_source_denied": true,
+  "graph_only": true,
+  "owner_removal_requested": true,
+  "logout_revoked": true,
+  "untrusted_tls_rejected": true,
+  "owned_repository_removed": true,
+  "tls_certificate_verified": true,
+  "disposable_database_removed": true
+}

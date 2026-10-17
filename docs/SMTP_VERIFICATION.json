@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-10-16T17:35:39.325808+00:00",
+  "status": "local_protocol_passed",
+  "scope": "Actual loopback SMTP with STARTTLS, certificate validation and AUTH against a disposable aiosmtpd server; no external mail or inbox delivery claim.",
+  "command": "uv run pytest -q tests/test_smtp.py tests/test_auth.py",
+  "targeted_tests_passed": 12,
+  "smtp_protocol_cases": 6,
+  "delivery": "Accepted by the local TLS/authenticated mailbox; envelope, subject and reset URL checked without retaining the token.",
+  "verified": [
+    "Authenticated STARTTLS delivery with locally trusted certificate",
+    "One-time reset and session revocation followed by login with changed password",
+    "Unknown account does not send mail and gets the same success response",
+    "Missing STARTTLS rejected",
+    "Untrusted certificate rejected",
+    "Wrong certificate hostname rejected",
+    "SMTP authentication rejected safely",
+    "SMTP DATA/delivery rejection handled safely",
+    "Each failure preserves the previous reset token/session and does not commit a reset-request audit event"
+  ],
+  "external_delivery_verified": false
+}

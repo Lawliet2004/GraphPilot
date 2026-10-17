@@ -1,0 +1,16 @@
+{
+  "fixture": "synthetic 400-file capacity observation; code never executed",
+  "files": 400,
+  "expected_functions": 4000,
+  "expected_resolved_calls": 3600,
+  "status": "passed",
+  "duration_seconds": 1.08,
+  "nodes": 4402,
+  "edges": 8001,
+  "initial_graph_nodes": 80,
+  "worker_cpu_seconds": 0.57,
+  "worker_rss_before_mib": 105.1,
+  "worker_rss_sampled_peak_mib": 106.03,
+  "scope": "Native fixture index. RSS sampled every ~100ms; worker CPU excludes separate FalkorDB process. Not a maximum-size or production SLA.",
+  "owned_data_removed": true
+}

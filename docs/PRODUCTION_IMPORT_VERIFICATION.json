@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-10-16T19:13:21.166009+00:00",
+  "status": "passed",
+  "scope": "Isolated native production-only venv; no container/image execution claim",
+  "packages_installed": 40,
+  "python_version": "3.12.15",
+  "checks": [
+    "uv sync --frozen --no-dev --no-install-project into ignored separate environment",
+    "Actual api.main import with production HTTPS/cookie configuration",
+    "Production schema endpoint disabled",
+    "Graph-only provider configuration preserved"
+  ],
+  "development_dependencies_used": false,
+  "native_application_venv_changed": false
+}

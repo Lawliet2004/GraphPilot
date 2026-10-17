@@ -1,0 +1,87 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: docker/postgres.Dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-graphpilot}
+      POSTGRES_DB: ${POSTGRES_DB:-graphpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [private]
+  falkordb:
+    image: falkordb/falkordb:v4.22.1@sha256:b0bdcac2cbaff989e77cb0610439b7a9289e86de033ccbbd4368b66fb680ae7a
+    restart: unless-stopped
+    command: [redis-server, --loadmodule, /var/lib/falkordb/bin/falkordb.so, --appendonly, 'yes', --dir, /data, --maxmemory, 768mb, --maxmemory-policy, noeviction]
+    volumes:
+      - falkor_data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [private]
+  migrate:
+    build: .
+    env_file: ${GP_ENV_FILE:-.env}
+    environment:
+      GP_DATABASE_URL: ${GP_COMPOSE_DATABASE_URL:?Set GP_COMPOSE_DATABASE_URL with the PostgreSQL password and postgres hostname}
+      GP_FALKOR_HOST: falkordb
+      GP_FALKOR_PORT: 6379
+    command: [alembic, upgrade, head]
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [private]
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: ${GP_ENV_FILE:-.env}
+    environment: &application
+      GP_DATABASE_URL: ${GP_COMPOSE_DATABASE_URL:?Set GP_COMPOSE_DATABASE_URL}
+      GP_FALKOR_HOST: falkordb
+      GP_FALKOR_PORT: 6379
+      GP_DATA_DIR: /data
+    volumes: [artifacts:/data]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      falkordb: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health/ready')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks: [private, outbound]
+  worker:
+    build: .
+    restart: unless-stopped
+    env_file: ${GP_ENV_FILE:-.env}
+    environment: *application
+    command: [python, -m, api.worker]
+    volumes: [artifacts:/data]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      falkordb: {condition: service_healthy}
+    networks: [private, outbound]
+  web:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    restart: unless-stopped
+    ports: ['127.0.0.1:${GP_WEB_PORT:-8080}:80']
+    depends_on:
+      api: {condition: service_healthy}
+    networks: [outbound]
+volumes:
+  postgres_data:
+  falkor_data:
+  artifacts:
+networks:
+  private: {internal: true}
+  outbound:

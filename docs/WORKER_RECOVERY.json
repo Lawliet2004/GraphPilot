@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "database_outage_seconds": 3,
+  "worker_pid_unchanged": true,
+  "post_recovery_index_job": "succeeded",
+  "runtime": "Native PostgreSQL and external worker; not a container restart test."
+}

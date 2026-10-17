@@ -1,0 +1,8 @@
+{
+  "status": "timed_out",
+  "private_log": "/home/papan/Desktop/Projects/GraphPilot/.data/trivy/postgres-alpine-full.log",
+  "image": "library/postgres@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+  "recorded_at": "2026-10-16T19:22:42.617575+00:00",
+  "wall_timeout_seconds": 930,
+  "graphpilot_built_images_audited": false
+}

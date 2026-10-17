@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Exact invalid strings used by tests/test_artifacts.py to verify redaction"
+regexTarget = "secret"
+regexes = [
+  '''^AKIA1234567890123456$''',
+  '''(?s)^-----BEGIN RSA PRIVATE KEY-----\nprivate data\n-----END RSA PRIVATE KEY-----?$''',
+]

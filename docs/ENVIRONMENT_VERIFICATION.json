@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-10-16T19:22:42.658622+00:00",
+  "container_commands": {
+    "docker": false,
+    "podman": false,
+    "nerdctl": false,
+    "buildah": false
+  },
+  "rootless_helpers": {
+    "newuidmap": false,
+    "newgidmap": false
+  },
+  "passwordless_sudo": false,
+  "docker_socket_present": false,
+  "git_remote_configured": false,
+  "deployment_target_supplied": false,
+  "application_mode": "graph-only",
+  "llm_configured": false,
+  "smtp_configured": false,
+  "github_token_configured": false,
+  "native_readiness": {
+    "status": "ready",
+    "checks": {
+      "postgresql": "connected",
+      "falkordb": "connected"
+    }
+  },
+  "native_counts": {
+    "users": 0,
+    "repositories": 0,
+    "active_jobs": 0
+  },
+  "container_runtime_executed": false,
+  "api_running": true,
+  "worker_running": true
+}

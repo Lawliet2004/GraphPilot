@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-10-17T05:21:34.912287+00:00",
+  "candidate_files": 163,
+  "scope": "Current Git candidates only; no history/remote or guarantee of secret absence",
+  "scanner": "Gitleaks; default rules extended only for two exact invalid redaction fixtures",
+  "ignored_probes": {
+    ".env": true,
+    ".env.production": true,
+    "app/.env.local": true,
+    ".data/private.dump": true,
+    ".tools/binary": true,
+    "backups/postgres.dump": true,
+    "app/dist/index.html": true,
+    "node_modules/fixture.js": true
+  },
+  "findings": [],
+  "status": "passed"
+}

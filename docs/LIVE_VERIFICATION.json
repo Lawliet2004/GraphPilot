@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "repository": "https://github.com/pallets/itsdangerous",
+  "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "files": 50,
+  "functions": 115,
+  "nodes": 196,
+  "edges": 319,
+  "duration_seconds": 5.18,
+  "search_symbol": "want_bytes",
+  "evidence_verified": true,
+  "context_mode": "graph",
+  "protected_after_logout": true,
+  "retrieval": {
+    "latency_ms": 9.35,
+    "graph_queries": 11,
+    "max_tool_calls": 7,
+    "max_depth": 2,
+    "intent": "dependency",
+    "returned_nodes": 19,
+    "context_bytes": 10234,
+    "ranking": "1.0 exact identifier/path; 0.95 SHA prefix; 0.8 name prefix; 0.55 name/path/status; 0.4 metadata text; 0.35 direct or 0.25 second-hop neighbor. Scores measure relevance, not certainty.",
+    "max_graph_queries": 15,
+    "source_excerpts": 8
+  }
+}

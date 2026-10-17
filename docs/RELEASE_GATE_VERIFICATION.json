@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-10-17T05:06:03.535256+00:00",
+  "scope": "Local verification of release automation; no Docker/image build, new image scan, external deployment or remote CI execution",
+  "tests": {
+    "command": "uv run pytest -q",
+    "passed": 110,
+    "seconds": 15.58,
+    "release_gate_cases": 29,
+    "upstream_deprecation_warnings": 1
+  },
+  "ruff": "passed",
+  "actionlint": {
+    "version": "1.7.12",
+    "status": "passed"
+  },
+  "python_dependency_audit": {
+    "tool": "pip-audit 2.10.1",
+    "scope": "Complete frozen uv.lock export, all groups, hashes required, strict, pip disabled",
+    "packages": 52,
+    "known_vulnerabilities": 0,
+    "skipped": 0
+  },
+  "npm_lock_audits": {
+    "frontend": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 16,
+        "dev": 117,
+        "optional": 53,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 132
+      }
+    },
+    "e2e": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 1,
+        "dev": 4,
+        "optional": 0,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 4
+      }
+    }
+  },
+  "compose_configuration": {
+    "status": "passed",
+    "service_count": 6,
+    "runtime_executed": false
+  },
+  "audit_cli_configuration_only_rejection": {
+    "exit_code": 1,
+    "status": "invalid_verification",
+    "scanner_invoked": false,
+    "expected": true
+  },
+  "historical_trivy_json_compatibility": {
+    "scope": "Reparsed existing reports; no new image scan",
+    "nginx": "passed",
+    "python": "findings",
+    "falkordb": "findings"
+  },
+  "container_runtime_executed": false,
+  "new_image_scans_executed": false,
+  "remote_ci_executed": false,
+  "upstream_image_findings_remediated": false
+}

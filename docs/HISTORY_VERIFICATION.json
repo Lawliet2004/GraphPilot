@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/octocat/Hello-World",
+  "branch": "master",
+  "status": "passed",
+  "job_status": "succeeded",
+  "message": "GitHub metadata synchronized; inspect coverage warnings",
+  "requests": 25,
+  "entity_types": {
+    "PullRequest": 120,
+    "Issue": 43,
+    "WorkflowRun": 4,
+    "Commit": 10
+  },
+  "published_history_entities": 177,
+  "coverage_warnings": [
+    "issues has additional pages. A later sync resumes at the saved page.",
+    "pulls has additional pages. A later sync resumes at the saved page.",
+    "PR details have additional pages; a later sync resumes saved detail cursors"
+  ],
+  "pending_pr_details": 114,
+  "log_downloads": 0,
+  "disposable_repository_removed": true,
+  "duration_seconds": 27.44
+}

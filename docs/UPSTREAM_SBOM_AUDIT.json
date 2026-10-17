@@ -1,0 +1,240 @@
+{
+  "timestamp": "2026-10-16T18:35:54.968076+00:00",
+  "status": "incomplete",
+  "scope": "SHA-256-bound publisher SPDX inventories for linux/amd64, analyzed with the cached vulnerability DB. No full filesystem scan, image execution or GraphPilot-built-image audit. The analyzer did not identify an OS for the available SPDX inventories; OS-package CVEs were not checked. Empty finding lists do not establish clean OS packages.",
+  "images": [
+    {
+      "image": "library/postgres@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336",
+      "status": "inventory_limited",
+      "platform_manifest": "sha256:885953109528ad3dfc90362b1a6f50a78620b5315be19f187753d267e484dc5b",
+      "inventory_digest": "sha256:85cc04fcafd71d13671ca77e03852c12563e9ef2af0cd08a07833b42728d9a76",
+      "package_count": 206,
+      "os": {
+        "Family": "none",
+        "Name": ""
+      },
+      "severity_counts": {
+        "MEDIUM": 30,
+        "UNKNOWN": 2,
+        "CRITICAL": 1,
+        "HIGH": 24,
+        "LOW": 3
+      },
+      "high_critical": [
+        {
+          "VulnerabilityID": "CVE-2025-68121",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.24.13, 1.25.7, 1.26.0-rc.3",
+          "Severity": "CRITICAL"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-61726",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.24.12, 1.25.6",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-61729",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.24.11, 1.25.5",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-25679",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.8, 1.26.1",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-27145",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.11, 1.26.4",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-32280",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-32281",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-32283",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33811",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33814",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33818",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39820",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39821",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39822",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.12, 1.26.5, 1.27.0-rc.2",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39836",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-42499",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-42504",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.11, 1.26.4",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-56853",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-56858",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-56859",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-56860",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-56862",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-78667",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.26.9, 1.27.2",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-78669",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.26.9, 1.27.2",
+          "Severity": "HIGH"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-97031",
+          "PkgName": "stdlib",
+          "InstalledVersion": "1.24.6",
+          "FixedVersion": "1.26.9, 1.27.2",
+          "Severity": "HIGH"
+        }
+      ],
+      "os_package_vulnerabilities_checked": false
+    },
+    {
+      "image": "falkordb/falkordb@sha256:b0bdcac2cbaff989e77cb0610439b7a9289e86de033ccbbd4368b66fb680ae7a",
+      "status": "unavailable",
+      "reason": "No publisher attestation for linux/amd64"
+    },
+    {
+      "image": "library/nginx@sha256:970364228b1e4f932abc22d321932816782cca8a20b85a77552a7cfe9acfb3b5",
+      "status": "inventory_limited",
+      "platform_manifest": "sha256:959ae6b898852db82e5b29b929388e59914f42be0a8f4d44c89a4c1f53b49208",
+      "inventory_digest": "sha256:5485e156bedb23e857287e501dec9b6792dd9b9bc71b03d2518bb5ab2ca0ebed",
+      "package_count": 88,
+      "os": {
+        "Family": "none",
+        "Name": ""
+      },
+      "severity_counts": {},
+      "high_critical": [],
+      "os_package_vulnerabilities_checked": false
+    },
+    {
+      "image": "library/python@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1",
+      "status": "inventory_limited",
+      "platform_manifest": "sha256:2b4f19dae3a777dfc3b76730bda1e82e1f66ab2a2686fa93ca78edbfb4f04ffe",
+      "inventory_digest": "sha256:611ca50ea732877ef8d0c859b502af2f86892e4e80f47bb7c4a9a6f0a5bbb82f",
+      "package_count": 125,
+      "os": {
+        "Family": "none",
+        "Name": ""
+      },
+      "severity_counts": {
+        "MEDIUM": 5,
+        "LOW": 1
+      },
+      "high_critical": [],
+      "os_package_vulnerabilities_checked": false
+    }
+  ],
+  "graphpilot_built_images_audited": false
+}

@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "runtime": "Native PostgreSQL/FalkorDBLite; container restore is still unverified",
+  "backup_directory": ".data/backups/20261016T161634Z-abef4cc90f14",
+  "writers_stopped": true,
+  "isolated_database_restored": true,
+  "isolated_graph_restored": true,
+  "artifact_evidence_matches": true,
+  "restored_login_works": true,
+  "snapshot_identity_preserved": true,
+  "backup_sha256": {
+    "postgres.dump": "b381adc3c660ac13bea461a196c56956171914205b4c0ca47697d7af7cbee0d3",
+    "falkor.rdb": "ae667d45b06c91997e63c872a8620a7991434e7fb386fe9dfbc28968d2025e3a",
+    "artifacts.tar.gz": "95ad07d71f36c2f128e24a823e8e44051b1b8af111adc40785cf3899611435b5"
+  },
+  "original_api_restarted": true
+}

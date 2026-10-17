@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-10-16T17:32:45.561094+00:00",
+  "scope": "Anonymous official registry metadata only. No image was executed or vulnerability-scanned. Digests are observations, not new deployment pins.",
+  "images": [
+    {
+      "image": "library/postgres:18.6-bookworm",
+      "manifest_http_status": 200,
+      "digest": "sha256:afc7e2d441324c0388fa80c3d24f733b4194a4eb7f47dd8ee2b08eb1a24a647c",
+      "volumes": [
+        "/var/lib/postgresql"
+      ],
+      "pgdata": "/var/lib/postgresql/18/docker"
+    },
+    {
+      "image": "falkordb/falkordb@sha256:b0bdcac2cbaff989e77cb0610439b7a9289e86de033ccbbd4368b66fb680ae7a",
+      "manifest_http_status": 200,
+      "digest": "sha256:b0bdcac2cbaff989e77cb0610439b7a9289e86de033ccbbd4368b66fb680ae7a"
+    },
+    {
+      "image": "library/nginx:1.28-alpine",
+      "manifest_http_status": 200,
+      "digest": "sha256:a8b39bd9cf0f83869a2162827a0caf6137ddf759d50a171451b335cecc87d236"
+    },
+    {
+      "image": "library/python:3.12-slim-bookworm",
+      "manifest_http_status": 200,
+      "digest": "sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258"
+    },
+    {
+      "image": "library/node:22-bookworm-slim",
+      "manifest_http_status": 200,
+      "digest": "sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392"
+    },
+    {
+      "image": "aquasec/trivy:0.76.0",
+      "manifest_http_status": 200,
+      "digest": "sha256:2416d1f74045b57274df1a340eee6b510cacd73c66a6ccb8da092b117eb7d222"
+    }
+  ],
+  "status": "passed"
+}

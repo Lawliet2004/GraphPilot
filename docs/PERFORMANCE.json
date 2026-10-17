@@ -1,0 +1,14 @@
+{
+  "test": "real HTTP symbol search",
+  "fixture": "fixtures/reference",
+  "concurrent_authenticated_sessions": 20,
+  "requests": 200,
+  "successful_correct_results": 200,
+  "elapsed_seconds": 0.931,
+  "p50_ms": 87.96,
+  "p95_ms": 143.41,
+  "api_rss_before_mib": 96.13,
+  "api_rss_after_mib": 99.79,
+  "api_cpu_seconds": 1.21,
+  "scope": "Warm native development API, real PostgreSQL and FalkorDBLite, 4-file fixture. Session fixtures seeded directly; login throughput and large-repo performance not measured."
+}

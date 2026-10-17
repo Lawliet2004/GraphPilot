@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "postgresql_restart": true,
+  "falkordb_shutdown_and_restart": true,
+  "relational_probe_survived": true,
+  "graph_probe_survived": true,
+  "api_reconnected": true,
+  "runtime": "Native PostgreSQL and FalkorDBLite; this does not verify Docker volume persistence."
+}

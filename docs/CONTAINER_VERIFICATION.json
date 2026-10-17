@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-10-16T19:26:23.076808+00:00",
+  "status": "configuration_only",
+  "project": "graphpilot_verify_7842615dbd49",
+  "runtime_executed": false,
+  "image_audit_executed": false,
+  "scope": "Disposable Compose verification; no public TLS, SMTP, model or remote CI claim",
+  "last_operation": "compose config --quiet",
+  "compose_configuration_valid": true
+}
