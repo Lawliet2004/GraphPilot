@@ -64,6 +64,12 @@ verification. See [verification evidence](GITHUB_CLI_VERIFICATION.json),
 [GitHub and CLI](GITHUB_AND_CLI.md) and
 [Azure deployment steps](AZURE_HOSTING.md).
 
+The frontend is now published at [gp-code.vercel.app](https://gp-code.vercel.app)
+on Vercel Hobby. The backend remains in Codespaces. See
+[Vercel verification](VERCEL_VERIFICATION.json) for live checks and the pending
+new-domain GitHub callback approval. This frontend move does not satisfy the
+always-awake backend requirement.
+
 Sources: [Azure for Students](https://azure.microsoft.com/en-us/free/students/),
 [Render free-service limitations](https://render.com/docs/free),
 [GitHub App user authorization](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app).

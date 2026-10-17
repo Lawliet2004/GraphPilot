@@ -1,0 +1,151 @@
+{
+  "timestamp": "2026-10-17T14:26:50.865430+00:00",
+  "production_url": "https://gp-code.vercel.app",
+  "hosting": {
+    "frontend": "Vercel Hobby",
+    "project": "gp-demo",
+    "backend": "Existing GitHub Codespaces Docker stack",
+    "authentication": "Firebase Authentication Spark",
+    "paid_upgrade_or_card_added": false
+  },
+  "frontend_source_commit": "028e8627f3aff9e5bb87d7eea01beb46c7ab88a9",
+  "ci_url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39040319152",
+  "vercel_dashboard": "https://vercel.com/papans-projects-92ad1bb7/gp-demo",
+  "vercel_deployment": "https://vercel.com/papans-projects-92ad1bb7/gp-demo/DSK76c7GnNvkrBCfSvh8ibRD9K3M",
+  "checks": {
+    "public": {
+      "status": "passed",
+      "scope": "Read-only public deployment checks; not a full user journey",
+      "checks": [
+        {
+          "path": "/",
+          "status": 200,
+          "duration_ms": 995.0
+        },
+        {
+          "path": "/assets/index-NJXf7fON.js",
+          "status": 200,
+          "duration_ms": 2693.6
+        },
+        {
+          "path": "/api/health/ready",
+          "status": 200,
+          "duration_ms": 4721.8
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401,
+          "duration_ms": 1805.5
+        },
+        {
+          "path": "/api/admin/users",
+          "status": 401,
+          "duration_ms": 671.4
+        },
+        {
+          "path": "/api/repositories/00000000-0000-0000-0000-000000000000/graph",
+          "status": 401,
+          "duration_ms": 677.5
+        },
+        {
+          "path": "/api/mcp/",
+          "status": 401,
+          "duration_ms": 904.0
+        }
+      ]
+    },
+    "auth_and_cli": {
+      "demo_firebase_login": true,
+      "demo_admin_boundary": true,
+      "live_cli_approval": true,
+      "actual_cli_commands": true,
+      "read_scope_enforced": true,
+      "cli_admin_denied": true,
+      "cli_revocation": true,
+      "github_configured": true,
+      "owner_firebase_login": true,
+      "owner_admin_boundary": true,
+      "status": "passed",
+      "url": "https://gp-code.vercel.app",
+      "github_live_private_test": "previous live private index plus Vercel MCP verification",
+      "hosting": "Codespaces; idle shutdown applies"
+    },
+    "private_repository_isolation": {
+      "status": "passed",
+      "anonymous_private_repository": 401,
+      "other_user_private_repository": 404,
+      "other_user_private_search": 404,
+      "private_repository_absent_from_other_user_list": true
+    },
+    "mcp": {
+      "status": "passed",
+      "direct_streamable_http": {
+        "tool_count": 5,
+        "accessible_repository_count": 2,
+        "read_only": true,
+        "symbol_search": true,
+        "nonempty_source_evidence": true,
+        "indexing_status": true
+      },
+      "stdio_bridge": {
+        "tool_count": 5,
+        "accessible_repository_count": 2,
+        "read_only": true,
+        "symbol_search": true,
+        "nonempty_source_evidence": true,
+        "indexing_status": true
+      },
+      "scope": "Real MCP SDK discovery and read-only tool calls; no OAuth/client installation claim"
+    },
+    "origin_and_redirects": {
+      "status": "passed",
+      "foreign_origin": 403,
+      "missing_origin": 403,
+      "old_frontend_redirect": 308,
+      "api_root_is_not_spa": 404
+    },
+    "routing": {
+      "status": "passed",
+      "strict_matcher": "path-to-regexp 6.3.0",
+      "results": [
+        {
+          "path": "/",
+          "destination": "/index.html",
+          "security_headers": true
+        },
+        {
+          "path": "/workspace",
+          "destination": "/index.html",
+          "security_headers": true
+        },
+        {
+          "path": "/api",
+          "destination": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev/api",
+          "security_headers": true
+        },
+        {
+          "path": "/api/health/ready",
+          "destination": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev/api/health/ready",
+          "security_headers": true
+        },
+        {
+          "path": "/api/mcp/",
+          "destination": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev/api/mcp/",
+          "security_headers": true
+        }
+      ]
+    }
+  },
+  "browser_login": "Owner signed in through gp-code.vercel.app and real indexed repositories rendered",
+  "github_callback": {
+    "saved": false,
+    "value": "https://gp-code.vercel.app/api/integrations/github/callback",
+    "state": "Prepared in GitHub App settings; awaits owner approval before Save changes. Fresh GitHub OAuth on the short domain is not yet verified."
+  },
+  "remaining": [
+    "Approve/save the prepared GitHub callback and verify a new OAuth return through Vercel",
+    "Azure academic verification and a verified always-awake backend migration",
+    "Real-inbox verification/reset delivery remains unproven"
+  ],
+  "notice": "The frontend is on Vercel; backend API/indexing/MCP depend on an awake Codespace with public port 18080. No always-awake backend claim."
+}

@@ -8,11 +8,18 @@ source evidence. Deterministic search works without an LLM or paid account.
 administration have real database, HTTP and browser checks. Local Docker and remote
 CI verify startup, private networking, restart and volume backup/restore. All four
 CI runtime images report zero known vulnerabilities at the recorded scan time.
-Public hosting/HTTPS and external email delivery remain to be configured.
+The public demo uses a Vercel frontend and a Codespaces backend. Always-awake
+backend hosting and external real-inbox email delivery remain to be verified.
 See [implementation status](IMPLEMENTATION_STATUS.md), [test report](docs/TEST_REPORT.md) and [interface review](docs/UI_REVIEW.md)
 and the [requirement-by-requirement audit](docs/REQUIREMENTS_AUDIT.md).
 
 ## Free cloud demos and MCP
+
+Open the current website at **[gp-code.vercel.app](https://gp-code.vercel.app)**.
+Firebase login, user/admin permissions, CLI and authenticated MCP have been tested
+through this address. The backend still follows Codespaces idle shutdown.
+See [Vercel hosting](docs/VERCEL_HOSTING.md) for the GitHub callback handoff and
+[deployment evidence](docs/VERCEL_VERIFICATION.json) for the exact verification scope.
 
 The complete stack can be started in a GitHub Codespace using the included dev
 container and `python3 scripts/cloud_demo.py start`. It keeps isolated private

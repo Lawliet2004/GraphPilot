@@ -1,5 +1,13 @@
 # Short Vercel demo address
 
+The deployed production website is **https://gp-code.vercel.app**, in project
+`gp-demo` on the existing Hobby team. The old generated Vercel alias redirects to
+it. Firebase user/admin login, scoped CLI, private-source MCP, rejected foreign
+origins and public security headers passed through this domain. The GitHub App's
+additional callback is prepared in the browser but still requires the owner's
+approval before saving; fresh GitHub connections on this domain must not be
+called verified until that callback is saved and exercised.
+
 Deploy the `app` directory as a Vite project on the existing Vercel Hobby account.
 The target name is `gp-demo`; the actual `.vercel.app` alias depends on availability.
 Vercel serves the built frontend and proxies `/api/*` to the existing Codespaces
@@ -9,6 +17,8 @@ belongs in the frontend deployment. API responses must remain uncached.
 The checked-in `app/vercel.json` supplies the build, API rewrite, SPA fallback and
 security headers. Its backend destination is the current demo's public gateway.
 Update that destination and redeploy when the backend moves to Azure.
+The API uses a named `(.*)` capture to preserve the trailing slash required by MCP;
+the SPA/header matcher also includes the root path. API data remains uncached.
 
 After the Vercel production domain is assigned:
 
