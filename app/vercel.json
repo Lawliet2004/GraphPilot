@@ -6,14 +6,18 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev/api/:path*"
+      "source": "/api",
+      "destination": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev/api"
     },
-    { "source": "/:path*", "destination": "/index.html" }
+    {
+      "source": "/api/:path(.*)",
+      "destination": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev/api/:path"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
@@ -26,7 +30,7 @@
       ]
     },
     {
-      "source": "/api/:path*",
+      "source": "/api/:path(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "private, no-store" },
         { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }

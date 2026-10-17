@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-17T14:01:29.387069+00:00",
+  "timestamp": "2026-10-17T14:20:19.075067+00:00",
   "candidate_files": 217,
   "scope": "Current Git candidates only; no history/remote or guarantee of secret absence",
   "scanner": "Gitleaks; default rules extended only for two exact invalid redaction fixtures",
