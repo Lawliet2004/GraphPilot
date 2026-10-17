@@ -1,10 +1,18 @@
 # Always-awake student demo hosting
 
-The requested host is pending Azure for Students verification. College-account
-portal sign-in is complete; an active student subscription, spending limit and
-eligible resources remain unverified. No Azure VM,
+The requested host is blocked by Microsoft academic eligibility verification.
+College-account portal sign-in is complete. The submitted student verification
+returned **“Unable to confirm your University ID.”** No active student subscription,
+spending limit or eligible resources have been verified. No Azure VM,
 subscription upgrade or paid service has been created by this setup. The current
 Codespaces URL is an on-demand demo and can stop after inactivity.
+
+The account holder reports this is their first Azure Students claim. Their
+existing GitHub Education benefits are active, but following the official Azure
+redemption link returned to the same academic-verification form. It did not
+provide an alternate verification method or activate a subscription. The official
+account/subscription support workflow is being reviewed; no support request has
+been sent. MFA and the date-of-birth field are no longer the blocker.
 
 Azure for Students advertises no credit card and a finite credit allowance.
 Eligibility, regional capacity and the actual subscription's spending protection
@@ -57,11 +65,10 @@ card, or assume every VM, disk and public IP is included in the free allowance.
    outages or extend expired student credits. Keep Codespaces until this host
    passes its live verification, then stop the unused workspace.
 
-The account holder must complete academic verification and accept applicable
-account terms. The current signup form has not completed verification; entering
-a school name alone does not activate a subscription. If that form rejects the
-school, use Microsoft's visible support/verification flow rather than bypassing
-its controls.
+The account holder must resolve the eligibility rejection through Microsoft's
+visible support/verification flow and accept applicable account terms. Entering
+a school name alone does not activate a subscription. Do not bypass validation
+or substitute a paid trial for the requested student benefit.
 
 Sources: [Azure for Students](https://azure.microsoft.com/en-us/free/students/),
 [Azure spending limit](https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/spending-limit),
