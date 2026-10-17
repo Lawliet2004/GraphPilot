@@ -86,7 +86,7 @@ jobs:
       - run: uv sync --frozen
       - run: uv run ruff check api tests scripts migrations
       - run: |
-          uv run python scripts/run-lite.py > /tmp/falkor.log 2>&1 &
+          .venv/bin/python scripts/run-lite.py > /tmp/falkor.log 2>&1 &
           for attempt in $(seq 1 30); do
             uv run python -c "import redis; redis.Redis(port=56379).ping()" && break || sleep 1
           done
@@ -131,9 +131,11 @@ jobs:
       - run: uv run alembic upgrade head
       - name: Run real service journeys
         run: |
-          uv run python scripts/run-lite.py > /tmp/falkor.log 2>&1 &
-          uv run uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/api.log 2>&1 &
-          uv run python -m api.worker > /tmp/worker.log 2>&1 &
+          # Long-running uv wrappers retain its cache lock and block setup-uv's
+          # post-job pruning. Packages are already installed by uv sync above.
+          .venv/bin/python scripts/run-lite.py > /tmp/falkor.log 2>&1 &
+          .venv/bin/uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/api.log 2>&1 &
+          .venv/bin/python -m api.worker > /tmp/worker.log 2>&1 &
           npm --prefix app run dev > /tmp/vite.log 2>&1 &
           for attempt in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:8000/api/health/ready && curl -fsS http://127.0.0.1:5173/ > /dev/null; then break; fi
