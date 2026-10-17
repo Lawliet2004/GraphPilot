@@ -1,0 +1,16 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "graphpilot",
+  "version": "0.1.0",
+  "description": "Read repository symbols, source evidence, impact and indexing status from GraphPilot.",
+  "repository": "https://github.com/Lawliet2004/GraphPilot",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "GraphPilot",
+        "shortDescription": "Explore repository evidence",
+        "capabilities": []
+      }
+    }
+  }
+}

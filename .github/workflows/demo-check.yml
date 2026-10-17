@@ -1,0 +1,42 @@
+name: Public demo checks
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Public HTTPS demo origin (no path or credentials)"
+        required: true
+        type: string
+  schedule:
+    - cron: "23 */6 * * *"
+permissions:
+  contents: read
+concurrency:
+  group: public-demo-check
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.event_name == 'workflow_dispatch' || vars.GRAPHPILOT_DEMO_URL != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GRAPHPILOT_DEMO_URL: ${{ inputs.url || vars.GRAPHPILOT_DEMO_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Read-only health and access checks
+        run: python3 scripts/demo_check.py --url "$GRAPHPILOT_DEMO_URL" --output .data/demo-check.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Read-only browser checks
+        run: npx playwright test --config=playwright.demo.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: public-demo-check
+          path: |
+            .data/demo-check.json
+            playwright-report/
+          retention-days: 3

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "graphpilot": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "--project", "${PLUGIN_ROOT}/../..", "python", "-m", "api.mcp_bridge"],
+      "cwd": "${PLUGIN_ROOT}/../.."
+    }
+  }
+}

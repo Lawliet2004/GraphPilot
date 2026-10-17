@@ -50,6 +50,16 @@ class PasswordReset(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class AgentToken(Base):
+    __tablename__ = "agent_tokens"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    name: Mapped[str] = mapped_column(String(80))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Repository(Base):
     __tablename__ = "repositories"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)

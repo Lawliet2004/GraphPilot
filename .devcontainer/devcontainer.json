@@ -1,0 +1,16 @@
+{
+  "name": "GraphPilot cloud demo",
+  "build": { "dockerfile": "Dockerfile", "context": ".." },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12", "installTools": false },
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+  },
+  "hostRequirements": { "cpus": 2, "memory": "8gb" },
+  "forwardPorts": [18080],
+  "portsAttributes": {
+    "18080": { "label": "GraphPilot demo", "onAutoForward": "notify", "protocol": "http" }
+  },
+  "postStartCommand": "python3 scripts/cloud_demo.py start",
+  "remoteUser": "vscode"
+}

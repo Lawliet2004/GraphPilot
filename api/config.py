@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     falkor_port: int = 6379
     falkor_password: str | None = Field(None, repr=False)
     falkor_socket: str | None = None
+    mcp_enabled: bool = False
     max_files: int = Field(5000, ge=1, le=50000)
     max_file_bytes: int = 1_000_000
     max_archive_bytes: int = 25_000_000

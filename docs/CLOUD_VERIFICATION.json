@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-10-17T08:14:05.655258+00:00",
+  "scope": "Local verification of the cloud demo controller, MCP and QA additions. Actual Codespaces/public cloud hosting is not yet verified.",
+  "backend_release_tests": {
+    "passed": 120,
+    "duration_seconds": 16.63
+  },
+  "browser_checks": {
+    "read_only_demo_checks": 3,
+    "full_repository_journey_through_docker_gateway": 1
+  },
+  "docker_startup": "passed; isolated graphpilot-cloud-check deployment on loopback port 18081",
+  "docker_stop_resume": {
+    "scope": "Owned local Docker deployment using the Codespaces controller; not actual cloud hosting",
+    "spa_and_csp": true,
+    "cookies_and_headers": true,
+    "origin_csrf_cors": true,
+    "api_body_limit": true,
+    "gateway_upload_limit": true,
+    "api_restart_preserves_session_and_source": true,
+    "worker_indexing": true,
+    "exact_source_evidence": true,
+    "outsider_source_denied": true,
+    "graph_only": true,
+    "owner_removal_requested": true,
+    "logout_revoked": true,
+    "status": "passed"
+  },
+  "mcp": {
+    "status": "passed",
+    "direct_streamable_http": {
+      "tool_count": 5,
+      "accessible_repository_count": 1,
+      "read_only": true,
+      "symbol_search": true,
+      "nonempty_source_evidence": true,
+      "indexing_status": true
+    },
+    "stdio_bridge": {
+      "tool_count": 5,
+      "accessible_repository_count": 1,
+      "read_only": true,
+      "symbol_search": true,
+      "nonempty_source_evidence": true,
+      "indexing_status": true
+    },
+    "scope": "Real MCP SDK discovery and read-only tool calls; no OAuth/client installation claim"
+  },
+  "mcp_token_cli_and_immediate_revocation": "passed",
+  "public_style_http_checks": {
+    "status": "passed",
+    "scope": "Read-only public deployment checks; not a full user journey",
+    "checks": [
+      {
+        "path": "/",
+        "status": 200,
+        "duration_ms": 3.7
+      },
+      {
+        "path": "/assets/index-CWJfPZUt.js",
+        "status": 200,
+        "duration_ms": 1.0
+      },
+      {
+        "path": "/api/health/ready",
+        "status": 200,
+        "duration_ms": 3.8
+      },
+      {
+        "path": "/api/auth/session",
+        "status": 401,
+        "duration_ms": 9.9
+      },
+      {
+        "path": "/api/admin/users",
+        "status": 401,
+        "duration_ms": 51.3
+      },
+      {
+        "path": "/api/repositories/00000000-0000-0000-0000-000000000000/graph",
+        "status": 401,
+        "duration_ms": 3.7
+      },
+      {
+        "path": "/api/mcp/",
+        "status": 401,
+        "duration_ms": 7.4
+      }
+    ]
+  },
+  "ruff": "passed",
+  "frontend_typescript_build": "passed",
+  "actionlint": "passed",
+  "python_dependency_audit": {
+    "audited_packages": 61,
+    "known_vulnerabilities": 0
+  },
+  "devcontainer_configuration": "Passed @devcontainers/cli 0.89.0 read-configuration with merged configuration; actual cloud runtime still requires account authorization",
+  "plugin_package": "JSON manifests parsed; real stdio bridge tested; host-specific installation not performed",
+  "cloud_workspace_created": false,
+  "cloud_https_auth_verified": false,
+  "blockers": [
+    "GitHub CLI lacks codespace scope; account owner must authorize or create the workspace in the web UI.",
+    "Chrome browser control failed before page access; the in-app browser is unavailable."
+  ],
+  "cost_boundary": "No paid service, model provider or recurring agent was enabled.",
+  "validation_cleanup": "Only the owned graphpilot-cloud-check deployment was stopped; its volumes were preserved. Native app and Quick Tunnel unchanged."
+}

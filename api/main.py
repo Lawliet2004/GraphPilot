@@ -14,6 +14,7 @@ from api.body_limits import BodyLimitMiddleware
 from api.config import settings
 from api.db import engine
 from api.graph.store import client
+from api.mcp_server import create_server, mcp_app
 from api.services.telemetry import record_request
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -27,7 +28,10 @@ log = logging.getLogger("graphpilot")
 async def lifespan(app):
     settings().data_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
     log.info("event=application_start environment=%s", settings().environment)
-    yield
+    mcp = create_server()
+    mcp_app.app = mcp.streamable_http_app()
+    async with mcp.session_manager.run():
+        yield
     engine.dispose()
     log.info("event=application_stop")
 
@@ -46,7 +50,7 @@ app.add_middleware(
     allow_origins=settings().origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE"],
-    allow_headers=["Content-Type", "X-CSRF-Token"],
+    allow_headers=["Content-Type", "X-CSRF-Token", "Authorization", "MCP-Protocol-Version"],
 )
 
 
@@ -58,6 +62,7 @@ async def security_headers(request: Request, call_next):
     if (
         request.method not in {"GET", "HEAD", "OPTIONS"}
         and request.headers.get("origin") not in settings().origins
+        and not (request.url.path.startswith("/api/mcp/") and not request.headers.get("origin"))
     ):
         response = JSONResponse({"detail": "Request origin is not allowed"}, status_code=403)
     else:
@@ -152,3 +157,7 @@ from api.routes.context import router as context_router  # noqa: E402
 
 app.include_router(admin_router)
 app.include_router(context_router)
+
+# A separate bearer gate protects every MCP request; browser cookie sessions are
+# never accepted here. The trailing slash is part of the client endpoint.
+app.mount("/api/mcp", mcp_app)

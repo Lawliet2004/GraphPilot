@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     channel: process.env.PLAYWRIGHT_CHANNEL,
-    baseURL: "http://127.0.0.1:5173",
+    baseURL: process.env.GRAPHPILOT_E2E_URL || "http://127.0.0.1:5173",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

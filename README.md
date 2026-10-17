@@ -12,6 +12,20 @@ Public hosting/HTTPS and external email delivery remain to be configured.
 See [implementation status](IMPLEMENTATION_STATUS.md), [test report](docs/TEST_REPORT.md) and [interface review](docs/UI_REVIEW.md)
 and the [requirement-by-requirement audit](docs/REQUIREMENTS_AUDIT.md).
 
+## Free cloud demos and MCP
+
+The complete stack can be started in a GitHub Codespace using the included dev
+container and `python3 scripts/cloud_demo.py start`. It keeps isolated private
+configuration and persistent volumes, and uses the forwarded HTTPS origin.
+Codespaces has a finite free allowance and idle shutdown; it is for scheduled
+demos, not permanent hosting. Account authorization is still required.
+
+Optional read-only MCP tools use expiring per-user bearer credentials at
+`/api/mcp/`; existing repository permissions apply. No model or paid API is needed.
+A stdio client bridge, an optional QA agent profile and read-only deployment
+checks are included. See the [cloud demo, MCP and QA guide](docs/CLOUD_DEMO.md)
+and [implementation plan](docs/CLOUD_PLAN.md).
+
 ## What works now
 
 - Argon2id registration/login, hashed expiring sessions, HttpOnly cookies, origin

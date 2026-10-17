@@ -1,5 +1,18 @@
 # GraphPilot implementation and verification status
 
+## Cloud/MCP continuation — October 17
+
+Free Codespaces startup configuration, an isolated persistent demo controller,
+five authenticated read-only MCP tools, expiring/revocable user tokens, a stdio
+client bridge, an optional QA agent profile and deployment-check workflow are
+implemented. Current local verification passes **120 backend/release tests**,
+three read-only browser checks and one full Docker repository browser journey.
+Real SDK HTTP/stdio tool calls and whole-stack stop/resume persistence pass.
+See [cloud verification](docs/CLOUD_VERIFICATION.json) and the
+[setup and account handoff](docs/CLOUD_DEMO.md). Actual cloud creation remains
+blocked by the missing GitHub `codespace` authorization; this is not a claim of
+a running cloud deployment. The evidence below records the earlier release.
+
 The unchanged specification is in `docs/REQUIREMENTS.md`. The native application,
 container deployment path and remote CI are verified. The repository is published
 on `main` at https://github.com/Lawliet2004/GraphPilot under the user's own identity.
