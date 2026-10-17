@@ -1,10 +1,59 @@
 {
-  "timestamp": "2026-10-16T19:26:23.076808+00:00",
-  "status": "configuration_only",
-  "project": "graphpilot_verify_7842615dbd49",
-  "runtime_executed": false,
+  "timestamp": "2026-10-17T05:38:01.140025+00:00",
+  "status": "passed",
+  "project": "graphpilot_verify_7cf8a9a0513b",
+  "runtime_executed": true,
   "image_audit_executed": false,
   "scope": "Disposable Compose verification; no public TLS, SMTP, model or remote CI claim",
-  "last_operation": "compose config --quiet",
-  "compose_configuration_valid": true
+  "last_operation": "compose down --volumes",
+  "compose_configuration_valid": true,
+  "compose_services": [
+    "api",
+    "falkordb",
+    "migrate",
+    "postgres",
+    "web",
+    "worker"
+  ],
+  "images_built_and_services_ready": true,
+  "postgres_nonroot_and_root_helper_absent": true,
+  "graph_nonroot_and_persistence_configuration": true,
+  "service_images": {
+    "api": "sha256:570122b8067f029c6ed64351d94b4122b905425df9a047b242b0affa8126cee1",
+    "falkordb": "sha256:2cc27da0a637804f1952fa0de293d286eb54c6ca3ef827935cdb6d0ed88e4fcc",
+    "migrate": "sha256:570122b8067f029c6ed64351d94b4122b905425df9a047b242b0affa8126cee1",
+    "postgres": "sha256:424e91ae94da54dec3356dbf7fcccf9b4a6f8b9ef6d423b3ab954dc4249ffb6a",
+    "web": "sha256:2608f2f77f6054aab06d3c1aa1682629613ff5d02261e2b40b20f22840f950d9",
+    "worker": "sha256:570122b8067f029c6ed64351d94b4122b905425df9a047b242b0affa8126cee1"
+  },
+  "container_images": [
+    "sha256:2608f2f77f6054aab06d3c1aa1682629613ff5d02261e2b40b20f22840f950d9",
+    "sha256:2cc27da0a637804f1952fa0de293d286eb54c6ca3ef827935cdb6d0ed88e4fcc",
+    "sha256:424e91ae94da54dec3356dbf7fcccf9b4a6f8b9ef6d423b3ab954dc4249ffb6a",
+    "sha256:570122b8067f029c6ed64351d94b4122b905425df9a047b242b0affa8126cee1"
+  ],
+  "database_ports_private_and_network_internal": true,
+  "spa_and_csp": true,
+  "cookies_and_headers": true,
+  "origin_csrf_cors": true,
+  "api_body_limit": true,
+  "gateway_upload_limit": true,
+  "api_recreation_gateway_recovery": true,
+  "backup_sha256": {
+    "postgres.dump": "bfe868ca1f829cb271400adad09251eb209c2b36bf813300aee33b8ba899c2a0",
+    "falkor.tar.gz": "547e40b28bde5a07aa8fd4b98485bb216f5d2758db718285288baa440c586b9f",
+    "artifacts.tar.gz": "b7cbd1b38e987c79596bba46945ff12939ea6b73901f0328ef4800f7d7adb4ef"
+  },
+  "owned_volumes_backed_up_and_restored": true,
+  "api_restart_preserves_session_and_source": true,
+  "worker_indexing": true,
+  "exact_source_evidence": true,
+  "outsider_source_denied": true,
+  "graph_only": true,
+  "owner_removal_requested": true,
+  "logout_revoked": true,
+  "owned_deployment_removed": true,
+  "verification_environment": "GitHub-hosted ubuntu-latest runner",
+  "source_commit": "be7ac4cc3ae989cd94f214556085eaadf43b153b",
+  "workflow_run": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607"
 }

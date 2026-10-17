@@ -1,0 +1,103 @@
+{
+  "timestamp": "2026-10-17T05:43:14.329726+00:00",
+  "scope": "Actual local runtime image IDs; offline scan using the explicitly recorded cached DB. Fresh online CI audit is separate in CONTAINER_IMAGE_AUDIT.json",
+  "vulnerability_database": {
+    "Version": 2,
+    "NextUpdate": "2026-10-17T01:13:54.947090202Z",
+    "UpdatedAt": "2026-10-16T01:13:54.947090392Z",
+    "DownloadedAt": "2026-10-16T17:54:22.762749936Z"
+  },
+  "images": [
+    {
+      "status": "passed",
+      "image": "sha256:0d54e416fbb53952da768a640207cbc1027064b3c725ff675464fdde4fd57f12",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 50,
+      "python_inventory_required": true,
+      "python_package_count": 40,
+      "services": [
+        "api"
+      ]
+    },
+    {
+      "status": "passed",
+      "image": "sha256:3f3e3253bdc2bc46f34b60b5d9937d1f82ae202d4fbf095c11f9dc615b508efb",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 71,
+      "python_inventory_required": false,
+      "python_package_count": 0,
+      "services": [
+        "web"
+      ]
+    },
+    {
+      "status": "passed",
+      "image": "sha256:52b40bf5fd5a05f5f75c1fc1a05998008e0cdd31aaf5c7ebd7036936d8226464",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 53,
+      "python_inventory_required": false,
+      "python_package_count": 0,
+      "services": [
+        "postgres"
+      ]
+    },
+    {
+      "status": "passed",
+      "image": "sha256:8ba893a1965e0d674b3d031e6c27b0f6e4688e8392d37e506bf8d929b3870c2b",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.23.6"
+      },
+      "severity_counts": {},
+      "os_package_count": 30,
+      "python_inventory_required": false,
+      "python_package_count": 0,
+      "services": [
+        "falkordb"
+      ]
+    },
+    {
+      "status": "passed",
+      "image": "sha256:f6bde0a6edd320ab19c16478feec354b3702b59234d78c5bcc4567439c3ef238",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 50,
+      "python_inventory_required": true,
+      "python_package_count": 40,
+      "services": [
+        "migrate"
+      ]
+    },
+    {
+      "status": "passed",
+      "image": "sha256:f8d1c228052a8ce24c43fe255ce7011c5d6cb7c0090c792eab959d3e67ee4e20",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 50,
+      "python_inventory_required": true,
+      "python_package_count": 40,
+      "services": [
+        "worker"
+      ]
+    }
+  ],
+  "status": "passed"
+}

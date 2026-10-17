@@ -1,6 +1,6 @@
 {
   "created_at": "2026-10-16T18:17:51.051635+00:00",
-  "scope": "Current definition tag/digest observations. PostgreSQL Alpine candidate manifest returned HTTP 200 and its publisher inventory was hash-verified. No GraphPilot-built-image runtime or audit claim.",
+  "scope": "Manifest observations for current base/service definitions. Actual derived/runtime image audit is separately recorded in CONTAINER_IMAGE_AUDIT.json.",
   "images": [
     {
       "image": "library/postgres:18.6-alpine3.24",
@@ -8,9 +8,9 @@
       "digest": "sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873"
     },
     {
-      "image": "falkordb/falkordb@sha256:b0bdcac2cbaff989e77cb0610439b7a9289e86de033ccbbd4368b66fb680ae7a",
+      "image": "falkordb/falkordb-server:v4.22.1-alpine",
       "manifest_http_status": 200,
-      "digest": "sha256:b0bdcac2cbaff989e77cb0610439b7a9289e86de033ccbbd4368b66fb680ae7a"
+      "digest": "sha256:8ba893a1965e0d674b3d031e6c27b0f6e4688e8392d37e506bf8d929b3870c2b"
     },
     {
       "image": "library/nginx:1.30.6-alpine",
@@ -18,9 +18,9 @@
       "digest": "sha256:970364228b1e4f932abc22d321932816782cca8a20b85a77552a7cfe9acfb3b5"
     },
     {
-      "image": "library/python:3.12-slim-trixie",
+      "image": "library/python:3.12-alpine3.24",
       "manifest_http_status": 200,
-      "digest": "sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+      "digest": "sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4"
     },
     {
       "image": "library/node:22-trixie-slim",

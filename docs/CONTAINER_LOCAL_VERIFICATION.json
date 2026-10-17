@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-17T05:38:04.232563+00:00",
+  "status": "passed",
+  "project": "graphpilot_verify_78dac9bbfd25",
+  "runtime_executed": true,
+  "image_audit_executed": false,
+  "scope": "Disposable Compose verification; no public TLS, SMTP, model or remote CI claim",
+  "last_operation": "compose down --volumes",
+  "compose_configuration_valid": true,
+  "compose_services": [
+    "api",
+    "falkordb",
+    "migrate",
+    "postgres",
+    "web",
+    "worker"
+  ],
+  "images_built_and_services_ready": true,
+  "postgres_nonroot_and_root_helper_absent": true,
+  "graph_nonroot_and_persistence_configuration": true,
+  "service_images": {
+    "api": "sha256:0d54e416fbb53952da768a640207cbc1027064b3c725ff675464fdde4fd57f12",
+    "falkordb": "sha256:8ba893a1965e0d674b3d031e6c27b0f6e4688e8392d37e506bf8d929b3870c2b",
+    "migrate": "sha256:f6bde0a6edd320ab19c16478feec354b3702b59234d78c5bcc4567439c3ef238",
+    "postgres": "sha256:52b40bf5fd5a05f5f75c1fc1a05998008e0cdd31aaf5c7ebd7036936d8226464",
+    "web": "sha256:3f3e3253bdc2bc46f34b60b5d9937d1f82ae202d4fbf095c11f9dc615b508efb",
+    "worker": "sha256:f8d1c228052a8ce24c43fe255ce7011c5d6cb7c0090c792eab959d3e67ee4e20"
+  },
+  "container_images": [
+    "sha256:0d54e416fbb53952da768a640207cbc1027064b3c725ff675464fdde4fd57f12",
+    "sha256:3f3e3253bdc2bc46f34b60b5d9937d1f82ae202d4fbf095c11f9dc615b508efb",
+    "sha256:52b40bf5fd5a05f5f75c1fc1a05998008e0cdd31aaf5c7ebd7036936d8226464",
+    "sha256:8ba893a1965e0d674b3d031e6c27b0f6e4688e8392d37e506bf8d929b3870c2b",
+    "sha256:f6bde0a6edd320ab19c16478feec354b3702b59234d78c5bcc4567439c3ef238",
+    "sha256:f8d1c228052a8ce24c43fe255ce7011c5d6cb7c0090c792eab959d3e67ee4e20"
+  ],
+  "database_ports_private_and_network_internal": true,
+  "spa_and_csp": true,
+  "cookies_and_headers": true,
+  "origin_csrf_cors": true,
+  "api_body_limit": true,
+  "gateway_upload_limit": true,
+  "api_recreation_gateway_recovery": true,
+  "backup_sha256": {
+    "postgres.dump": "707a3c3643df5b881f51adfca49b1b3f2576bbce2c3147ca6fa00f34f90b149b",
+    "falkor.tar.gz": "5665767541c5fc8eadf21628ca489834a3e31ea52e4e3366e30801f221220148",
+    "artifacts.tar.gz": "3e659494c950501d4ac39994d52fed09e1c47046db32fb7bd3857ff5228fcdea"
+  },
+  "owned_volumes_backed_up_and_restored": true,
+  "api_restart_preserves_session_and_source": true,
+  "worker_indexing": true,
+  "exact_source_evidence": true,
+  "outsider_source_denied": true,
+  "graph_only": true,
+  "owner_removal_requested": true,
+  "logout_revoked": true,
+  "owned_deployment_removed": true
+}

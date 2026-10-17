@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-10-17T05:39:29.811283+00:00",
+  "status": "passed",
+  "scope": "All actual built/service runtime images from the successful disposable deployment; OS and application package coverage required; zero findings at scan time, no suppressions",
+  "scanner": "aquasec/trivy:0.76.0@sha256:2416d1f74045b57274df1a340eee6b510cacd73c66a6ccb8da092b117eb7d222",
+  "images": [
+    {
+      "status": "passed",
+      "image": "sha256:2608f2f77f6054aab06d3c1aa1682629613ff5d02261e2b40b20f22840f950d9",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 71,
+      "python_inventory_required": false,
+      "python_package_count": 0,
+      "services": [
+        "web"
+      ],
+      "findings": []
+    },
+    {
+      "status": "passed",
+      "image": "sha256:2cc27da0a637804f1952fa0de293d286eb54c6ca3ef827935cdb6d0ed88e4fcc",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.23.6"
+      },
+      "severity_counts": {},
+      "os_package_count": 30,
+      "python_inventory_required": false,
+      "python_package_count": 0,
+      "services": [
+        "falkordb"
+      ],
+      "findings": []
+    },
+    {
+      "status": "passed",
+      "image": "sha256:424e91ae94da54dec3356dbf7fcccf9b4a6f8b9ef6d423b3ab954dc4249ffb6a",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 53,
+      "python_inventory_required": false,
+      "python_package_count": 0,
+      "services": [
+        "postgres"
+      ],
+      "findings": []
+    },
+    {
+      "status": "passed",
+      "image": "sha256:570122b8067f029c6ed64351d94b4122b905425df9a047b242b0affa8126cee1",
+      "os": {
+        "Family": "alpine",
+        "Name": "3.24.2"
+      },
+      "severity_counts": {},
+      "os_package_count": 50,
+      "python_inventory_required": true,
+      "python_package_count": 40,
+      "services": [
+        "api",
+        "migrate",
+        "worker"
+      ],
+      "findings": []
+    }
+  ],
+  "verification_environment": "GitHub-hosted ubuntu-latest runner",
+  "source_commit": "be7ac4cc3ae989cd94f214556085eaadf43b153b",
+  "workflow_run": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607"
+}

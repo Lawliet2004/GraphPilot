@@ -78,5 +78,7 @@
   "container_runtime_executed": false,
   "new_image_scans_executed": false,
   "remote_ci_executed": false,
-  "upstream_image_findings_remediated": false
+  "upstream_image_findings_remediated": false,
+  "historical_result": true,
+  "superseded_by": "CI_VERIFICATION.json and CONTAINER_IMAGE_AUDIT.json"
 }

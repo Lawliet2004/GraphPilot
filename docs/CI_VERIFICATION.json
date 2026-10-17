@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-10-17T05:41:34.996081+00:00",
+  "repository": "https://github.com/Lawliet2004/GraphPilot",
+  "branch": "main",
+  "source_commit": "be7ac4cc3ae989cd94f214556085eaadf43b153b",
+  "workflow_run": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607",
+  "status": "passed",
+  "jobs": [
+    {
+      "name": "frontend",
+      "conclusion": "success",
+      "url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607/job/117321282934"
+    },
+    {
+      "name": "dependencies",
+      "conclusion": "success",
+      "url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607/job/117321283065"
+    },
+    {
+      "name": "backend",
+      "conclusion": "success",
+      "url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607/job/117321283070"
+    },
+    {
+      "name": "containers",
+      "conclusion": "success",
+      "url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607/job/117321283088"
+    },
+    {
+      "name": "repository",
+      "conclusion": "success",
+      "url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607/job/117321283102"
+    },
+    {
+      "name": "e2e",
+      "conclusion": "success",
+      "url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006962607/job/117321283104"
+    }
+  ],
+  "test_observations": [
+    [
+      "111",
+      "22.79"
+    ],
+    [
+      "3",
+      "39.1"
+    ]
+  ],
+  "backend_release_tests": 111,
+  "browser_journeys": 3,
+  "runtime_image_audit": "Zero known vulnerabilities across four actual CI runtime images",
+  "scope": "Actual remote CI execution; no public hosting/HTTPS or SMTP inbox claim",
+  "initial_failed_run": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39006073607",
+  "initial_failure": "Prior image/configuration trial failed in graph-volume restore; subsequent current-image local and CI drills pass"
+}

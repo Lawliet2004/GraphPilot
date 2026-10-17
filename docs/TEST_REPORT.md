@@ -1,6 +1,32 @@
 # GraphPilot verification report — ongoing
 
-## Latest continuation verification
+## Latest release verification — October 17
+
+All six remote CI jobs pass: **111 backend/release tests in 22.79 s** and
+**three browser journeys in 39.1 s**, plus builds, full dependency/secret audits,
+actual Docker startup/private networking/non-root databases/indexing/recreation/
+volume backup+restore and strict image audits. Four actual runtime images report
+**zero known vulnerabilities across reported severities** with no suppressions.
+The complete local Compose drill also passes and removes its owned deployment.
+Ruff and Actionlint pass. Docker Engine/Compose/Buildx are installed; the repository
+is published on `main` under Lawliet2004 with no co-authors.
+
+Real authenticated GitHub job-log download now passes through the production
+adapter (token in memory only; no persisted artifact from that probe). The
+containerized safe Git adapter fetch and independent graph-container restore pass.
+Native HTTPS/local SMTP evidence remains separate from public hosting/external
+inbox delivery, which are deferred/unconfigured.
+
+Current evidence: `CI_VERIFICATION.json`, `CONTAINER_VERIFICATION.json`,
+`CONTAINER_LOCAL_VERIFICATION.json`, `CONTAINER_IMAGE_AUDIT.json`,
+`GITHUB_LOG_VERIFICATION.json`, `CONTAINER_GIT_VERIFICATION.json` and
+`GRAPH_CONTAINER_PERSISTENCE.json`. Earlier counts/status claims below describe
+historical observations and are superseded for release readiness by these reports.
+
+Devin's exact swe-2-max documentation review completed. Its separate container
+review timed out after 240 seconds without a final result; it is not a passing check.
+
+## Earlier local continuation verification
 
 October 17 local release-check follow-up supersedes the previous 81-test total:
 **110 passed in 15.58 s**, including 29 image-gate regression cases. Ruff and

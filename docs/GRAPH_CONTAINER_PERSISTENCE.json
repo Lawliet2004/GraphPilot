@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-10-17T05:35:49.884355+00:00",
+  "scope": "Isolated real graph-engine/container-volume drill; synthetic one-node fixture only",
+  "status": "passed",
+  "effective_persistence_and_memory_config": {
+    "maxmemory-policy": "noeviction",
+    "appendonly": "yes",
+    "maxmemory": "805306368",
+    "dir": "/data"
+  },
+  "nonroot_initialization": true,
+  "graph_write": true,
+  "owned_volume_backup_restore": true,
+  "graph_read_after_restore": true,
+  "backup_bytes": 1222
+}

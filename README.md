@@ -4,9 +4,11 @@ Evidence-aware code intelligence with **FalkorDB**, FastAPI, PostgreSQL and Reac
 Connect a repository, build its real static graph, explore dependencies and inspect
 source evidence. Deterministic search works without an LLM or paid account.
 
-**The native demo is verified.** Repository exploration, evidence, history and
-administration have real database, HTTP and browser checks. Container/production
-verification remains open; this is not a production security certification.
+**Native and container checks pass.** Repository exploration, evidence, history and
+administration have real database, HTTP and browser checks. Local Docker and remote
+CI verify startup, private networking, restart and volume backup/restore. All four
+CI runtime images report zero known vulnerabilities at the recorded scan time.
+Public hosting/HTTPS and external email delivery remain to be configured.
 See [implementation status](IMPLEMENTATION_STATUS.md), [test report](docs/TEST_REPORT.md) and [interface review](docs/UI_REVIEW.md)
 and the [requirement-by-requirement audit](docs/REQUIREMENTS_AUDIT.md).
 
@@ -40,9 +42,9 @@ and the [requirement-by-requirement audit](docs/REQUIREMENTS_AUDIT.md).
 ## Start with Docker Compose
 
 Requires Docker Engine + Compose v2. No databases need public host ports.
-Docker is **not installed on the development host used for this implementation**,
-so container startup/build/restart tests remain outstanding. Native execution was
-verified instead; this distinction matters.
+Docker Engine 29.1.3, Compose 2.40.3 and Buildx 0.30.1 are installed on the
+development host. The disposable container drill passes locally and in remote CI;
+see [container evidence](docs/CONTAINER_VERIFICATION.json).
 
 ```bash
 cp .env.example .env
@@ -207,7 +209,9 @@ application. They do not reuse your credentials. Clean generated test accounts a
 `.impeccable/review`, `test-results` and `playwright-report` directories.
 GitHub Actions defines lint, real database tests, a frontend build and real-service
 browser journeys. Dependency jobs audit the complete Python lock and both npm locks,
-including development packages. Remote CI has not yet run.
+including development packages. All six jobs pass remotely: 111 backend/release
+tests, three browser journeys, container verification and image/dependency/secret
+audits. See [CI evidence](docs/CI_VERIFICATION.json).
 
 Run the same Python dependency audit locally without installing audited packages:
 
@@ -280,7 +284,7 @@ container deployment. See `docs/GATEWAY_VERIFICATION.json`.
 uv run python -m scripts.verify_gateway --nginx /path/to/nginx
 # Safe configuration validation without starting containers:
 uv run python -m scripts.verify_compose --check-config
-# Once Docker is available, build/start/recreate/backup/restore a disposable stack:
+# Build/start/recreate/backup/restore a disposable stack:
 uv run python -m scripts.verify_compose
 # Inspect only Git candidates with Gitleaks; ignored private data is never scanned:
 uv run python -m scripts.verify_repository --gitleaks /path/to/gitleaks
@@ -289,28 +293,23 @@ uv run python -m scripts.audit_remote_images --trivy /path/to/trivy --db-reposit
 ```
 
 The Compose verifier generates private credentials and its own project, ports,
-volumes and environment file. It destroys only that disposable deployment. It has
-passed configuration validation here; its actual container/restore path is still
-unexecuted. CI now includes that path plus an image vulnerability audit and a
-separate candidate secret scan. Workflow syntax passes Actionlint; remote CI needs
-a Git remote, which the user has not supplied. `GP_ENV_FILE` and `GP_WEB_PORT` allow
+volumes and environment file. It destroys only that disposable deployment. Its
+actual container/restore path passes locally and in CI, including non-root database
+startup and effective graph persistence/memory settings. CI includes the image
+audit and a separate candidate secret scan; workflow syntax passes Actionlint.
+`GP_ENV_FILE` and `GP_WEB_PORT` allow
 an explicit separate Compose environment file and loopback port; normal startup
 continues to use `.env` and port 8080.
 
-The old web/Python/PostgreSQL image scans found high/critical package findings,
-archived in `docs/REMOTE_IMAGE_AUDIT_INITIAL.json`. Definitions now pin maintained
-Nginx 1.30.6 and Trixie bases while preserving Python 3.12 and PostgreSQL 18.6.
-Current upstream scan results are separate in `docs/REMOTE_IMAGE_AUDIT.json`;
-inspect each image's status and findings. A timed-out scan is unknown. These scans
-cannot replace building/auditing GraphPilot's own images. The longer FalkorDB
-scan completed with 36 high findings. Actual container runtime checks remain open.
-
-The publisher-inventory and full-scan findings are explained in
-[the image security review](docs/IMAGE_SECURITY_REVIEW.md). The updated Python
-base still has high findings. Compose now derives PostgreSQL from the pinned
-official image, removes its unused Go-based root-switching helper and starts as
-`postgres`; that image's initialization/volume permissions require actual runtime
-verification. Inventory-only results do not establish OS-package coverage.
+Historical image scans found high/critical findings in the previous definitions.
+Current images use pinned Python 3.12 Alpine, Nginx 1.30.6 Alpine, PostgreSQL 18.6
+Alpine and the server-only FalkorDB 4.22.1 Alpine image. Derived images apply fixed
+zlib/nghttp2 packages and remove unused runtime pip/gosu. PostgreSQL and FalkorDB
+run as their database users. All four actual CI runtime images report zero known
+vulnerabilities; no findings were suppressed. See the
+[image review](docs/IMAGE_SECURITY_REVIEW.md) and
+[built-image audit](docs/CONTAINER_IMAGE_AUDIT.json). Results describe their scan
+time and do not establish a public deployment or future vulnerability status.
 
 ### Backup and restore
 
@@ -333,13 +332,14 @@ stop API/worker and FalkorDB, restore its volume with the service image as a tar
 helper, restore artifacts similarly, and use `pg_restore --clean --if-exists` into
 the destination database. Restart databases, apply migrations, then start API and
 worker and check readiness, memberships, source evidence and snapshot counts.
-These backup/restore commands have not been runtime-tested on this Docker-free
-host. A separate native restore drill has passed, including actual restored login,
+The guarded Compose drill has verified backup/restore locally and in CI. The
+manual example above is guidance; use the verifier for the executed sequence.
+A separate native restore drill has passed, including actual restored login,
 graph identity and source evidence; see `docs/RESTORE_VERIFICATION.json`. The
 guarded native command is `uv run python -m scripts.verify_restore` and is restricted
 to this workspace’s development process/port layout. It briefly stops and restarts
 API/worker writers, keeps a private ignored backup, and restores only into disposable
-instances. Container restore remains a required verification gate.
+instances.
 
 ## Troubleshooting and known limits
 
@@ -362,7 +362,7 @@ instances. Container restore remains a required verification gate.
   current branch heads, conversation-pinned snapshots, and at least the latest ten
   generations per branch. Unpinned older generations become eligible after 30 days.
   Expiring CI logs have a separate periodic cleanup. Native backup/restore has been
-  drilled; container-volume restore remains unverified.
+  drilled, and container-volume backup/restore passes locally and in CI.
 - **Branch selection:** connect existing Git branches from the repository header.
   Each branch has its own graph head; selection stays in the URL for that investigation.
   Snapshot selection pins graph, source, impact and conversation citations to an immutable
@@ -401,8 +401,10 @@ The CI log browser test uses a labeled synthetic fixture in a disposable
 `graphpilot_browser_<random-id>` PostgreSQL database, its own artifact directory,
 and isolated API/Vite ports 8001/5174. It exercises real storage, graph, auth,
 evidence and downloads without inserting fixtures into the normal application.
-The live unauthenticated GitHub log probe returned HTTP 403; successful external
-log access has not been claimed.
+The live unauthenticated GitHub log probe returned HTTP 403. A real authenticated
+job-log download through the application adapter now passes for this repository;
+its token was held in memory and the probe did not persist an artifact. Storage,
+snapshot permissions and browser downloads are covered separately by fixtures.
 
 Ingestion applies nested `.gitignore` files with Git-style negation and directory
 pruning, in addition to fixed dependency exclusions. Ignore files are limited to

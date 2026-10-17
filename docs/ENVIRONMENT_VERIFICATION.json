@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-10-16T19:22:42.658622+00:00",
+  "timestamp": "2026-10-17T05:44:14.233544+00:00",
   "container_commands": {
-    "docker": false,
+    "docker": true,
     "podman": false,
     "nerdctl": false,
     "buildah": false
@@ -11,8 +11,8 @@
     "newgidmap": false
   },
   "passwordless_sudo": false,
-  "docker_socket_present": false,
-  "git_remote_configured": false,
+  "docker_socket_present": true,
+  "git_remote_configured": true,
   "deployment_target_supplied": false,
   "application_mode": "graph-only",
   "llm_configured": false,
@@ -30,7 +30,15 @@
     "repositories": 0,
     "active_jobs": 0
   },
-  "container_runtime_executed": false,
+  "container_runtime_executed": true,
   "api_running": true,
-  "worker_running": true
+  "worker_running": true,
+  "docker_installed_via_desktop_administrator_authentication": true,
+  "docker_engine_version": "29.1.3",
+  "compose_version": "2.40.3",
+  "buildx_version": "0.30.1",
+  "git_remote": "https://github.com/Lawliet2004/GraphPilot.git",
+  "git_branch": "main",
+  "remote_ci_executed": true,
+  "hosting_domain_deferred_by_user": true
 }
