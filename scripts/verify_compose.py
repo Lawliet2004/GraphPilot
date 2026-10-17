@@ -152,6 +152,39 @@ def main():
                     'test "$(id -u)" != 0 && ! command -v gosu',
                 )
                 report["postgres_nonroot_and_root_helper_absent"] = True
+                run("exec", "-T", "falkordb", "sh", "-c", 'test "$(id -u)" != 0')
+                graph_config = json.loads(
+                    subprocess.check_output(
+                        command
+                        + [
+                            "exec",
+                            "-T",
+                            "falkordb",
+                            "redis-cli",
+                            "--json",
+                            "CONFIG",
+                            "GET",
+                            "dir",
+                            "appendonly",
+                            "maxmemory",
+                            "maxmemory-policy",
+                        ],
+                        env=env,
+                        text=True,
+                    )
+                )
+                if isinstance(graph_config, list):
+                    graph_config = dict(zip(graph_config[::2], graph_config[1::2], strict=True))
+                expected_config = {
+                    "dir": "/data",
+                    "appendonly": "yes",
+                    "maxmemory": str(768 * 2**20),
+                    "maxmemory-policy": "noeviction",
+                }
+                assert graph_config == expected_config, (
+                    "Graph process ignored its persistence or memory configuration"
+                )
+                report["graph_nonroot_and_persistence_configuration"] = True
                 report["service_images"] = {}
                 for service in sorted(SERVICES):
                     container = subprocess.check_output(

@@ -6,7 +6,11 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
 FROM python:3.12-alpine3.24@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4 AS runtime
-RUN apk add --no-cache git ca-certificates && addgroup -g 10001 graphpilot && adduser -D -u 10001 -G graphpilot graphpilot
+RUN apk add --no-cache --upgrade git ca-certificates 'zlib>=1.3.2-r1' \
+    && python -m pip uninstall -y pip \
+    && rm -rf /usr/local/lib/python3.12/ensurepip \
+    && addgroup -g 10001 graphpilot \
+    && adduser -D -u 10001 -G graphpilot graphpilot
 WORKDIR /app
 COPY --from=build --chown=graphpilot:graphpilot /app/.venv /app/.venv
 COPY --chown=graphpilot:graphpilot api ./api
