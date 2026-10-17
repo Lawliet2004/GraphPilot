@@ -1,6 +1,8 @@
 # Always-awake student demo hosting
 
-The requested host is pending Azure for Students verification. No Azure VM,
+The requested host is pending Azure for Students verification. Portal sign-in
+is currently waiting for the college account holder to approve Microsoft MFA.
+The subscription, spending limit and eligible resources remain unverified. No Azure VM,
 subscription upgrade or paid service has been created by this setup. The current
 Codespaces URL is an on-demand demo and can stop after inactivity.
 
@@ -25,28 +27,33 @@ card, or assume every VM, disk and public IP is included in the free allowance.
    backups privately if retaining its users and indexed source.
 4. Assign a stable DNS name to the public IP. Configure a trusted HTTPS reverse
    proxy (for example Caddy) on ports 80/443, forwarding to `127.0.0.1:18080`.
-   Start GraphPilot with the real HTTPS origin:
+   Keep the Vercel frontend as the canonical browser origin:
 
    ```bash
-   python3 scripts/cloud_demo.py start --build --public-url https://YOUR-HOST
+   python3 scripts/cloud_demo.py start --build \
+     --public-url https://gp-code.vercel.app \
+     --allowed-origin https://BACKEND-HOST
    python3 scripts/cloud_demo.py check
    ```
 
    The existing Compose stack supplies private networks, durable volumes,
    migrations and `unless-stopped` restart policies. Enable Docker at boot. Keep
    the web port bound to loopback; HTTPS is the public entry point.
-5. Add the final origin to Firebase's authorized domains if required for enabled
-   sign-in methods, and update the GitHub App callback to
-   `https://YOUR-HOST/api/integrations/github/callback`. Configure its private
+5. After the new backend passes direct readiness and private recovery checks,
+   update `app/vercel.json` to proxy its stable HTTPS origin and redeploy Vercel.
+   Keep `gp-code.vercel.app` authorized in Firebase and retain the GitHub callback
+   `https://gp-code.vercel.app/api/integrations/github/callback`. Configure private
    environment settings as described in [GitHub and CLI](GITHUB_AND_CLI.md).
 6. Verify a normal Firebase user and the existing admin, two users' repository
    isolation, a selected private repository, indexing, evidence, history sync,
    browser-approved CLI and authenticated MCP. Reboot the VM and confirm the
    website, database, graph and source persist. Exercise backup/restore on a
    separate disposable target before relying on backups.
-7. Run `python3 scripts/demo_check.py --url https://YOUR-HOST` from an external
-   machine. Schedule that read-only check against the stable URL, retain short
-   logs, and monitor credits/disk space. A free monitor does not prevent provider
+7. Run `python3 scripts/demo_check.py --url https://gp-code.vercel.app` from an external
+   machine. Enable the existing workflow's
+   always-awake backend check after migration, retain short logs, and monitor
+   credits/disk space. See [monitoring](AVAILABILITY_MONITORING.md) and
+   [backup/recovery](BACKUP_AND_RECOVERY.md). A free monitor does not prevent provider
    outages or extend expired student credits. Keep Codespaces until this host
    passes its live verification, then stop the unused workspace.
 

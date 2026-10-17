@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-17T11:04:54.993087+00:00",
+  "timestamp": "2026-10-17T16:44:25.187847+00:00",
   "firebase_project": "graphpilot-demo-20261017",
   "plan": "Spark: no cost ($0/month), verified in Firebase console",
   "firebase_cli": "15.34.0",
@@ -11,8 +11,8 @@
     "project_and_email_password_setup": "completed"
   },
   "cloud_url": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev",
-  "deployed_application_commit": "ba801c0432e2a8d0e8d154dc8bc908bdfedc1ca9",
-  "migration": "0009_firebase_identity",
+  "deployed_application_commit": "00cd4a1f4e312d7366c7e229d65677115a620a18",
+  "migration": "0011_model_credentials",
   "cloud_firebase_auth_and_repository_checks": {
     "status": "passed",
     "owner_admin": true,
@@ -56,9 +56,32 @@
   },
   "frontend_build": "passed",
   "ruff": "passed",
-  "ci": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39026956679",
+  "ci": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39049064858",
   "browser": "Normal demo Firebase login, workspace, Settings verification controls and real graph verified in Chrome",
-  "email_flow_evidence": "Verification and password reset passed against the official emulator. External inbox delivery not verified.",
+  "email_flow_evidence": "Actual Gmail receipt: verification in Inbox, reset in Spam. Verification applied and displayed by GraphPilot; reset code validated. Password was not changed.",
   "session_limit": "Firebase browser sessions expire after at most one hour; automatic refresh is not implemented.",
-  "cost_boundary": "No card or paid Firebase service enabled. Existing finite Codespaces hosting remains separate."
+  "cost_boundary": "No card or paid Firebase service enabled. Existing finite Codespaces hosting remains separate.",
+  "real_inbox_verification": {
+    "timestamp": "2026-10-17T16:09:00.520214+00:00",
+    "delivery_verified": true,
+    "password_changed": false,
+    "signup_http": 201,
+    "normal_account": true,
+    "verification_send_accepted": true,
+    "reset_request_http": 200,
+    "verification_inbox_delivery": true,
+    "verification_action_http": 200,
+    "email_verification_applied": true,
+    "reset_inbox_delivery": false,
+    "reset_action_http": 200,
+    "reset_code_valid": true,
+    "verified_status_visible": true,
+    "status": "passed",
+    "scope": "Actual Gmail receipt: verification in Inbox, reset in Spam. Verification applied and reset code validated; password change remains a user action.",
+    "verification_delivery_folder": "Inbox",
+    "reset_email_received": true,
+    "reset_delivery_folder": "Spam"
+  },
+  "canonical_frontend_url": "https://gp-code.vercel.app",
+  "historical_evidence_note": "Original Firebase rollout suite/tool checks are retained below; current live restart, personal-model and mail evidence is in CLOUD_OPERATIONS_VERIFICATION.json."
 }

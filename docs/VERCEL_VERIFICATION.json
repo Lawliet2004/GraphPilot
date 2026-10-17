@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-17T14:26:50.865430+00:00",
+  "timestamp": "2026-10-17T16:48:17.535623+00:00",
   "production_url": "https://gp-code.vercel.app",
   "hosting": {
     "frontend": "Vercel Hobby",
@@ -8,49 +8,47 @@
     "authentication": "Firebase Authentication Spark",
     "paid_upgrade_or_card_added": false
   },
-  "frontend_source_commit": "028e8627f3aff9e5bb87d7eea01beb46c7ab88a9",
-  "ci_url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39040319152",
+  "ci_url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39049064858",
   "vercel_dashboard": "https://vercel.com/papans-projects-92ad1bb7/gp-demo",
-  "vercel_deployment": "https://vercel.com/papans-projects-92ad1bb7/gp-demo/DSK76c7GnNvkrBCfSvh8ibRD9K3M",
   "checks": {
     "public": {
       "status": "passed",
-      "scope": "Read-only public deployment checks; not a full user journey",
+      "scope": "Current unauthenticated public checks after live backup, restart and isolated restore; authenticated evidence is in CLOUD_OPERATIONS_VERIFICATION.json",
       "checks": [
         {
           "path": "/",
           "status": 200,
-          "duration_ms": 995.0
+          "expected": 200
         },
         {
-          "path": "/assets/index-NJXf7fON.js",
+          "path": "/assets/index-DJcc3MaY.js",
           "status": 200,
-          "duration_ms": 2693.6
+          "expected": 200
         },
         {
           "path": "/api/health/ready",
           "status": 200,
-          "duration_ms": 4721.8
+          "expected": 200
         },
         {
           "path": "/api/auth/session",
           "status": 401,
-          "duration_ms": 1805.5
+          "expected": 401
         },
         {
           "path": "/api/admin/users",
           "status": 401,
-          "duration_ms": 671.4
+          "expected": 401
         },
         {
           "path": "/api/repositories/00000000-0000-0000-0000-000000000000/graph",
           "status": 401,
-          "duration_ms": 677.5
+          "expected": 401
         },
         {
           "path": "/api/mcp/",
           "status": 401,
-          "duration_ms": 904.0
+          "expected": 401
         }
       ]
     },
@@ -134,18 +132,42 @@
           "security_headers": true
         }
       ]
-    }
+    },
+    "byok_live": {
+      "status": "passed",
+      "model": "openrouter/free",
+      "mode": "ai",
+      "retrieved_evidence_count": 8,
+      "citations": [
+        "E2",
+        "E4",
+        "E6"
+      ],
+      "citations_reference_actual_evidence": true,
+      "provider_key_usage_before": 0,
+      "provider_key_usage_after": 0,
+      "published_prompt_token_price": "0",
+      "published_completion_token_price": "0",
+      "other_users_private_repository_http": 404,
+      "administrator_has_model_credentials": false,
+      "key_absent_from_public_javascript_tracked_source_and_conversation": true,
+      "temporary_credential_and_local_key_file_removed": true,
+      "graph_mode_after_removal": true,
+      "scope": "Real browser question using a temporary normal-user key; no OpenAI inference or future free quota guarantee"
+    },
+    "operations_evidence": "CLOUD_OPERATIONS_VERIFICATION.json"
   },
   "browser_login": "Owner signed in through gp-code.vercel.app and real indexed repositories rendered",
   "github_callback": {
     "saved": false,
     "value": "https://gp-code.vercel.app/api/integrations/github/callback",
-    "state": "Prepared in GitHub App settings; awaits owner approval before Save changes. Fresh GitHub OAuth on the short domain is not yet verified."
+    "state": "GitHub Confirm access requires the account holder's emailed code. Callback has not been saved; fresh short-domain OAuth is not verified."
   },
   "remaining": [
-    "Approve/save the prepared GitHub callback and verify a new OAuth return through Vercel",
-    "Azure academic verification and a verified always-awake backend migration",
-    "Real-inbox verification/reset delivery remains unproven"
+    "Azure college-account MFA, student subscription/spending-limit verification, provisioning and migration",
+    "GitHub Confirm access, save short-domain callback and verify fresh browser OAuth",
+    "Final-host reboot, full backend monitoring and recovery checks after migration"
   ],
-  "notice": "The frontend is on Vercel; backend API/indexing/MCP depend on an awake Codespace with public port 18080. No always-awake backend claim."
+  "notice": "The frontend is on Vercel; backend API/indexing/MCP depend on an awake Codespace with public port 18080. No always-awake backend claim.",
+  "frontend_application_change_commit": "00cd4a1f4e312d7366c7e229d65677115a620a18"
 }

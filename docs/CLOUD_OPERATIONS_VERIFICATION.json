@@ -1,0 +1,133 @@
+{
+  "timestamp": "2026-10-17T16:48:17.535623+00:00",
+  "production_url": "https://gp-code.vercel.app",
+  "backend": "GitHub Codespaces; idle shutdown and finite allowance apply",
+  "deployed_application_commit": "00cd4a1f4e312d7366c7e229d65677115a620a18",
+  "source_commit_at_recovery": "1b1ef8dc3d82a249b79871d7487394c7a89879e8",
+  "ci_url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39049064858",
+  "restart": {
+    "timestamp": "2026-10-17T16:26:39.508047+00:00",
+    "status": "passed",
+    "scope": "Current Codespaces runtime after all-service cold restart, not an Azure VM reboot",
+    "postgresql_and_falkordb_ready": true,
+    "demo_login_role_and_no_model_key": true,
+    "owner_login_role_and_no_model_key": true,
+    "repositories_graph_and_exact_source_persisted": 2,
+    "encrypted_github_connection_still_works": true
+  },
+  "backup_restore": {
+    "status": "passed",
+    "source_all_five_services_restarted": true,
+    "postgresql_table_fingerprints_equal": 20,
+    "graph_node_and_edge_counts_equal": 5,
+    "artifact_and_source_file_hashes_equal": 431,
+    "isolated_api_ready": true,
+    "isolated_target_removed": true,
+    "off_host_copy_all_manifest_hashes_verified": true,
+    "saved_model_credential_rows": 0,
+    "scope": "Current cloud stack, not an Azure VM reboot; private backup locations and data are omitted",
+    "guarded_public_command": "python3 scripts/cloud_backup.py --restore-drill",
+    "guarded_public_command_status": "passed",
+    "existing_saved_bundle_restore_status": "passed",
+    "private_file_modes_explicitly_enforced": true,
+    "guard_tests_and_monitor_tests_passed": 24
+  },
+  "personal_model_live_test": {
+    "status": "passed",
+    "model": "openrouter/free",
+    "mode": "ai",
+    "retrieved_evidence_count": 8,
+    "citations": [
+      "E2",
+      "E4",
+      "E6"
+    ],
+    "citations_reference_actual_evidence": true,
+    "provider_key_usage_before": 0,
+    "provider_key_usage_after": 0,
+    "published_prompt_token_price": "0",
+    "published_completion_token_price": "0",
+    "other_users_private_repository_http": 404,
+    "administrator_has_model_credentials": false,
+    "key_absent_from_public_javascript_tracked_source_and_conversation": true,
+    "temporary_credential_and_local_key_file_removed": true,
+    "graph_mode_after_removal": true,
+    "scope": "Real browser question using a temporary normal-user key; no OpenAI inference or future free quota guarantee"
+  },
+  "firebase_mail": {
+    "timestamp": "2026-10-17T16:09:00.520214+00:00",
+    "delivery_verified": true,
+    "password_changed": false,
+    "signup_http": 201,
+    "normal_account": true,
+    "verification_send_accepted": true,
+    "reset_request_http": 200,
+    "verification_inbox_delivery": true,
+    "verification_action_http": 200,
+    "email_verification_applied": true,
+    "reset_inbox_delivery": false,
+    "reset_action_http": 200,
+    "reset_code_valid": true,
+    "verified_status_visible": true,
+    "status": "passed",
+    "scope": "Actual Gmail receipt: verification in Inbox, reset in Spam. Verification applied and reset code validated; password change remains a user action.",
+    "verification_delivery_folder": "Inbox",
+    "reset_email_received": true,
+    "reset_delivery_folder": "Spam"
+  },
+  "availability_monitoring": {
+    "status": "enabled",
+    "workflow": "Demo availability",
+    "scope": "Static Vercel frontend only; no Codespaces keepalive or backend availability claim",
+    "manual_run": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39046913319",
+    "manual_run_status": "success",
+    "account_email_notifications_verified": false
+  },
+  "pending": [
+    "Azure college-account MFA, student subscription/spending-limit verification, provisioning and migration",
+    "GitHub Confirm access, save short-domain callback and verify fresh browser OAuth",
+    "Final-host reboot, full backend monitoring and recovery checks after migration"
+  ],
+  "paid_upgrade_or_card_added": false,
+  "public_post_recovery_checks": {
+    "timestamp": "2026-10-17T16:48:17.535623+00:00",
+    "status": "passed",
+    "checks": [
+      {
+        "path": "/",
+        "status": 200,
+        "expected": 200
+      },
+      {
+        "path": "/assets/index-DJcc3MaY.js",
+        "status": 200,
+        "expected": 200
+      },
+      {
+        "path": "/api/health/ready",
+        "status": 200,
+        "expected": 200
+      },
+      {
+        "path": "/api/auth/session",
+        "status": 401,
+        "expected": 401
+      },
+      {
+        "path": "/api/admin/users",
+        "status": 401,
+        "expected": 401
+      },
+      {
+        "path": "/api/repositories/00000000-0000-0000-0000-000000000000/graph",
+        "status": 401,
+        "expected": 401
+      },
+      {
+        "path": "/api/mcp/",
+        "status": 401,
+        "expected": 401
+      }
+    ]
+  }
+}

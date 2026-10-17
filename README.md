@@ -9,7 +9,8 @@ administration have real database, HTTP and browser checks. Local Docker and rem
 CI verify startup, private networking, restart and volume backup/restore. All four
 CI runtime images report zero known vulnerabilities at the recorded scan time.
 The public demo uses a Vercel frontend and a Codespaces backend. Always-awake
-backend hosting and external real-inbox email delivery remain to be verified.
+backend hosting remains pending account verification. Real Firebase verification
+and reset emails were received; the reset message landed in Spam.
 See [implementation status](IMPLEMENTATION_STATUS.md), [test report](docs/TEST_REPORT.md) and [interface review](docs/UI_REVIEW.md)
 and the [requirement-by-requirement audit](docs/REQUIREMENTS_AUDIT.md).
 
@@ -195,8 +196,10 @@ Without a key, context returns structured graph results with an explicit
 notice, and there is no operator-level model fallback. The deprecated
 `GP_LLM_BASE_URL`, `GP_LLM_MODEL` and `GP_LLM_API_KEY` variables remain only
 for config compatibility and are never used for user-facing synthesis.
-CLI/agent credentials cannot manage model keys. Actual successful inference
-with a real configured model remains unverified.
+CLI/agent credentials cannot manage model keys. A live browser question using a
+temporary personal `openrouter/free` credential returned an answer with three
+valid source citations; provider usage stayed at zero. The test credential was
+removed and graph-only behavior was verified again.
 
 See [personal model credentials](docs/BYOK.md) for storage, provider and deployment details.
 
@@ -209,10 +212,12 @@ Local password resets use configured SMTP with STARTTLS (`GP_SMTP_*`, `GP_PUBLIC
 Without email delivery the UI explains that reset is unavailable. Tests cover a
 one-time token and session invalidation. Real local SMTP/STARTTLS delivery with
 authentication now passes, including certificate/hostname validation and safe
-failure handling. External inbox delivery remains unverified. The client uses the
+failure handling. Separately, real Firebase verification/reset mail delivery was
+verified in Gmail; see the Firebase guide for folder placement and scope. The client uses the
 system CA store; a private mail CA can be supplied through `SSL_CERT_FILE`.
 `GP_GITHUB_TOKEN`, if configured, remains backend-only.
-Private repository support via GitHub App is not implemented.
+Per-user GitHub App access, including selected private repositories, is covered
+in the [GitHub and CLI guide](docs/GITHUB_AND_CLI.md).
 
 ## Test
 
@@ -345,6 +350,11 @@ vulnerabilities; no findings were suppressed. See the
 time and do not establish a public deployment or future vulnerability status.
 
 ### Backup and restore
+
+For the deployed cloud stack, use the [guarded backup and recovery command](docs/BACKUP_AND_RECOVERY.md).
+It has been exercised against the actual deployment, with an off-host copy and
+an isolated restore. [Availability monitoring](docs/AVAILABILITY_MONITORING.md)
+checks the static frontend while the backend remains in Codespaces.
 
 Stop API/worker writers to obtain a consistent metadata/graph/artifact set:
 

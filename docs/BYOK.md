@@ -37,6 +37,16 @@ Deploy API and frontend together, then verify graph-only behavior and two-user
 isolation. Never put a provider key in frontend build variables, Docker images,
 repository files or a shared server fallback.
 
+On 2026-10-17, a real question submitted through the deployed browser used a
+normal user's temporary `openrouter/free` credential. It returned AI synthesis
+with three valid citations into eight retrieved excerpts. The provider reported
+zero usage before and after. Another user's private repository remained denied
+(404), and the administrator had no saved model credential. The key was absent
+from the public JavaScript, tracked source and saved conversation. The test
+credential and its private local test file were removed; the next question
+returned graph mode. This is a free-model verification, not an OpenAI inference
+or future quota guarantee. See [cloud operations evidence](CLOUD_OPERATIONS_VERIFICATION.json).
+
 References: [OpenRouter Chat Completions](https://openrouter.ai/docs/api_reference/overview),
 [OpenRouter free routing](https://openrouter.ai/docs/guides/routing/model-variants/free),
 [OpenAI Chat Completions](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create).

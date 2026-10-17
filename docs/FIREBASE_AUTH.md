@@ -74,6 +74,13 @@ disable the GraphPilot user or revoke those tokens to terminate agent access.
 Settings shows email-verification status and a resend button. Firebase's hosted
 email-action pages handle verification and password reset. Use a real email inbox
 to receive them. The shared demo and GitHub noreply login IDs are not inboxes.
+Actual Gmail delivery was verified on 2026-10-17 with a unique test alias: the
+verification action succeeded and GraphPilot displayed the verified status. The
+verification message was in Inbox. The reset message arrived in Spam and its
+code validated; the user completes the password change on the hosted action page.
+This proves receipt, not reliable Inbox placement for reset mail. No real inbox
+address or action code is stored in public evidence.
+
 Email verification is displayed but is not a prerequisite for this hackathon's
 repository features. While Firebase is enabled, reset emails apply to Firebase
 accounts only. Migrate existing local accounts deliberately before relying on

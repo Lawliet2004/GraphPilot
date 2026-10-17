@@ -12,7 +12,8 @@
 ## Hosting decision
 
 The owner has a college email and can verify Azure for Students eligibility.
-The official student signup has been opened. Activation is pending the owner.
+The official student signup has been opened. Portal sign-in is waiting for the
+college account holder to approve Microsoft MFA; student activation is unverified.
 The proposed host is a small Linux VM running the existing Docker Compose stack,
 with persistent volumes, a public HTTPS gateway and restart policies. Firebase
 continues to manage authentication. PostgreSQL, FalkorDB and source artifacts
@@ -67,7 +68,10 @@ verification. See [verification evidence](GITHUB_CLI_VERIFICATION.json),
 The frontend is now published at [gp-code.vercel.app](https://gp-code.vercel.app)
 on Vercel Hobby. The backend remains in Codespaces. See
 [Vercel verification](VERCEL_VERIFICATION.json) for live checks and the pending
-new-domain GitHub callback approval. This frontend move does not satisfy the
+new-domain GitHub callback, currently blocked by GitHub Confirm access.
+Live personal-key synthesis, actual Firebase mail receipt, restart persistence,
+off-host backup and isolated restore now have verification evidence in
+[cloud operations](CLOUD_OPERATIONS_VERIFICATION.json). This frontend move does not satisfy the
 always-awake backend requirement.
 
 Sources: [Azure for Students](https://azure.microsoft.com/en-us/free/students/),
