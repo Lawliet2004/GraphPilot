@@ -14,6 +14,25 @@ from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 
+RUNTIME_REPOS = {
+    "library/postgres",
+    "library/python",
+    "library/nginx",
+    "falkordb/falkordb",
+    "falkordb/falkordb-server",
+}
+
+
+def runtime_images(metadata):
+    selected = [
+        row
+        for row in metadata["images"]
+        if row["image"].split("@")[0].split(":")[0] in RUNTIME_REPOS
+    ]
+    if not selected:
+        raise ValueError("Metadata has no supported runtime images to audit")
+    return selected
+
 
 def scan(command, output, run_dir, index, env, timeout):
     deadline = time.monotonic() + timeout
@@ -78,13 +97,10 @@ def main():
     }
     env["DOCKER_CONFIG"] = str(root / "docker-config")
     metadata = json.loads(Path("docs/IMAGE_METADATA_VERIFICATION.json").read_text())
-    selected = [
-        row
-        for row in metadata["images"]
-        if row["image"].startswith(
-            ("library/postgres:", "library/python:", "library/nginx:", "falkordb/falkordb@")
-        )
-    ]
+    try:
+        selected = runtime_images(metadata)
+    except ValueError as exc:
+        parser.error(str(exc))
     selected.sort(
         key=lambda row: next(
             index

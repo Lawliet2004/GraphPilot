@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from scripts.audit_container_images import SERVICES, assess, audit, public_report, verified_images
+from scripts.audit_remote_images import runtime_images
 
 APP = "sha256:" + "a" * 64
 SERVICE = "sha256:" + "b" * 64
@@ -175,3 +176,12 @@ def test_audit_refuses_empty_input_before_starting_a_scanner(tmp_path, monkeypat
     report = audit(before, tmp_path / "summary.json", Path("/synthetic-trivy"))
     assert report["status"] == "invalid_verification"
     assert report["images"] == []
+
+
+def test_upstream_audits_cover_server_variant_and_reject_empty_selection():
+    server = {"image": "falkordb/falkordb-server:v4.22.1-alpine"}
+    metadata = {"images": [server, {"image": "library/nginx-unrelated:latest"}]}
+    assert runtime_images(metadata) == [server]
+    for images in ([], [{"image": "library/node:22"}]):
+        with pytest.raises(ValueError):
+            runtime_images({"images": images})

@@ -1,12 +1,12 @@
 FROM ghcr.io/astral-sh/uv:0.13.1 AS uv
-FROM python:3.12-slim-trixie@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 AS build
+FROM python:3.12-alpine3.24@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4 AS build
 COPY --from=uv /uv /uvx /bin/
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-FROM python:3.12-slim-trixie@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 AS runtime
-RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/* && useradd -m -u 10001 graphpilot
+FROM python:3.12-alpine3.24@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4 AS runtime
+RUN apk add --no-cache git ca-certificates && addgroup -g 10001 graphpilot && adduser -D -u 10001 -G graphpilot graphpilot
 WORKDIR /app
 COPY --from=build --chown=graphpilot:graphpilot /app/.venv /app/.venv
 COPY --chown=graphpilot:graphpilot api ./api

@@ -17,9 +17,10 @@ services:
       retries: 20
     networks: [private]
   falkordb:
-    image: falkordb/falkordb:v4.22.1@sha256:b0bdcac2cbaff989e77cb0610439b7a9289e86de033ccbbd4368b66fb680ae7a
+    image: falkordb/falkordb-server:v4.22.1-alpine@sha256:8ba893a1965e0d674b3d031e6c27b0f6e4688e8392d37e506bf8d929b3870c2b
     restart: unless-stopped
-    command: [redis-server, --loadmodule, /var/lib/falkordb/bin/falkordb.so, --appendonly, 'yes', --dir, /data, --maxmemory, 768mb, --maxmemory-policy, noeviction]
+    entrypoint: [redis-server]
+    command: [--loadmodule, /var/lib/falkordb/bin/falkordb.so, --appendonly, 'yes', --dir, /data, --maxmemory, 768mb, --maxmemory-policy, noeviction]
     volumes:
       - falkor_data:/data
     healthcheck:

@@ -13,6 +13,8 @@ from pathlib import Path
 
 import httpx
 
+from scripts.audit_remote_images import runtime_images
+
 ACCEPT = ",".join(
     [
         "application/vnd.oci.image.index.v1+json",
@@ -79,13 +81,10 @@ def main():
         "graphpilot_built_images_audited": False,
     }
     metadata = json.loads(args.metadata.read_text())
-    selected = [
-        r
-        for r in metadata["images"]
-        if r["image"].startswith(
-            ("library/postgres:", "library/python:", "library/nginx:", "falkordb/falkordb@")
-        )
-    ]
+    try:
+        selected = runtime_images(metadata)
+    except ValueError as exc:
+        parser.error(str(exc))
     if args.declared_distro and (len(selected) != 1 or not args.distro_source):
         parser.error("An explicit distribution requires one image and its publisher source")
     full_scans = json.loads(Path("docs/REMOTE_IMAGE_AUDIT.json").read_text()).get("images", [])

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-10-17T05:29:01.695400+00:00",
+  "repository": "Lawliet2004/GraphPilot",
+  "job_id": 117318717141,
+  "scope": "Real authenticated production-adapter log download; no token, signed URL or raw log retained in this report",
+  "status": "passed",
+  "requests": 2,
+  "log_downloads": 1,
+  "redacted_bytes": 26683,
+  "real_job_marker_present": true,
+  "configured_token_absent_after_redaction": true,
+  "result": "Downloaded through the real authenticated adapter and redacted in memory; this probe did not persist an artifact"
+}

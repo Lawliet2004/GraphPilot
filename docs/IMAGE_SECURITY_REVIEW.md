@@ -1,5 +1,18 @@
 # Image review — October 17, 2026 (Asia/Kolkata)
 
+Current runtime follow-through: Docker Engine 29.1.3, Compose 2.40.3 and Buildx
+0.30.1 are now installed via the normal administrator prompt. GitHub CI executed:
+110 backend/release tests and three browser journeys passed; the first container
+run reached backup/restore and failed in the graph-volume restore helper. That
+failure is being reproduced; it is not a passing container gate.
+
+The current candidate definitions use pinned Python 3.12 Alpine 3.24 and the
+publisher's FalkorDB **server-only 4.22.1 Alpine** image. The engine version stays
+4.22.1. The Python publisher inventory reports six medium/one low finding and
+no high/critical findings with an explicit publisher-sourced Alpine declaration.
+Actual built-image scans and complete container verification are pending. The
+Trixie findings below describe the prior definitions and are retained as history.
+
 Release-check follow-up: CI now retains sanitized per-image JSON, verifies exact
 service image-ID coverage and fails for missing/incomplete scans, unrecognized
 OS/package inventory, modified findings or end-of-life OS. High/critical findings

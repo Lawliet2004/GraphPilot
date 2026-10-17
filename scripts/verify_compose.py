@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import secrets
 import shutil
 import socket
@@ -264,6 +265,15 @@ with tarfile.open(fileobj=sys.stdin.buffer,mode='r|gz') as archive:
                                 output=None if restore else stream,
                                 raw=True,
                             )
+                        except subprocess.CalledProcessError:
+                            logs.flush()
+                            errors = re.findall(
+                                rb"(?:^|\n)([A-Za-z_][A-Za-z_0-9.]*Error):",
+                                (root / "commands.log").read_bytes()[-16000:],
+                            )
+                            if errors:
+                                report["volume_helper_error_type"] = errors[-1].decode()
+                            raise
                         finally:
                             # A killed Docker client can leave its --rm helper running.
                             subprocess.run(
@@ -327,6 +337,10 @@ with tarfile.open(fileobj=sys.stdin.buffer,mode='r|gz') as archive:
                 ) as client:
                     exercise(client, report, restart)
                 report["status"] = "passed"
+            except Exception as exc:
+                report["failure_operation"] = report.get("last_operation")
+                report["failure_type"] = type(exc).__name__
+                raise
             finally:
                 try:
                     if started:
