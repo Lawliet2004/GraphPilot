@@ -35,7 +35,16 @@ def call(action, body):
         else "https://identitytoolkit.googleapis.com/v1/"
     )
     try:
-        with httpx.Client(timeout=15, follow_redirects=False, trust_env=False) as http:
+        # Some demo networks advertise IPv6 without a working route to Google.
+        # Bind outbound Auth requests to IPv4 rather than stalling on each address.
+        with httpx.Client(
+            timeout=15,
+            follow_redirects=False,
+            trust_env=False,
+            transport=httpx.HTTPTransport(
+                local_address=None if cfg.firebase_emulator_host else "0.0.0.0"
+            ),
+        ) as http:
             result = http.post(
                 base + "accounts:" + action, params={"key": cfg.firebase_api_key}, json=body
             )

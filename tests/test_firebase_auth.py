@@ -89,7 +89,9 @@ def provider(monkeypatch):
         firebase_auth,
         "httpx",
         SimpleNamespace(
-            Client=lambda **kw: httpx.Client(transport=transport, **kw), HTTPError=httpx.HTTPError
+            Client=httpx.Client,
+            HTTPTransport=lambda **kw: transport,
+            HTTPError=httpx.HTTPError,
         ),
     )
     return state
