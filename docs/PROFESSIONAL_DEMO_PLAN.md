@@ -12,8 +12,8 @@
 ## Hosting decision
 
 The owner has a college email and can verify Azure for Students eligibility.
-The official student signup has been opened. Portal sign-in is waiting for the
-college account holder to approve Microsoft MFA; student activation is unverified.
+The official student signup has been opened and college-account portal sign-in
+is complete. Student activation and spending protection remain unverified.
 The proposed host is a small Linux VM running the existing Docker Compose stack,
 with persistent volumes, a public HTTPS gateway and restart policies. Firebase
 continues to manage authentication. PostgreSQL, FalkorDB and source artifacts

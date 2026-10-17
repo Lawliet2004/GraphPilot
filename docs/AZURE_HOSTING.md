@@ -1,8 +1,8 @@
 # Always-awake student demo hosting
 
-The requested host is pending Azure for Students verification. Portal sign-in
-is currently waiting for the college account holder to approve Microsoft MFA.
-The subscription, spending limit and eligible resources remain unverified. No Azure VM,
+The requested host is pending Azure for Students verification. College-account
+portal sign-in is complete; an active student subscription, spending limit and
+eligible resources remain unverified. No Azure VM,
 subscription upgrade or paid service has been created by this setup. The current
 Codespaces URL is an on-demand demo and can stop after inactivity.
 

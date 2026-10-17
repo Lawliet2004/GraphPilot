@@ -84,7 +84,7 @@
     "account_email_notifications_verified": false
   },
   "pending": [
-    "Azure college-account MFA, student subscription/spending-limit verification, provisioning and migration",
+    "Azure student activation, subscription/spending-limit verification, provisioning and migration",
     "GitHub Confirm access, save short-domain callback and verify fresh browser OAuth",
     "Final-host reboot, full backend monitoring and recovery checks after migration"
   ],
