@@ -40,6 +40,27 @@ def test_other_gateways_do_not_rewrite_origins(tmp_path):
     assert "proxy_set_header Host $http_host;" in gateway
 
 
+def test_vercel_origin_keeps_old_codespace_login_and_foreign_origin_rejection(tmp_path):
+    state = tmp_path / "demo"
+    old = "https://demo-18080.app.github.dev"
+    path = prepare(state, "https://gp-demo.vercel.app", 18080, [old, old])
+    values = dict(line.split("=", 1) for line in path.read_text().splitlines())
+    assert values["GP_PUBLIC_URL"] == "https://gp-demo.vercel.app"
+    assert json.loads(values["GP_ORIGINS"]) == ["https://gp-demo.vercel.app", old]
+    gateway = (state / "nginx.conf").read_text()
+    assert '"demo-18080.app.github.dev|http://localhost:18080|same-origin"' in gateway
+    assert '"https://demo-18080.app.github.dev";' in gateway
+    assert "default $http_origin;" in gateway
+    assert "return 308 https://gp-demo.vercel.app$request_uri;" in gateway
+    prepare(state, "https://gp-demo.vercel.app", 18080)
+    resumed = dict(line.split("=", 1) for line in path.read_text().splitlines())
+    assert json.loads(resumed["GP_ORIGINS"]) == ["https://gp-demo.vercel.app", old]
+    with pytest.raises(ValueError):
+        prepare(state, "https://gp-demo.vercel.app", 18080, ["https://evil.example/path"])
+    with pytest.raises(ValueError):
+        prepare(state, "https://gp-demo.vercel.app", 18080, ["http://localhost:5173"])
+
+
 def test_codespace_url_and_http_restrictions():
     assert (
         public_url(18080, environ={"CODESPACE_NAME": "my-demo"})
@@ -53,6 +74,12 @@ def test_codespace_url_and_http_restrictions():
     )
     assert public_url(18080, environ={"CODESPACE_NAME": "resumed"}, previous=previous) == (
         "https://resumed-18080.app.github.dev"
+    )
+    assert (
+        public_url(
+            18080, environ={"CODESPACE_NAME": "resumed"}, previous="https://gp-demo.vercel.app"
+        )
+        == "https://gp-demo.vercel.app"
     )
     for url in [
         "http://public.example",

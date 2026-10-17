@@ -22,3 +22,4 @@ backups/
 .impeccable/questions/
 .impeccable/seed-output.txt
 app/tsconfig.tsbuildinfo
+.vercel/

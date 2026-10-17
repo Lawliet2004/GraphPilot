@@ -23,6 +23,13 @@ def public_url(port, explicit=None, environ=None, previous=None):
     env = os.environ if environ is None else environ
     if explicit:
         url = explicit.rstrip("/")
+    elif (
+        previous
+        and previous.startswith("https://")
+        and not urlparse(previous).hostname.endswith(".app.github.dev")
+    ):
+        # Keep an explicit frontend domain after the Codespace resumes.
+        url = previous
     elif env.get("CODESPACE_NAME"):
         name = env["CODESPACE_NAME"]
         domain = env.get("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
@@ -66,7 +73,7 @@ def save_private(path, content):
         temporary.unlink(missing_ok=True)
 
 
-def prepare(state, address, port):
+def prepare(state, address, port, allowed_origins=None):
     state.mkdir(parents=True, exist_ok=True, mode=0o700)
     state.chmod(0o700)
     env_file = state / "compose.env"
@@ -79,6 +86,15 @@ def prepare(state, address, port):
         if env_file.exists()
         else {}
     )
+    if allowed_origins is None:
+        allowed_origins = (
+            json.loads(values.get("GP_ORIGINS", "[]"))
+            if values.get("GP_PUBLIC_URL") == address
+            else []
+        )
+    origins = list(dict.fromkeys([address, *(public_url(port, o) for o in allowed_origins)]))
+    if address.startswith("https://") and any(not o.startswith("https://") for o in origins):
+        raise ValueError("An HTTPS deployment requires HTTPS allowed origins")
     password = values.get("POSTGRES_PASSWORD") or secrets.token_hex(32)
     secure = address.startswith("https://")
     dsn = f"postgresql+psycopg://graphpilot:{password}@postgres:5432/graphpilot"
@@ -93,7 +109,7 @@ def prepare(state, address, port):
             "GP_ENVIRONMENT": "production" if secure else "development",
             "GP_COOKIE_SECURE": str(secure).lower(),
             "GP_PUBLIC_URL": address,
-            "GP_ORIGINS": json.dumps([address]),
+            "GP_ORIGINS": json.dumps(origins),
             "GP_ALLOWED_LOCAL_ROOTS": "[]",
             "GP_MCP_ENABLED": "true",
             "GP_LLM_BASE_URL": "",
@@ -103,22 +119,32 @@ def prepare(state, address, port):
     )
     save_private(env_file, "\n".join(f"{k}={v}" for k, v in values.items()) + "\n")
     gateway = (ROOT / "app/nginx.conf").read_text()
-    if urlparse(address).hostname.endswith(".app.github.dev"):
+    codespace_origins = [o for o in origins if urlparse(o).hostname.endswith(".app.github.dev")]
+    if codespace_origins:
         # Codespaces rewrites a same-origin browser Origin to its local upstream
         # and supplies the original public Host separately. Require that exact
         # pair plus browser same-origin metadata; preserve all other Origins.
-        host = urlparse(address).netloc
+        host = urlparse(codespace_origins[0]).netloc
+        mappings = "".join(
+            f'  "{urlparse(o).netloc}|http://localhost:{port}|same-origin" "{o}";\n'
+            for o in codespace_origins
+        )
         gateway = (
             "map_hash_bucket_size 256;\n"
             'map "$http_x_forwarded_host|$http_origin|$http_sec_fetch_site" $graphpilot_origin {\n'
-            "  default $http_origin;\n"
-            f'  "{host}|http://localhost:{port}|same-origin" "{address}";\n'
-            "}\n" + gateway
+            "  default $http_origin;\n" + mappings + "}\n" + gateway
         )
         gateway = gateway.replace(
             "proxy_set_header Host $http_host;",
             f"proxy_set_header Host {host};\n    proxy_set_header Origin $graphpilot_origin;",
         )
+        if address not in codespace_origins:
+            # Browser sessions and OAuth state stay on the canonical frontend.
+            # /api remains available to the proxy and existing MCP clients.
+            gateway = gateway.replace(
+                "    try_files $uri $uri/ /index.html;",
+                f"    return 308 {address}$request_uri;",
+            )
     if secure:
         gateway = gateway.replace(
             "proxy_set_header X-Forwarded-Proto $scheme;",
@@ -137,7 +163,13 @@ def prepare(state, address, port):
                     "web": {
                         "volumes": [f"{state / 'nginx.conf'}:/etc/nginx/conf.d/default.conf:ro"],
                         "healthcheck": {
-                            "test": ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"],
+                            "test": [
+                                "CMD",
+                                "wget",
+                                "-q",
+                                "--spider",
+                                "http://127.0.0.1/api/health/ready",
+                            ],
                             "interval": "5s",
                             "timeout": "3s",
                             "retries": 20,
@@ -171,6 +203,11 @@ def main():
     )
     parser.add_argument("--port", type=int, default=18080)
     parser.add_argument("--public-url")
+    parser.add_argument(
+        "--allowed-origin",
+        action="append",
+        help="Additional exact HTTPS browser origin, for an existing URL during a hosting move",
+    )
     parser.add_argument("--project", default="graphpilot-cloud-demo")
     parser.add_argument("--build", action="store_true")
     parser.add_argument("--email", help="Existing account email for admin/token commands")
@@ -197,7 +234,7 @@ def main():
                 None,
             )
         address = public_url(args.port, args.public_url, previous=previous)
-        env_file = prepare(state, address, args.port)
+        env_file = prepare(state, address, args.port, args.allowed_origin)
     elif not env_file.exists():
         parser.error("This demo has not been started")
     docker = docker_command()
