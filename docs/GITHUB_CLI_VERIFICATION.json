@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-10-17T13:39:39.464728+00:00",
+  "application_commit": "99c9d9f2d6bd078f216e92f955632107819580a9",
+  "ci_url": "https://github.com/Lawliet2004/GraphPilot/actions/runs/39036789294",
+  "ci_all_six_jobs": "passed",
+  "backend_tests": {
+    "passed": 143,
+    "skipped": 1,
+    "skip": "Opt-in Firebase emulator test"
+  },
+  "frontend_build": "passed",
+  "browser_journeys": "passed in CI, including real CLI pairing and mocked-provider UI test",
+  "github_app": {
+    "slug": "graphpilot-lawliet2004-demo",
+    "permissions": "Read-only contents, metadata, Actions, issues and pull requests",
+    "repository_selection": "selected",
+    "private_fixture": "Lawliet2004/graphpilot-auth-demo-20261017"
+  },
+  "live_auth_cli": {
+    "demo_firebase_login": true,
+    "demo_admin_boundary": true,
+    "live_cli_approval": true,
+    "actual_cli_commands": true,
+    "read_scope_enforced": true,
+    "cli_admin_denied": true,
+    "cli_revocation": true,
+    "github_configured": true,
+    "owner_firebase_login": true,
+    "owner_admin_boundary": true,
+    "status": "passed",
+    "url": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev",
+    "github_live_private_test": "see cloud-private-check.json",
+    "hosting": "Codespaces; idle shutdown applies"
+  },
+  "live_private_repository": {
+    "github_configured": true,
+    "account_connected": true,
+    "selected_repository_count": 2,
+    "selected_private_visible": true,
+    "private_fetch_index": true,
+    "source_evidence": true,
+    "private_history_sync": true,
+    "graph_nodes": 7,
+    "repository_id": "c95b9e65-5839-4117-b781-0018f3320646",
+    "other_user_private_access_denied": true,
+    "status": "passed",
+    "fixture": "Synthetic private repository; no real private project data",
+    "url": "https://graphpilot-demo-4jq4pvw4j7w9374gp-18080.app.github.dev"
+  },
+  "live_private_mcp": {
+    "status": "passed",
+    "direct_streamable_http": {
+      "tool_count": 5,
+      "accessible_repository_count": 2,
+      "read_only": true,
+      "symbol_search": true,
+      "nonempty_source_evidence": true,
+      "indexing_status": true
+    },
+    "stdio_bridge": {
+      "tool_count": 5,
+      "accessible_repository_count": 2,
+      "read_only": true,
+      "symbol_search": true,
+      "nonempty_source_evidence": true,
+      "indexing_status": true
+    },
+    "scope": "Real MCP SDK discovery and read-only tool calls; no OAuth/client installation claim"
+  },
+  "remaining": [
+    "Azure academic verification and actual always-awake deployment",
+    "Stable-host HTTPS, restart/persistence/restore and scheduled external monitoring checks",
+    "External real-inbox verification/reset delivery is not proven"
+  ],
+  "hosting_notice": "Current Codespaces deployment has idle shutdown and finite free allowances. No Azure resource or paid upgrade created.",
+  "browser_control": "Chrome extension requested an update; Azure signup incomplete."
+}

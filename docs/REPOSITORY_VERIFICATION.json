@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-17T13:29:35.101948+00:00",
-  "candidate_files": 213,
+  "timestamp": "2026-10-17T13:39:39.834876+00:00",
+  "candidate_files": 214,
   "scope": "Current Git candidates only; no history/remote or guarantee of secret absence",
   "scanner": "Gitleaks; default rules extended only for two exact invalid redaction fixtures",
   "ignored_probes": {

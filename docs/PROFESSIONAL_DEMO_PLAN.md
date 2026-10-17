@@ -56,8 +56,12 @@ The existing cloud demo has Firebase login, role checks, real public-repository
 indexing and five read-only MCP tools. A GitHub App connection, private-repository
 access and the new always-awake deployment must not be called complete before
 their live checks pass. The GitHub/CLI implementation and automated checks are
-ready; actual App registration, installation and live private-repository testing
-remain account-dependent. See [GitHub and CLI](GITHUB_AND_CLI.md) and
+ready. The actual App is now registered, installed for two selected repositories
+and authorized by the owner. A synthetic private repository passed live indexing,
+source evidence, history sync and another user's access-denial checks. CLI and MCP
+also passed live cloud checks. Always-awake Azure hosting remains pending academic
+verification. See [verification evidence](GITHUB_CLI_VERIFICATION.json),
+[GitHub and CLI](GITHUB_AND_CLI.md) and
 [Azure deployment steps](AZURE_HOSTING.md).
 
 Sources: [Azure for Students](https://azure.microsoft.com/en-us/free/students/),
