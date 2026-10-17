@@ -159,7 +159,7 @@ test("real repository journey, source evidence, settings, restrictions and respo
     page.getByText("Graph retrieval", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Natural-language synthesis is unavailable", {
+    page.getByText("Add or update your own model credentials in Settings", {
       exact: false,
     }),
   ).toBeVisible();

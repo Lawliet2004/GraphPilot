@@ -115,7 +115,7 @@ test("recorded CI log fixture: real archive, browser evidence, download and resp
         .getByRole("button", { name: "Ask GraphPilot", exact: true })
         .click();
       await expect(
-        page.getByText(/Natural-language synthesis is unavailable/),
+        page.getByText(/Add or update your own model credentials in Settings/),
       ).toBeVisible();
       await page.goto("/workspace");
       await expect(
