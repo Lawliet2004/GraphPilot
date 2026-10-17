@@ -75,6 +75,18 @@ class GitHubConnection(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class ModelCredential(Base):
+    __tablename__ = "model_credentials"
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    provider: Mapped[str] = mapped_column(String(20))
+    model: Mapped[str] = mapped_column(String(120))
+    api_key: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class AuthorizationRequest(Base):
     __tablename__ = "authorization_requests"
     id: Mapped[str] = mapped_column(String(64), primary_key=True)

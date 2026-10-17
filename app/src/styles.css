@@ -1669,6 +1669,12 @@ td select {
 .settings-layout h2:not(:first-child) {
   margin-top: 45px;
 }
+.settings-layout > section > section {
+  margin-top: 45px;
+}
+.model-credentials .definition-list dd {
+  overflow-wrap: anywhere;
+}
 .settings-layout > section > p {
   font-size: 12px;
 }

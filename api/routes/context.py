@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from api.agent.synthesis import synthesize
 from api.auth import current_session
 from api.db import db_session
+from api.model_credentials import for_synthesis
 from api.models import Conversation, User
 from api.routes.repositories import read_evidence
 from api.search.retrieval import retrieve
@@ -55,7 +56,12 @@ def context(
             }
         )
     synthesis = (
-        synthesize(body.question, citations, result["relationships"])
+        synthesize(
+            body.question,
+            citations,
+            result["relationships"],
+            credential=for_synthesis(db, user.id),
+        )
         if citations
         else {
             "mode": "graph",

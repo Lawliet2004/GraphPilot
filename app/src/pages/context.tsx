@@ -135,8 +135,9 @@ export function ContextExplorer({ repo }: { repo: Repo }) {
           </li>
         </ol>
         <p className="notice subtle">
-          Graph search works without a model. When configured, AI synthesis uses
-          retrieved evidence and must cite it.
+          Graph search works without a model. With your own provider key
+          (Settings), asking here sends bounded excerpts to your provider — only
+          on request, at their rates.
         </p>
       </aside>
     </div>

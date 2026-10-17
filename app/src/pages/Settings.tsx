@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api, post, date, type Capabilities } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { ErrorNotice, Heading, Loading } from "../components/ui";
+import { ModelCredentials } from "../components/ModelCredentials";
 import { CliCredentials } from "./CliAccess";
 export function Settings() {
   const { user, refresh, provider, emailVerified } = useAuth();
@@ -156,6 +157,7 @@ export function Settings() {
             </button>
           </form>
           <CliCredentials />
+          <ModelCredentials />
           <h2>Connected services</h2>
           {caps.isPending ? (
             <Loading />
@@ -167,8 +169,10 @@ export function Settings() {
                 <dt>AI synthesis</dt>
                 <dd>
                   {caps.data?.llm_configured
-                    ? "Configured on server"
-                    : "Not configured · graph search is available"}
+                    ? "Your provider key is saved"
+                    : caps.data?.byok_available
+                      ? "Add your own key above · graph search works without it"
+                      : "Not configured · graph search is available"}
                 </dd>
               </div>
               <div>
@@ -190,8 +194,8 @@ export function Settings() {
             </dl>
           )}
           <p className="small muted">
-            Provider connections are managed through server configuration.
-            Secrets are never sent to your browser.
+            GitHub and email connections are managed through server
+            configuration. Secrets are never sent to your browser.
           </p>
         </section>
         <section>

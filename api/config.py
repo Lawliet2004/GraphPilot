@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     max_archive_bytes: int = 25_000_000
     max_extract_bytes: int = 100_000_000
     job_timeout_seconds: int = Field(300, ge=10, le=3600)
+    # Deprecated operator-level model fields: retained only so existing env
+    # files and deployments keep validating. User-facing synthesis always uses
+    # per-user BYOK credentials and never falls back to these values.
     llm_base_url: str = ""
     llm_model: str = ""
     llm_api_key: str = Field("", repr=False)

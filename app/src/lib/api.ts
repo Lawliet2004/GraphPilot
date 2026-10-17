@@ -104,6 +104,8 @@ export type ContextResult = {
   snapshot_id: string | null;
   historical: boolean;
   mode: "graph" | "ai";
+  provider?: string;
+  model?: string;
   answer: string | null;
   notice: string;
   results: Node[];
@@ -158,8 +160,17 @@ export function scoped(
 export type Capabilities = {
   local_sources: boolean;
   llm_configured: boolean;
+  byok_available: boolean;
   password_reset_email: boolean;
   github_authenticated: boolean;
+};
+export type ModelCredentialStatus = {
+  configured: boolean;
+  provider: "openai" | "openrouter" | null;
+  model: string | null;
+  updated_at: string | null;
+  byok_available: boolean;
+  providers: string[];
 };
 export function csrf() {
   return (

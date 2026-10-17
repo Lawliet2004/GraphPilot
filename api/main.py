@@ -4,6 +4,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
@@ -12,7 +13,7 @@ from api.auth import current_session
 from api.auth import router as auth_router
 from api.body_limits import BodyLimitMiddleware
 from api.config import settings
-from api.db import engine
+from api.db import db_session, engine
 from api.graph.store import client
 from api.mcp_server import create_server, mcp_app
 from api.services.telemetry import record_request
@@ -97,6 +98,17 @@ async def security_headers(request: Request, call_next):
     return response
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_error(request, exc):
+    # Pydantic echoes submitted values under "input"/"ctx"; credential fields
+    # could contain secrets, so only location, message and type are returned.
+    detail = [
+        {"loc": list(e.get("loc", [])), "msg": e.get("msg", ""), "type": e.get("type", "")}
+        for e in exc.errors()
+    ]
+    return JSONResponse({"detail": detail}, status_code=422)
+
+
 @app.exception_handler(Exception)
 async def unexpected_error(request, exc):
     log.error("event=application_error error_type=%s", type(exc).__name__)
@@ -133,14 +145,17 @@ def ready():
 
 
 @app.get("/api/capabilities")
-def capabilities(user=Depends(current_session)):
+def capabilities(user=Depends(current_session), db=Depends(db_session)):
+    from api.models import ModelCredential
+
     cfg = settings()
     return {
         "python_semantic_indexing": True,
         "other_languages": "file references only",
         "local_sources": bool(cfg.allowed_local_roots),
         "archive_upload": True,
-        "llm_configured": bool(cfg.llm_base_url and cfg.llm_model),
+        "llm_configured": bool(db.get(ModelCredential, user.id)),
+        "byok_available": bool(cfg.credential_key),
         "github_authenticated": bool(cfg.github_token),
         "password_reset_email": bool(cfg.firebase_project_id or cfg.smtp_host and cfg.smtp_from),
     }
@@ -165,6 +180,10 @@ app.include_router(github_connection_router)
 from api.routes.cli_access import router as cli_router  # noqa: E402
 
 app.include_router(cli_router)
+
+from api.routes.model import router as model_router  # noqa: E402
+
+app.include_router(model_router)
 
 # A separate bearer gate protects every MCP request; browser cookie sessions are
 # never accepted here. The trailing slash is part of the client endpoint.

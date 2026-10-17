@@ -184,20 +184,21 @@ the working tree. Uncommitted edits are intentionally not a Git snapshot.
 
 ## Model and email configuration
 
-Set these **server-side** for local llama.cpp or another OpenAI-compatible provider:
+Natural-language synthesis is per-user BYOK. Each signed-in user stores their
+own provider key and model choice in **Settings → AI synthesis with your own
+key** (OpenAI or OpenRouter; the endpoints are fixed HTTPS URLs). The key is
+encrypted at rest with `GP_CREDENTIAL_KEY`, is never returned by the API — not
+even a suffix — and is sent only to the chosen provider, only when that user
+asks a question. Bounded repository excerpts, relationship data and citation
+IDs cross the boundary; provider charges apply to the user's own account.
+Without a key, context returns structured graph results with an explicit
+notice, and there is no operator-level model fallback. The deprecated
+`GP_LLM_BASE_URL`, `GP_LLM_MODEL` and `GP_LLM_API_KEY` variables remain only
+for config compatibility and are never used for user-facing synthesis.
+CLI/agent credentials cannot manage model keys. Actual successful inference
+with a real configured model remains unverified.
 
-```dotenv
-GP_LLM_BASE_URL=http://127.0.0.1:8081/v1
-GP_LLM_MODEL=your-model-name
-GP_LLM_API_KEY=
-```
-
-A hosted provider can use an HTTPS base URL and its key. Both URL and model must
-be supplied. Inside Compose, loopback addresses refer to that container; configure
-a reachable service or host address. The model gets bounded quoted excerpts,
-relationship data and citation IDs, never database credentials or shell tools.
-When unset/unavailable, context returns structured search results and an explicit
-notice. Actual successful inference with a real configured model remains unverified.
+See [personal model credentials](docs/BYOK.md) for storage, provider and deployment details.
 
 Optional [Firebase Authentication](docs/FIREBASE_AUTH.md) manages email/password
 credentials, verification and password reset on the Spark plan. GraphPilot keeps
