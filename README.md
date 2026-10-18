@@ -14,6 +14,33 @@ and reset emails were received; the reset message landed in Spam.
 See [implementation status](IMPLEMENTATION_STATUS.md), [test report](docs/TEST_REPORT.md) and [interface review](docs/UI_REVIEW.md)
 and the [requirement-by-requirement audit](docs/REQUIREMENTS_AUDIT.md).
 
+## Hackathon submission (FalkorDB)
+
+| Item | Where |
+|---|---|
+| Live deployment | **https://gp-code.vercel.app** (backend on a Codespace; may need a minute to wake) |
+| Source | https://github.com/Lawliet2004/GraphPilot (this repository) |
+| Setup instructions | [Start with Docker Compose](#start-with-docker-compose) · [Native development](#native-development) |
+| Graph data model | [docs/GRAPH_MODEL.md](docs/GRAPH_MODEL.md#nodes) |
+| Cypher queries & graph algorithms | [docs/GRAPH_MODEL.md](docs/GRAPH_MODEL.md#cypher-queries-the-product-depends-on) |
+| Demo video | Linked in the submission form |
+
+**Graph model in one glance** — one immutable FalkorDB graph per repository
+branch+revision; every node is `:Entity` plus a type label.
+
+```
+(Branch)-[:HAS_FILE]->(File)-[:DEFINES]->(Class)-[:DEFINES]->(Function)
+(Function)-[:CALLS]->(Function)        (File)-[:IMPORTS]->(File)
+(TestCase)-[:TESTS]->(Function)        (Commit)-[:MODIFIES]->(File)
+(WorkflowRun)-[:TRIGGERED_BY]->(Commit) (WorkflowRun)-[:PRODUCES]->(LogArtifact)
+```
+
+Core queries: bounded BFS impact over incoming `CALLS|IMPORTS`, variable-length
+path matching (`*1..4`), neighbor expansion and ID-diff incremental publication.
+
+**Quick local start:** `cp .env.example .env` (set passwords), then
+`docker compose up --build -d` and open http://localhost:8080.
+
 ## Free cloud demos and MCP
 
 Open the current website at **[gp-code.vercel.app](https://gp-code.vercel.app)**.
