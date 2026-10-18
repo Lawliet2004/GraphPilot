@@ -67,7 +67,7 @@ export function ModelCredentials() {
   const configured = !!row?.configured && !editing;
   return (
     <section className="model-credentials">
-      <h2>AI synthesis with your own key</h2>
+      <h2>AI answers (optional)</h2>
       <p className="muted">
         Graph search, evidence and citations work without any model. To get a
         written answer you can add your own provider key: your provider bills

@@ -12,6 +12,16 @@ relationships are sent to the chosen provider. The provider bills your account;
 GraphPilot does not supply credits. Free-model availability and quotas are
 controlled by the provider. Private verification uses free models only.
 
+The repository opens on **Ask**; **Code** contains the graph and dependency
+tracing, and **Activity** contains history and index health. Broad questions
+automatically gather a representative sample of indexed README, dependency,
+entry-point, UI and test files, including non-Python text source. Specific
+questions still search symbols and follow recorded relationships. The sample is
+bounded, not a complete review. Up to three recent questions and answers from
+the same user, repository, branch and snapshot help interpret follow-ups; these
+are also sent to the user's provider. Source excerpts remain limited to eight
+items and 24,000 characters. Indexing does not execute repository code or tests.
+
 Credentials are encrypted in PostgreSQL with the deployment's durable
 `GP_CREDENTIAL_KEY`. The same key must be available to API processes after
 restart or restore. Preserve it with protected backups; do not rotate it without

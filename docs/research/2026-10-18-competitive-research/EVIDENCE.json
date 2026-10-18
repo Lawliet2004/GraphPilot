@@ -1,0 +1,266 @@
+{
+  "research_started_at_utc": "2026-10-18T05:54:55Z",
+  "research_completed_at_utc": "2026-10-18T09:13:22Z",
+  "elapsed_wall_minutes": 198.46,
+  "scope": "Selected relevant landscape: 10 product families; 17 pinned repository entries (16 implementation repositories plus Sourcebot public configuration/deployment tree); GraphRAG additional docs-only comparison. Not an exhaustive survey of every competitor.",
+  "requested_subagent_selector": "swe-2-max",
+  "cli_version": "3000.11.92 (7f4e64980e22)",
+  "research_model_sessions": [
+    {
+      "task": "Commercial-product research",
+      "session_id": "wary-pecorino",
+      "model": "SWE-2 Max",
+      "cli_version": "3000.11.92",
+      "recorded_steps": 24,
+      "export_sha256": "bcdb25a2b16a43433a9a18565858bf5bff54415863f5c1f644e74032597441a5"
+    },
+    {
+      "task": "Open-source research",
+      "session_id": "pricey-echinacea",
+      "model": "SWE-2 Max",
+      "cli_version": "3000.11.92",
+      "recorded_steps": 111,
+      "export_sha256": "90500259d233a35e0185070db762ca279eb501a2960dce5cebd9b411d92f5c57"
+    },
+    {
+      "task": "Commercial-source audit",
+      "session_id": "humorous-taleggio",
+      "model": "SWE-2 Max",
+      "cli_version": "3000.11.92",
+      "recorded_steps": 59,
+      "export_sha256": "53b1effbfb90db5e25af2095f9b397a5e8c2c65d109efe3f79160a7de2470b85"
+    },
+    {
+      "task": "Open-source audit",
+      "session_id": "notch-ermine",
+      "model": "SWE-2 Max",
+      "cli_version": "3000.11.92",
+      "recorded_steps": 32,
+      "export_sha256": "ead4fd9e6c2f74b71c9be850eccc901138dedea14c33d90e80041caee27c267a"
+    },
+    {
+      "task": "Independent feasibility review",
+      "session_id": "longing-baroness",
+      "model": "SWE-2 Max",
+      "cli_version": "3000.11.92",
+      "recorded_steps": 19,
+      "export_sha256": "b7c72db2305b454a3d7cd7d1872c009dd9c06a206f6d4a3a044eedc79241e326"
+    },
+    {
+      "task": "Implementation-design research review, resumed after connection failure",
+      "session_id": "rounded-soldier",
+      "model": "SWE-2 Max",
+      "cli_version": "3000.11.92",
+      "recorded_steps": 26,
+      "export_sha256": "b0583275df5f5d9c6c796b5f623808f94fff5c98340c9f79b7d069eacceea195"
+    }
+  ],
+  "git_head": "765644ced40dbb6ac82943a7a8c4ac78891dad0b",
+  "working_tree": "Preexisting tracked/untracked changes included in source review; see self-analysis.json source_hashes. Research wrote only this dated documentation folder.",
+  "source_catalog": "REPOSITORIES.json",
+  "source_path_checks": "SOURCE_PATH_CHECKS.json",
+  "evidence_categories": [
+    "official product documentation",
+    "commit-pinned source inspection",
+    "local isolated probes",
+    "proposed recommendations"
+  ],
+  "runtime_limits": [
+    "No paid competitor installation or comparative benchmark",
+    "No customer interviews",
+    "No successful browser inspection; UI conclusions are source-based",
+    "No full GraphPilot release test audit",
+    "Pure parser counts are not accuracy measurements",
+    "Synthetic graph timings are not API or competitor performance",
+    "First Falkor fulltext subtest was inconclusive; fulltext-check.json separately verifies readiness",
+    "Availability probe is one observation, not a diagnosed incident or uptime rate"
+  ],
+  "artifacts": [
+    {
+      "path": "CHECKOUT_PIN_CHECKS.json",
+      "bytes": 1919,
+      "sha256": "863186f3fc28958e7b1ce8a2c62cf1f18d618bd352a774dff4c74b5bcec82f0b"
+    },
+    {
+      "path": "DESIGN_NOTES.md",
+      "bytes": 7596,
+      "sha256": "4009c4f3c3359b133eaa1ea07342712bf2e686571ac2957ab969992abb560b8b"
+    },
+    {
+      "path": "IMPLEMENTATION_HANDOFF.md",
+      "bytes": 13552,
+      "sha256": "c3221199bc84e49077bf3ea36c5f0ead0249da7c22637d21ac8e4be5969d3368"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1285,
+      "sha256": "9a53f80071e5a30c0b957bf27415149d0351f384e9d96efac8ed6c872783493a"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 65178,
+      "sha256": "2af96dea87b5917d68c23e67815f82fca19d855ecc219e13fa3deeed3f595870"
+    },
+    {
+      "path": "REPOSITORIES.json",
+      "bytes": 11790,
+      "sha256": "903e6016a72b2d37aa7de9f8e834d506f133eef64862f789052fac13e3049ad7"
+    },
+    {
+      "path": "REVIEW_DECISIONS.md",
+      "bytes": 4636,
+      "sha256": "e201e62ae4dfbd223b40e44dd120bac9f396b80958fd97097c63879313ca807b"
+    },
+    {
+      "path": "SOURCES.md",
+      "bytes": 24720,
+      "sha256": "d8ca16bbfc6fe5d0e30c7d513faecafcf053b63bf505c2522778c142a8447493"
+    },
+    {
+      "path": "SOURCE_PATH_CHECKS.json",
+      "bytes": 16804,
+      "sha256": "e41b35259c8cc24bfdd6336055a935f3787c70c1994cb1564488c52acdc821f3"
+    },
+    {
+      "path": "adversarial-probes.json",
+      "bytes": 2479,
+      "sha256": "9b161ba287ac6c4985c31ec19016ee81f3e6c2bd2a29a88e578ab9e9d1db363f"
+    },
+    {
+      "path": "availability-probe.json",
+      "bytes": 677,
+      "sha256": "2d40dabd3bba0032e0cfebc1f83af0ecd4003efd6b623e848560c84288a12cd6"
+    },
+    {
+      "path": "correctness-probes.json",
+      "bytes": 1229,
+      "sha256": "aff02f538bf952d49023083df1804482ecc3b185cc058d43e3e70e41b1a835fb"
+    },
+    {
+      "path": "design-edge-checks.json",
+      "bytes": 960,
+      "sha256": "cff1d5dd8c3a5f5a0d645124c235fe4355655f777565025a2a1757d5388fbfa0"
+    },
+    {
+      "path": "fulltext-check.json",
+      "bytes": 3950,
+      "sha256": "5261241ed96cdddd889470f93f08bbfab8a257bde43d97c721307c85d43ef0a6"
+    },
+    {
+      "path": "graph-probes.json",
+      "bytes": 3162,
+      "sha256": "f927e93ca12a8b920bdf1764af2ebc85b47fff766f4d8c658621f0a853ef17d3"
+    },
+    {
+      "path": "local-probes.json",
+      "bytes": 4967,
+      "sha256": "42c79e8510f4eea153ed3952f3eace097b2e19c4a464ac035500a11824d2c0f1"
+    },
+    {
+      "path": "probes/README.md",
+      "bytes": 4115,
+      "sha256": "a9f2799f808175c0543421c0a4b2be4b42bcf567ca50176b808c4f5b0b253e19"
+    },
+    {
+      "path": "probes/adversarial-probes.py",
+      "bytes": 1997,
+      "sha256": "cb5c817ef6b8b75b38e7654e52260c0443a82acbb389d5aa807243ec1233564c"
+    },
+    {
+      "path": "probes/correctness-probes.py",
+      "bytes": 4154,
+      "sha256": "ef98956ba33148b6821bfaaf8b89acd80740865e8e5017415c9289f3f055e2db"
+    },
+    {
+      "path": "probes/fulltext-check.py",
+      "bytes": 1612,
+      "sha256": "7bc5913edebf8e0417194423cb7b6d498d902761bfc7ac6abb3f4d0fdbc4c9d6"
+    },
+    {
+      "path": "probes/graph-probes.py",
+      "bytes": 3038,
+      "sha256": "e20565a61ffc1dbe7769fcfea515d5936d17fad47503d60a880cc39e63f65827"
+    },
+    {
+      "path": "probes/local-probes.py",
+      "bytes": 2401,
+      "sha256": "206a8cc4e964ef0e5fea98bbb11acdaaecfb20c6223ea9a6b0d3c99102716df4"
+    },
+    {
+      "path": "probes/search-index-probe.py",
+      "bytes": 4990,
+      "sha256": "80d5b5549ced82417540b1474d691a5cf9f2dbc2de71f0a2c52d68448680d10c"
+    },
+    {
+      "path": "probes/self-analysis.py",
+      "bytes": 1795,
+      "sha256": "425d79cf189079694b11a755830479c713ec603394c19291b9873aef34834e30"
+    },
+    {
+      "path": "probes/traversal-contract-check.py",
+      "bytes": 2840,
+      "sha256": "505a7dd71712ca410c0822387f81c48954baf9b20904fcf450a36f932bb6b12c"
+    },
+    {
+      "path": "search-index-probe.json",
+      "bytes": 4177,
+      "sha256": "4a545b4d48d0cbf39cde50b1da52793fee62027dda27dd1ad262b7b9669ac684"
+    },
+    {
+      "path": "self-analysis.json",
+      "bytes": 9083,
+      "sha256": "f3c696d2c88fca2b025245e1274ce4115563abd6acd37c4b95c43d3213262a0c"
+    },
+    {
+      "path": "traversal-contract-check.json",
+      "bytes": 842,
+      "sha256": "cef90d2a38973c4a1ad584a456c05db9295c3a59ca7273c9941f4d4f531402cc"
+    }
+  ],
+  "additional_primary_fetches": [
+    {
+      "url": "https://docs.sourcebot.dev/docs/upgrade/v5-to-v6-guide.md",
+      "http_status": 200,
+      "bytes": 7083,
+      "sha256": "c0124961856947cc1d64b4d501bedab0097f78d240d22a819b3133a877fee340",
+      "verified_claims": [
+        "Basic activation required",
+        "five active users",
+        "seven-day connectivity restriction",
+        "telemetry license policy"
+      ]
+    }
+  ],
+  "verified_artifact_contracts": {
+    "source_path_checks": 72,
+    "source_path_statuses": {
+      "local_file": 37,
+      "local_directory": 3,
+      "pinned_raw_file": 30,
+      "api_tree_directory": 2
+    },
+    "analyzed_source_hashes_unchanged_before_implementation": 81,
+    "relative_markdown_links": "checked; all existing at research validation",
+    "research_probe_scripts": 8,
+    "recorded_probe_data_files": 10,
+    "full_release_test_audit": false,
+    "product_implementation_during_research": false,
+    "shallow_checkout_heads_matching_catalog": 11,
+    "abstract_traversal_check": "4096 simple four-node directed graphs without self loops x3 caps; independent Floyd-Warshall; not product validation",
+    "retained_research_scripts_compile": 8,
+    "design_review_counterchecks": "CRLF/U+2028 rewriting, trailing-newline formula, relative-import boundary; separate diagnosis not product integration testing"
+  },
+  "timing_note": "Elapsed wall time spans the chat session, including a gap with no recorded tool activity between 06:52:17 and 09:02:58 UTC. It is not a claim of continuous active research for that entire wall-clock interval. Active duration was not separately instrumented.",
+  "retry_note": "Final implementation-design research review encountered cognition.ai unavailable/retryable connection error; resumed the same rounded-soldier session with the same swe-2-max model. No product implementation occurred during this review.",
+  "review_disposition": "Six completed SWE-2 Max research/audit/design-review sessions. Parent reconciled claims, reproduced key defects, and corrected misleading review advice. No raw model reasoning transcripts copied into deliverables.",
+  "artifact_validation": {
+    "relative_markdown_links_checked": 47,
+    "missing_relative_links": 0,
+    "all_json_parse": true,
+    "retained_python_scripts_compile": 8,
+    "analyzed_source_hashes_unchanged": 81,
+    "git_diff_check_passed": true,
+    "application_release_tests_run": false,
+    "reason_no_release_test_audit": "Research made no application changes; isolated probes and artifact validation are reported separately."
+  }
+}

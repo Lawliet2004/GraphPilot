@@ -43,7 +43,7 @@ test("real repository journey, source evidence, settings, restrictions and respo
   await page.getByLabel("Your name").fill("E2E Developer");
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Create workspace" }).click();
+  await page.getByRole("button", { name: "Create account" }).click();
   await expect(page).toHaveURL("/workspace");
   await expect(
     page.getByRole("heading", {
@@ -67,7 +67,7 @@ test("real repository journey, source evidence, settings, restrictions and respo
   await expect(page.getByRole("alert")).toContainText("Repository not found");
   await page.goto("/workspace");
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.getByRole("link", { name: "Connect repository" }).first().click();
+  await page.getByRole("link", { name: "Add repository" }).first().click();
   await page
     .getByLabel("Public GitHub repository URL")
     .fill("https://github.com/pallets/itsdangerous");
@@ -78,6 +78,12 @@ test("real repository journey, source evidence, settings, restrictions and respo
   await expect(
     page.getByRole("status").filter({ hasText: "Indexing repository" }),
   ).toBeVisible({ timeout: 10000 });
+  await expect(
+    page
+      .getByRole("navigation", { name: "Repository navigation" })
+      .getByRole("link"),
+  ).toHaveCount(4);
+  await page.getByRole("link", { name: "Graph", exact: true }).click();
   await expect(
     page.getByRole("img", { name: /Interactive repository graph/ }),
   ).toBeVisible({ timeout: 90000 });
@@ -148,9 +154,7 @@ test("real repository journey, source evidence, settings, restrictions and respo
   await expect(page.locator(".connection-entries")).not.toContainText(
     "DEFINES",
   );
-  await page
-    .getByRole("link", { name: "Context explorer", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Ask", exact: true }).click();
   await page
     .getByLabel("Ask about this repository")
     .fill("Find callers of want_bytes");
@@ -164,9 +168,8 @@ test("real repository journey, source evidence, settings, restrictions and respo
     }),
   ).toBeVisible();
   await expect(page.locator(".context-results")).toContainText("want_bytes");
-  await page
-    .getByRole("link", { name: "Impact analysis", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Graph", exact: true }).click();
+  await page.getByText("Trace dependencies", { exact: true }).click();
   await page.getByLabel("Find a file or function").fill("want_bytes");
   await page
     .getByRole("button", { name: /want_bytes/ })
@@ -175,10 +178,15 @@ test("real repository journey, source evidence, settings, restrictions and respo
   await expect(
     page.getByRole("columnheader", { name: "Evidence classification" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Diagnostics", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Repository navigation" })
+    .getByRole("link", { name: "History", exact: true })
+    .click();
+  await page.getByText("Index health", { exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Latest index checks" }),
   ).toBeVisible();
+  await page.getByText("Branch & saved versions", { exact: true }).click();
   await page.getByText("Connect branch", { exact: true }).click();
   await page.getByLabel("Existing Git branch", { exact: true }).fill("stable");
   await page
@@ -206,7 +214,7 @@ test("real repository journey, source evidence, settings, restrictions and respo
     (await (await page.request.get("/api" + repositoryPath)).json())
       .snapshot_id,
   ).toBe(mainSnapshot.snapshot_id);
-  await page.getByRole("link", { name: "Graph explorer", exact: true }).click();
+  await page.getByRole("link", { name: "Graph", exact: true }).click();
   await expect(page).toHaveURL(/branch=stable/);
   await expect(
     page
@@ -219,9 +227,7 @@ test("real repository journey, source evidence, settings, restrictions and respo
   await expect(
     page.getByRole("button", { name: "Sync source", exact: true }),
   ).toBeDisabled();
-  await page
-    .getByRole("link", { name: "Context explorer", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Ask", exact: true }).click();
   await expect(page).toHaveURL(
     new RegExp("revision=" + stableSnapshot.snapshot_id),
   );
@@ -310,6 +316,7 @@ test("real repository journey, source evidence, settings, restrictions and respo
 test("admin bootstrap, live role changes, membership grants and audit events", async ({
   page,
   playwright,
+  baseURL,
 }) => {
   page.setDefaultTimeout(15000);
   const { execFileSync } = await import("node:child_process");
@@ -334,9 +341,11 @@ test("admin bootstrap, live role changes, membership grants and audit events", a
       stdio: ["pipe", "pipe", "pipe"],
     },
   );
+  const memberBaseURL = baseURL || "http://127.0.0.1:5173";
+  const memberOrigin = new URL(memberBaseURL).origin;
   const member = await playwright.request.newContext({
-    baseURL: "http://127.0.0.1:5173",
-    extraHTTPHeaders: { Origin: "http://127.0.0.1:5173" },
+    baseURL: memberBaseURL,
+    extraHTTPHeaders: { Origin: memberOrigin },
   });
   const registered = await member.post("/api/auth/register", {
     data: {
@@ -396,8 +405,8 @@ test("admin bootstrap, live role changes, membership grants and audit events", a
     .toBe("ready");
   const receivingEmail = `e2e-member-${randomUUID()}@graphpilot.invalid`;
   const receiving = await playwright.request.newContext({
-    baseURL: "http://127.0.0.1:5173",
-    extraHTTPHeaders: { Origin: "http://127.0.0.1:5173" },
+    baseURL: memberBaseURL,
+    extraHTTPHeaders: { Origin: memberOrigin },
   });
   const received = await receiving.post("/api/auth/register", {
     data: {

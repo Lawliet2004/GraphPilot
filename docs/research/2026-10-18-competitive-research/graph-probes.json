@@ -1,0 +1,120 @@
+{
+  "scope": "Disposable isolated FalkorDBLite, UNIX socket only. Does not connect to application databases. Search capability probe, not a competitor performance benchmark.",
+  "source_search": [
+    {
+      "query": "synthesize",
+      "graph_result_count": 1,
+      "graph_results": [
+        {
+          "name": "synthesize",
+          "path": "api/agent/synthesis.py"
+        }
+      ],
+      "literal_source_files": [
+        "api/agent/synthesis.py",
+        "api/routes/context.py"
+      ]
+    },
+    {
+      "query": "authenticate_token",
+      "graph_result_count": 1,
+      "graph_results": [
+        {
+          "name": "authenticate_token",
+          "path": "api/services/agent_tokens.py"
+        }
+      ],
+      "literal_source_files": [
+        "api/auth.py",
+        "api/mcp_server.py",
+        "api/services/agent_tokens.py"
+      ]
+    },
+    {
+      "query": "api/routes/context.py",
+      "graph_result_count": 4,
+      "graph_results": [
+        {
+          "name": "conversations",
+          "path": "api/routes/context.py"
+        },
+        {
+          "name": "context",
+          "path": "api/routes/context.py"
+        },
+        {
+          "name": "Question",
+          "path": "api/routes/context.py"
+        },
+        {
+          "name": "context.py",
+          "path": "api/routes/context.py"
+        }
+      ],
+      "literal_source_files": []
+    },
+    {
+      "query": "X-CSRF-Token",
+      "graph_result_count": 0,
+      "graph_results": [],
+      "literal_source_files": [
+        "api/auth.py",
+        "api/main.py",
+        "scripts/artifact_browser.py",
+        "scripts/benchmark.py",
+        "scripts/smoke_gateway.py",
+        "scripts/verify-live.py",
+        "scripts/verify_capacity.py",
+        "scripts/verify_history.py",
+        "scripts/verify_restore.py",
+        "app/src/lib/api.ts"
+      ]
+    },
+    {
+      "query": "Request origin is not allowed",
+      "graph_result_count": 0,
+      "graph_results": [],
+      "literal_source_files": [
+        "api/main.py",
+        "api/mcp_server.py"
+      ]
+    },
+    {
+      "query": "python-ast-3",
+      "graph_result_count": 0,
+      "graph_results": [],
+      "literal_source_files": [
+        "api/ingestion/python.py"
+      ]
+    },
+    {
+      "query": "graph_queries",
+      "graph_result_count": 0,
+      "graph_results": [],
+      "literal_source_files": [
+        "api/routes/context.py",
+        "api/search/retrieval.py",
+        "app/src/lib/api.ts",
+        "app/src/pages/context.tsx"
+      ]
+    }
+  ],
+  "substring_plan": "Results\n    Limit\n        Project\n            Filter\n                Node By Label Scan | (n:Entity)",
+  "exact_plan": "Results\n    Limit\n        Project\n            Node By Index Scan | (n:Entity)",
+  "impact_cap": {
+    "known_direct_callers": 105,
+    "returned_callers": 100,
+    "response_keys": [
+      "results",
+      "unknown",
+      "max_depth"
+    ],
+    "has_truncation_indicator": false,
+    "unknown": "Dynamic dispatch, external packages and unsupported languages are unverified."
+  },
+  "installed_packages": {
+    "falkordblite": "0.10.0",
+    "falkordb": "1.8.0",
+    "redis": "8.1.0"
+  }
+}

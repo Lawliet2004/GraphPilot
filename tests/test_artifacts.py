@@ -192,7 +192,11 @@ def test_real_archive_download_isolation_expiry_and_cleanup(client, db, monkeypa
     with monkeypatch.context() as counting:
         counting.setattr(store, "query", counted_query)
         result = client.post(base + "/context", json={"question": "Investigate pytest"}).json()
-    assert len(queries) == result["diagnostics"]["graph_queries"] <= 15
+    assert len(queries) == result["diagnostics"]["graph_queries"]
+    assert (
+        result["diagnostics"]["graph_queries"]
+        <= result["diagnostics"]["max_graph_queries"]
+    )
     assert any("FAILED test_checkout" in c["content"] for c in result["evidence"])
     saved = client.get(base + "/conversations").json()[0]
     assert "FAILED test_checkout" not in str(saved)

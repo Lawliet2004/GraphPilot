@@ -58,6 +58,8 @@ def test_mcp_protocol_discovery_real_evidence_and_input_limits(client, db, monke
         assert {t["name"] for t in tools} == {
             "list_repositories",
             "search_symbols",
+            "search_content",
+            "read_source",
             "read_evidence",
             "inspect_impact",
             "indexing_status",

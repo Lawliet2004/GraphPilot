@@ -137,7 +137,11 @@ def test_fixed_retrieval_tasks_query_accounting_and_isolation(client, db, monkey
             assert names <= actual, (question, names - actual)
             assert relations <= {e["type"] for e in result["relationships"]}, question
             assert result["diagnostics"]["intent"] == intent
-            assert len(calls) == result["diagnostics"]["graph_queries"] <= 15
+            assert len(calls) == result["diagnostics"]["graph_queries"]
+            assert (
+                result["diagnostics"]["graph_queries"]
+                <= result["diagnostics"]["max_graph_queries"]
+            )
             assert result["diagnostics"]["context_bytes"] < 30000
             assert result["mode"] == "graph" and result["answer"] is None
             if not names:

@@ -166,7 +166,7 @@ export function Settings() {
           ) : (
             <dl className="definition-list">
               <div>
-                <dt>AI synthesis</dt>
+                <dt>AI answers</dt>
                 <dd>
                   {caps.data?.llm_configured
                     ? "Your provider key is saved"

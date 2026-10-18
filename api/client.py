@@ -1,19 +1,30 @@
-"""Remote GraphPilot CLI. No remote shell or repository-code execution."""
+"""GraphPilot CLI: hosted workspace access plus local developer workflows.
+
+Hosted commands use the private device-login session. The runner family drives
+your own GitHub Codespace through local gh credentials — `runner ssh`
+intentionally opens an interactive SSH session — and the git family runs the
+local Git commands you explicitly invoked (which may execute repository hooks).
+Hosted indexing still never executes repository code.
+"""
 
 import argparse
 import base64
 import hashlib
 import json
 import os
+import re
 import secrets
 import stat
 import sys
 import time
+import uuid
 import webbrowser
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 import httpx
+
+from api import developer_tools
 
 
 def challenge(value):
@@ -37,6 +48,16 @@ def origin(value):
         )
     ):
         raise ValueError("Use an HTTPS website origin, or HTTP on loopback for local testing")
+    return value
+
+
+def uuid_arg(value):
+    try:
+        parsed = uuid.UUID(value)
+    except (ValueError, AttributeError, TypeError):
+        raise argparse.ArgumentTypeError("must be a canonical UUID") from None
+    if str(parsed) != value:
+        raise argparse.ArgumentTypeError("must be a canonical lowercase hyphenated UUID")
     return value
 
 
@@ -74,13 +95,45 @@ def load_session(path):
     return data
 
 
+class ServerError(ValueError):
+    pass
+
+
+def server_detail(response):
+    try:
+        detail = response.json().get("detail")
+    except (ValueError, AttributeError):
+        detail = None
+    if isinstance(detail, list):
+        detail = "; ".join(str(item.get("msg", "")) for item in detail if isinstance(item, dict))
+    if not isinstance(detail, str) or not detail.strip():
+        return f"HTTP {response.status_code}"
+    detail = re.sub(r"gp_mcp_\S+", "[redacted]", detail.strip())
+    return f"{detail[:300]} (HTTP {response.status_code})"
+
+
 def call(client, method, path, **kwargs):
     response = client.request(method, path, **kwargs)
     if response.status_code >= 400:
-        raise ValueError(
-            f"Command failed (HTTP {response.status_code}). Check login, permissions and repository status."
-        )
+        raise ServerError(server_detail(response))
     return response.json()
+
+
+def authorization_uri(value, server, user_code):
+    uri, base = urlsplit(value), urlsplit(server)
+    loopback = {"127.0.0.1", "localhost", "::1"}
+    same_origin = (uri.scheme, uri.netloc) == (base.scheme, base.netloc)
+    if (
+        uri.scheme not in {"http", "https"}
+        or uri.username
+        or uri.password
+        or uri.path != "/cli/authorize"
+        or uri.fragment
+        or parse_qs(uri.query) != {"code": [user_code.replace("-", "")]}
+        or not (same_origin or (uri.hostname in loopback and base.hostname in loopback))
+    ):
+        raise ValueError("Server returned an unexpected CLI authorization URL")
+    return value
 
 
 def login(args, path):
@@ -99,13 +152,11 @@ def login(args, path):
             "/api/cli/device",
             json={"challenge": challenge(verifier), "write": args.write, "name": "GraphPilot CLI"},
         )
-        expected = server + "/cli/authorize?code=" + start["user_code"].replace("-", "")
-        if start["verification_uri"] != expected:
-            raise ValueError("Server returned an unexpected CLI authorization URL")
-        print("Open:", expected)
+        verification = authorization_uri(start["verification_uri"], server, start["user_code"])
+        print("Open:", verification)
         print("Confirm this code in your own browser:", start["user_code"])
         if not args.no_browser:
-            webbrowser.open(expected)
+            webbrowser.open(verification)
         deadline = time.monotonic() + min(600, int(start["expires_in"]))
         interval = max(5, int(start["interval"]))
         while time.monotonic() < deadline:
@@ -117,7 +168,7 @@ def login(args, path):
             if response.status_code in {202, 429}:
                 continue
             if response.status_code != 200:
-                raise ValueError("CLI login was denied or expired. Start again.")
+                raise ServerError(server_detail(response))
             data = response.json()
             save_session(
                 path,
@@ -169,16 +220,30 @@ def main():
     evidence = sub.add_parser("evidence")
     evidence.add_argument("repository_id")
     evidence.add_argument("node_id")
+    ask = sub.add_parser("ask", help="Ask a question about an indexed repository")
+    ask.add_argument("repository_id", type=uuid_arg)
+    ask.add_argument("question")
+    ask.add_argument("--branch")
+    ask.add_argument("--revision", type=uuid_arg)
+    jobs = sub.add_parser("jobs").add_subparsers(dest="action", required=True)
+    listed = jobs.add_parser("list")
+    listed.add_argument("repository_id", type=uuid_arg)
+    cancelling = jobs.add_parser("cancel")
+    cancelling.add_argument("job_id", type=uuid_arg)
     github = sub.add_parser("github").add_subparsers(dest="action", required=True)
     github.add_parser("installations")
     choices = github.add_parser("repos")
     choices.add_argument("installation", type=int)
     choices.add_argument("--page", type=int, default=1)
+    developer_tools.add_parsers(sub)
     args = parser.parse_args()
     try:
         if args.command == "login":
             login(args, args.config)
             return 0
+        if args.command in {"git", "runner"}:
+            # Local-only workflows; the hosted session is never loaded.
+            return developer_tools.dispatch(args)
         data = load_session(args.config)
         with httpx.Client(
             base_url=data["server"],
@@ -213,6 +278,24 @@ def main():
                     if args.command == "search"
                     else call(c, "GET", route + "/evidence/" + args.node_id)
                 )
+            elif args.command == "ask":
+                question = args.question.strip()
+                if not 2 <= len(question) <= 2000:
+                    raise ValueError("Questions are between 2 and 2000 characters")
+                route = f"/api/repositories/{args.repository_id}"
+                params = {"branch": args.branch, "revision": args.revision}
+                result = call(
+                    c,
+                    "POST",
+                    route + "/context",
+                    json={"question": question},
+                    params={key: value for key, value in params.items() if value},
+                )
+            elif args.command == "jobs":
+                if args.action == "list":
+                    result = call(c, "GET", f"/api/repositories/{args.repository_id}/jobs")
+                else:
+                    result = call(c, "POST", f"/api/jobs/{args.job_id}/cancel")
             elif args.action == "list":
                 result = call(c, "GET", "/api/repositories")
             elif args.action == "connect":
@@ -238,11 +321,7 @@ def main():
                         c,
                         "POST",
                         "/api/repositories",
-                        json={
-                            "source_type": "github",
-                            "source": args.url,
-                            "branch": args.branch or "main",
-                        },
+                        json={"source_type": "github", "source": args.url, "branch": args.branch},
                     )
             elif args.action == "upload":
                 if not args.archive.is_file() or args.archive.stat().st_size > 25_000_000:
@@ -280,6 +359,9 @@ def main():
                     }
             print(json.dumps(result, indent=2))
         return 0
+    except ServerError as exc:
+        print(f"Command could not complete: {exc}", file=sys.stderr)
+        return 1
     except (ValueError, KeyError, OSError, httpx.HTTPError):
         # Do not echo response bodies, URLs with credentials, tokens or local file contents.
         print(

@@ -1,0 +1,68 @@
+[
+  {
+    "name": "aider",
+    "expected": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+    "observed": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+    "matches": true
+  },
+  {
+    "name": "continue",
+    "expected": "5522c6f44ca0ac3528b37244818fbfa39b5af470",
+    "observed": "5522c6f44ca0ac3528b37244818fbfa39b5af470",
+    "matches": true
+  },
+  {
+    "name": "scip",
+    "expected": "fcb3cb3c679fe2da18141550f864b9e67afab297",
+    "observed": "fcb3cb3c679fe2da18141550f864b9e67afab297",
+    "matches": true
+  },
+  {
+    "name": "scip-python",
+    "expected": "8b60bbce1f2a4c7a517776cb395bbafb2e731e4f",
+    "observed": "8b60bbce1f2a4c7a517776cb395bbafb2e731e4f",
+    "matches": true
+  },
+  {
+    "name": "scip-typescript",
+    "expected": "e6d730c32189f14553d315b697f19bd8b60db65e",
+    "observed": "e6d730c32189f14553d315b697f19bd8b60db65e",
+    "matches": true
+  },
+  {
+    "name": "ast-grep",
+    "expected": "14934d690a547abce8576baff9a1856a10ae7da8",
+    "observed": "14934d690a547abce8576baff9a1856a10ae7da8",
+    "matches": true
+  },
+  {
+    "name": "dependency-cruiser",
+    "expected": "c580daf6477aa5619bacad9c9091c9b7cc81882d",
+    "observed": "c580daf6477aa5619bacad9c9091c9b7cc81882d",
+    "matches": true
+  },
+  {
+    "name": "code-graph",
+    "expected": "f5e72c074bf8b529d71472162e6d43cd6caaa5b6",
+    "observed": "f5e72c074bf8b529d71472162e6d43cd6caaa5b6",
+    "matches": true
+  },
+  {
+    "name": "GitNexus",
+    "expected": "b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19",
+    "observed": "b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19",
+    "matches": true
+  },
+  {
+    "name": "serena",
+    "expected": "d9e4c796fae0207ba6848d1df4b331122a5567b5",
+    "observed": "d9e4c796fae0207ba6848d1df4b331122a5567b5",
+    "matches": true
+  },
+  {
+    "name": "LightRAG",
+    "expected": "aaebfe1bb8d55deb6a4304d357a3bf4c92fcd40a",
+    "observed": "aaebfe1bb8d55deb6a4304d357a3bf4c92fcd40a",
+    "matches": true
+  }
+]

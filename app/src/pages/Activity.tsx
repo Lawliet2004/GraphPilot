@@ -12,7 +12,7 @@ export function Activity() {
   return (
     <div className="page">
       <Heading
-        title="Your workspace, in motion."
+        title="Jobs & activity."
         description="Recent actions recorded for your account."
       />
       {q.isPending ? (

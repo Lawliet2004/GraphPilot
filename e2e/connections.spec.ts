@@ -28,14 +28,14 @@ test("real browser CLI approval, signup return, scoped access and revocation", a
   await page
     .getByLabel("Password", { exact: true })
     .fill("test-" + randomUUID());
-  await page.getByRole("button", { name: "Create workspace" }).click();
+  await page.getByRole("button", { name: "Create account" }).click();
   await expect(
-    page.getByRole("heading", { name: "Connect your command line." }),
+    page.getByRole("heading", { name: "Approve CLI access" }),
   ).toBeVisible();
   await expect(page.getByText("Browser CLI verification")).toBeVisible();
   await expect(
     page.getByText(
-      "Connect repositories, upload source, request indexing or history sync, and remove repositories you own.",
+      "Connect repositories, upload source, request indexing or history sync, ask questions, and remove repositories you own.",
     ),
   ).toBeVisible();
   await mkdir(".data/professional-demo", { recursive: true });

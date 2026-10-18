@@ -1,0 +1,1000 @@
+{
+  "started_at_utc": "2026-10-18T09:14:20+00:00",
+  "recorded_at_utc": "2026-10-18T11:57:56.868766+00:00",
+  "release": "first coherent source-evidence slice",
+  "research_handoff": "../../research/2026-10-18-competitive-research/IMPLEMENTATION_HANDOFF.md",
+  "implementation_provenance": [
+    {
+      "role": "implementation A",
+      "selector": "swe-2-max",
+      "model": "SWE-2 Max",
+      "session_id": "mangrove-deposit",
+      "cli_version": "3000.11.92",
+      "export_sha256": "c6f92df9e5485c21cf5779bcdcd6dfb98d155694845188d3f338e461e15cde7a"
+    },
+    {
+      "role": "implementation B/C",
+      "selector": "swe-2-max",
+      "model": "SWE-2 Max",
+      "session_id": "mangrove-deposit",
+      "cli_version": "3000.11.92",
+      "export_sha256": "494dd3cf5a382dd72f66c4db0a72a4accbda0dbbd96b73a3485157012fab4c36"
+    },
+    {
+      "role": "gate repairs C",
+      "selector": "swe-2-max",
+      "model": "SWE-2 Max",
+      "session_id": "mangrove-deposit",
+      "cli_version": "3000.11.92",
+      "export_sha256": "77ebe981d61f1c7d7c74312de05f888356a36b37ac10c4c6519ec17ba699f5b3"
+    },
+    {
+      "role": "browser harness D",
+      "selector": "swe-2-max",
+      "model": "SWE-2 Max",
+      "session_id": "mangrove-deposit",
+      "cli_version": "3000.11.92",
+      "export_sha256": "408e75e7ad878d674886e58790ec01cc6302592fa5b3c6eea6ab95058a55b55d"
+    },
+    {
+      "role": "browser queue isolation E",
+      "selector": "swe-2-max",
+      "model": "SWE-2 Max",
+      "session_id": "mangrove-deposit",
+      "cli_version": "3000.11.92",
+      "export_sha256": "bb8c411828f8abd911f8ab32ecec8e23128bf45c3d73d0913883b5382b1527b6"
+    },
+    {
+      "role": "fresh finish reviewer",
+      "selector": "swe-2-max",
+      "model": "SWE-2 Max",
+      "session_id": "gray-pocket",
+      "cli_version": "3000.11.92",
+      "export_sha256": "ce08305de97b383d9f45ac70789e77b146cdad8bd6dccbf5bdd6b006b3f8d102"
+    },
+    {
+      "role": "fresh ordinary-extension documenter",
+      "selector": "swe-2-max",
+      "model": "SWE-2 Max",
+      "session_id": "ordinary-diamond",
+      "cli_version": "3000.11.92",
+      "export_sha256": "9e6439562ba807cc8527ede65fe88a098aed4aec02ee6d074ccdc58dd2cb6143"
+    }
+  ],
+  "checks": {
+    "baseline_backend": {
+      "passed": 225,
+      "skipped": 1
+    },
+    "final_backend": {
+      "passed": 280,
+      "skipped": 1,
+      "seconds": 38.08,
+      "warning": "existing Starlette TestClient httpx deprecation",
+      "skipped_reason": "Firebase auth emulator opt-in disabled"
+    },
+    "lint": "passed (ruff + TypeScript)",
+    "app_tests": {
+      "passed": 6
+    },
+    "build": "passed",
+    "playwright": {
+      "passed": 8,
+      "failed": 0,
+      "log": "logs/parent-final-playwright.log",
+      "preceding_full_run": {
+        "passed": 6,
+        "failed": 2,
+        "reason": "developer-tools spec left GitHub indexing job in serial worker queue; journeys waited behind it, all jobs eventually succeeded",
+        "log": "logs/parent-playwright-queue-timeout.log"
+      },
+      "journeys_recheck": {
+        "passed": 2,
+        "failed": 0,
+        "log": "logs/parent-journeys-recheck.log"
+      },
+      "shared_db_rate_limit_run": {
+        "passed": 7,
+        "failed": 1,
+        "reason": "last admin registration hit durable auth.attempt limit after repeated runs",
+        "log": "logs/parent-playwright-rate-limit.log"
+      },
+      "final_environment": "fresh graphpilot_release_browser database; authentication unchanged",
+      "harness_repairs": [
+        "stale scope wording",
+        "ambiguous role selectors",
+        "hardcoded baseURL/Origin",
+        "wait for test-owned external indexing before exit"
+      ]
+    },
+    "independent_browser": {
+      "passed": 1,
+      "log": "logs/parent-review-browser.log"
+    },
+    "detector": {
+      "findings": [],
+      "source_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "runs": 1
+    },
+    "git_diff_check": "passed"
+  },
+  "independent_receipts": {
+    "independent-bindings": {
+      "receipt_sha256": "fe768a98af31bd2f61630d5b16154e6d243f0ebac3ae01ed47506844a2b059f9",
+      "result": {
+        "pass": true,
+        "parser_version": "python-ast-4",
+        "cases": [
+          {
+            "case": "self_assignment",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "cls_assignment",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "self_walrus",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "module_conditional",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "module_delete",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "module_import_replaces",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "direct_control",
+            "calls": [
+              [
+                "run",
+                "target"
+              ]
+            ],
+            "expected_target": true
+          },
+          {
+            "case": "receiver_control",
+            "calls": [
+              [
+                "C.run",
+                "C.target"
+              ]
+            ],
+            "expected_target": true
+          },
+          {
+            "case": "relative_beyond_root",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "relative_init_beyond",
+            "calls": [],
+            "expected_target": false
+          },
+          {
+            "case": "relative_init_control",
+            "calls": [
+              [
+                "run",
+                "target"
+              ]
+            ],
+            "expected_target": true
+          },
+          {
+            "case": "relative_nested_control",
+            "calls": [
+              [
+                "run",
+                "target"
+              ]
+            ],
+            "expected_target": true
+          }
+        ]
+      }
+    },
+    "independent-binding-alias-order": {
+      "receipt_sha256": "60de2dae9a19aacc11ee10f2c377c054700ef2832ad378d48ef1a0de348a76a7",
+      "result": {
+        "pass": true,
+        "calls": [
+          [
+            3,
+            "a.py:early"
+          ],
+          [
+            5,
+            "b.py:late"
+          ]
+        ]
+      }
+    },
+    "independent-impact": {
+      "receipt_sha256": "94d733b5fcb204079ae9a98cd82b8a05231d012dad23896048ed33314375b13d",
+      "result": {
+        "checks": [
+          {
+            "case": "saturated_shallow_True",
+            "returned": 100,
+            "incomplete": true
+          },
+          {
+            "case": "saturated_shallow_False",
+            "returned": 100,
+            "incomplete": true
+          },
+          {
+            "case": "105_direct",
+            "returned": 100,
+            "incomplete": true
+          },
+          {
+            "case": "seeded_directed_graphs_with_cycles_parallel_edges",
+            "graphs": 160
+          }
+        ],
+        "pass": true,
+        "note": "The probe display flag summarizes truncated OR has_more; it is recorded here as incomplete, not the raw response.truncated field."
+      }
+    },
+    "independent-impact-timeout": {
+      "receipt_sha256": "2b3e184727c4fe8e8ff18625fe733310c0c6b6dea723454b1b03f8ccfe3ffa0f",
+      "result": {
+        "pass": true,
+        "actual_queries": 2,
+        "reported_queries": 2
+      }
+    },
+    "parent-citations": {
+      "receipt_sha256": "3ac053bb9aa2f23367a5d83e8a91e54d697fe363b1a83532b366dde1b10a2c4d",
+      "result": {
+        "pass": true,
+        "cases": [
+          {
+            "case": "long_ascii",
+            "served_characters": 3000,
+            "start": 10,
+            "end": 78,
+            "truncated": true,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          },
+          {
+            "case": "upstream_partial",
+            "served_characters": 6,
+            "start": 21,
+            "end": 21,
+            "truncated": true,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          },
+          {
+            "case": "empty_upstream",
+            "served_characters": 0,
+            "start": 8,
+            "end": 7,
+            "truncated": true,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          },
+          {
+            "case": "unicode_crlf",
+            "served_characters": 19,
+            "start": 30,
+            "end": 31,
+            "truncated": false,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          },
+          {
+            "case": "unicode_separator_before_cut",
+            "served_characters": 3000,
+            "start": 30,
+            "end": 30,
+            "truncated": true,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          },
+          {
+            "case": "one_long_line",
+            "served_characters": 3000,
+            "start": 5,
+            "end": 5,
+            "truncated": true,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          },
+          {
+            "case": "non_source",
+            "served_characters": 27,
+            "start": null,
+            "end": null,
+            "truncated": null,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          },
+          {
+            "case": "old_unknown",
+            "served_characters": 11,
+            "start": null,
+            "end": null,
+            "truncated": null,
+            "metadata_keys": [
+              "citation",
+              "commit",
+              "content",
+              "content_hash",
+              "end_line",
+              "end_line_partial",
+              "entity_id",
+              "line_excerpt",
+              "match",
+              "name",
+              "path",
+              "pinned",
+              "start_line",
+              "truncated",
+              "type",
+              "url"
+            ]
+          }
+        ]
+      }
+    },
+    "parent-source-root": {
+      "receipt_sha256": "9bee8a4dfab481460291c29116b505a5106b1410d1b15224cdcf3145c084aa6f",
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "case": "repository_link_outside_root",
+            "rejected": true
+          },
+          {
+            "case": "snapshots_link_inside_owned_root",
+            "rejected": true
+          }
+        ]
+      }
+    },
+    "parent-scan-budgets": {
+      "receipt_sha256": "f3c4b83b7c55b6f475d6929b160587f1e1951492c9c196c1d95db7af5bfa57ce",
+      "result": {
+        "pass": true,
+        "bytes": {
+          "read_upper_bounds": [
+            101,
+            49
+          ],
+          "actual_read_bound_sum": 150,
+          "budget": 150,
+          "reported_bytes": 150,
+          "truncated": true
+        },
+        "time": {
+          "processed_lines": 15,
+          "elapsed_ms": 1500,
+          "truncated": true,
+          "completion_reason": "time_budget"
+        },
+        "unicode_spans": [
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    "independent-integration": {
+      "receipt_sha256": "7cbbdc6922744f491d6299318952f9832478820c65e6d2d4fab3b2e4fad90386",
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "case": "literal_X-CSRF-Token",
+            "pass": true,
+            "line": 232
+          },
+          {
+            "case": "literal_Request origin is not allowed",
+            "pass": true,
+            "line": 233
+          },
+          {
+            "case": "literal_python-ast-3",
+            "pass": true,
+            "line": 234
+          },
+          {
+            "case": "literal_graph_queries",
+            "pass": true,
+            "line": 235
+          },
+          {
+            "case": "short_punctuation_unicode_x",
+            "pass": true
+          },
+          {
+            "case": "short_punctuation_unicode_xy",
+            "pass": true
+          },
+          {
+            "case": "short_punctuation_unicode_λ",
+            "pass": true
+          },
+          {
+            "case": "short_punctuation_unicode_\"literal quote\"",
+            "pass": true
+          },
+          {
+            "case": "short_punctuation_unicode_[a-z].*",
+            "pass": true
+          },
+          {
+            "case": "short_punctuation_unicode_  padded  ",
+            "pass": true
+          },
+          {
+            "case": "case_and_original_span_uniqueness",
+            "pass": true
+          },
+          {
+            "case": "approved_manifest_exclusions_and_dotfiles",
+            "pass": true
+          },
+          {
+            "case": "beyond200_exact_source",
+            "pass": true,
+            "start": 229,
+            "end": 235
+          },
+          {
+            "case": "http_mcp_shared_search_and_range",
+            "pass": true
+          },
+          {
+            "case": "stray_artifact_excluded",
+            "pass": true
+          },
+          {
+            "case": "retained_snapshot_stable_after_reindex",
+            "pass": true,
+            "old_snapshot": "3a8891a1-4307-49cc-9372-9a8bd0535b5e",
+            "new_snapshot": "e587fcfd-9a45-4865-89b3-43c21177cb14"
+          },
+          {
+            "case": "late_long_line_exact_range_and_context",
+            "pass": true
+          },
+          {
+            "case": "live_membership_revocation_http_mcp",
+            "pass": true
+          },
+          {
+            "case": "live_token_revocation",
+            "pass": true
+          },
+          {
+            "case": "retired_snapshot_fails_cleanly",
+            "pass": true
+          }
+        ]
+      }
+    },
+    "independent-range-hash": {
+      "receipt_sha256": "c62a9ca39e3ba7d22272ef9244c215702f65adf4643eaaa0cdb34615480b7ca3",
+      "result": {
+        "pass": true,
+        "status": 409,
+        "served_modified_bytes_under_old_snapshot": false,
+        "reported_snapshot_id": null
+      }
+    },
+    "independent-mcp-pagination": {
+      "receipt_sha256": "0e06aa950790baf3389e7a474e68870b0d98546ff9823f4d2f5bbad1f2a9036a",
+      "result": {
+        "pagination_pass": true,
+        "visible_repositories": 55,
+        "hidden_repository_excluded": true,
+        "pages": [
+          {
+            "returned": 20,
+            "has_more": true,
+            "next_offset": 20
+          },
+          {
+            "returned": 20,
+            "has_more": true,
+            "next_offset": 40
+          },
+          {
+            "returned": 15,
+            "has_more": false,
+            "next_offset": null
+          }
+        ],
+        "indexed_snapshot_handle": true
+      }
+    },
+    "independent-input-contract": {
+      "receipt_sha256": "c16815977011e3f57e9885ffb7dc4dec3bf28b2e416e182f3db75f850ff8676a",
+      "result": {
+        "multiline": {
+          "status": 200,
+          "exhaustive_zero": true
+        },
+        "response_cap": {
+          "returned": 1,
+          "limit": 1,
+          "total": 2,
+          "truncated": false,
+          "has_more": true,
+          "completion_reason": "result_limit"
+        },
+        "mcp_unsafe_filter_rejected": false
+      }
+    },
+    "independent-query-accounting": {
+      "receipt_sha256": "81c63d593db0b54d013cfa3e4d50f0ad4e5533738f5e63b97767f2daa1148d13",
+      "result": {
+        "context_failed_scan": {
+          "actual": 3,
+          "reported": 2,
+          "failed_scan_disclosed": true
+        },
+        "http_impact": {
+          "actual": 4,
+          "reported": 3
+        }
+      }
+    },
+    "independent-storage-lock": {
+      "receipt_sha256": "ede52e01569a749f0c32a5a2dbbdd387e53c4d8b24d40b3718a0d575d2ca883b",
+      "result": {
+        "pass": true,
+        "exclusive_lock_during_read": false,
+        "exclusive_lock_after_read": true
+      }
+    }
+  },
+  "parent_run_log_receipts": {
+    "parent-integration.log": {
+      "sha256": "c2c80ff9dcaf72b591bccdb2d4917f40dd9cf216a1221d8447d9bc6d652575b5",
+      "bytes": 29
+    },
+    "parent-range_hash.log": {
+      "sha256": "c62a9ca39e3ba7d22272ef9244c215702f65adf4643eaaa0cdb34615480b7ca3",
+      "bytes": 111
+    },
+    "parent-mcp_pagination.log": {
+      "sha256": "0853b89de7fa0653f167684c30d1d78e94b8e930b1fb90e9e6b0ee144ba5081f",
+      "bytes": 402
+    },
+    "parent-input_contract.log": {
+      "sha256": "e83457358a4607716b0f9e8be3dbf5f8fd64f55bb9a54669f199be05b868b8d9",
+      "bytes": 272
+    },
+    "parent-query_accounting.log": {
+      "sha256": "5fe0198ce1d8ba723facaec11544bfdd44b88f85d0d1d1e3a3f41646fb759226",
+      "bytes": 1388
+    },
+    "parent-storage_lock.log": {
+      "sha256": "cd64c82240ee6af2070438bc1b083ed40389151f9a5ce500a1a8ebd3137a6598",
+      "bytes": 1018
+    },
+    "parent-review-browser.log": {
+      "sha256": "2afefbe2f9282152b789ad3e2677a4b43c65d04353a33728a33dcdc91271754c",
+      "bytes": 382
+    }
+  },
+  "preservation": {
+    "baseline_file_count": 273,
+    "missing": [],
+    "changed": [
+      "api/graph/store.py",
+      "api/ingestion/python.py",
+      "api/mcp_server.py",
+      "api/routes/context.py",
+      "api/routes/repositories.py",
+      "api/search/retrieval.py",
+      "api/services/indexing.py",
+      "app/src/lib/api.ts",
+      "app/src/pages/Repository.tsx",
+      "app/src/pages/context.tsx",
+      "app/src/styles.css",
+      "e2e/connections.spec.ts",
+      "e2e/developer-tools.spec.ts",
+      "e2e/journeys.spec.ts",
+      "tests/test_admin_agent.py",
+      "tests/test_artifacts.py",
+      "tests/test_context.py",
+      "tests/test_mcp.py",
+      "tests/test_retrieval_benchmark.py"
+    ],
+    "new_paths": [
+      "api/services/source_ranges.py",
+      "api/services/source_search.py",
+      "docs/implementation/2026-10-18-source-evidence/REPORT.md",
+      "docs/implementation/2026-10-18-source-evidence/VERIFICATION.json",
+      "docs/implementation/2026-10-18-source-evidence/documenter-check-result.md",
+      "docs/implementation/2026-10-18-source-evidence/finish-review-result.md",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-app-tests.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-build.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-final-playwright.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-full-pytest.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-journeys-recheck.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-lint.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-playwright-queue-timeout.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-playwright-rate-limit.log",
+      "docs/implementation/2026-10-18-source-evidence/logs/parent-review-browser.log",
+      "docs/implementation/2026-10-18-source-evidence/screenshots/source-ask-desktop.png",
+      "docs/implementation/2026-10-18-source-evidence/screenshots/source-ask-mobile.png",
+      "docs/implementation/2026-10-18-source-evidence/screenshots/source-content-desktop.png",
+      "docs/implementation/2026-10-18-source-evidence/screenshots/source-content-mobile.png",
+      "docs/implementation/2026-10-18-source-evidence/screenshots/source-empty-desktop.png",
+      "docs/implementation/2026-10-18-source-evidence/screenshots/source-partial-desktop.png",
+      "e2e/content-evidence.spec.ts",
+      "tests/test_content_search.py",
+      "tests/test_correctness_contracts.py"
+    ],
+    "unchanged_count": 254,
+    "research_files": 29,
+    "research_unchanged": true,
+    "head": "765644ced40dbb6ac82943a7a8c4ac78891dad0b",
+    "baseline_inventory_sha256": "22763c548c41ebd3f762ce7a10780d99dd06cacb537aa69d103d1ba12b37d90b",
+    "baseline_tracked_patch_sha256": "89f2d85b6d15c5e2dad1fb20660beb29a87c80246f5b8d38a388dad17947e799",
+    "unrelated_baseline_files_unchanged": true
+  },
+  "changed_source_files": {
+    "api/graph/store.py": {
+      "sha256": "55743002251c1d640f658f38a34a4f4ba97e50ae0a8a0bb08bda2175aeffb29f",
+      "bytes": 19223
+    },
+    "api/ingestion/python.py": {
+      "sha256": "491d5a7d856c9f75ebadec6ada138162ef93aaae66a8e9adfac11f8c7a12da41",
+      "bytes": 22462
+    },
+    "api/mcp_server.py": {
+      "sha256": "061e1faac20ad1e4dbc7a608be7e5ce4fdea3600f5632e067923bd4d7671b08c",
+      "bytes": 11549
+    },
+    "api/routes/context.py": {
+      "sha256": "7211ca96aaad6ac4322fa30d46c9a73306122415b0cbcaee1874fcdede3b0dbd",
+      "bytes": 8275
+    },
+    "api/routes/repositories.py": {
+      "sha256": "f8b73c69c83fd68e1bf05e68041b8198d7844fcbe78864eefbe9f84e40916da6",
+      "bytes": 30952
+    },
+    "api/search/retrieval.py": {
+      "sha256": "99f608aad1540d3e7e0da5f98b5582a574676c8be0f697b3a43266b9ff250b20",
+      "bytes": 12130
+    },
+    "api/services/indexing.py": {
+      "sha256": "68b48ba4c3c1b592d6ba1184e09e75b35d5f649d3b4c195581ef0afe5333a6db",
+      "bytes": 10173
+    },
+    "app/src/lib/api.ts": {
+      "sha256": "4ea421a74ff6e61e23b439e464061246060bd6526e0a4d9cac16f284c33f8660",
+      "bytes": 10044
+    },
+    "app/src/pages/Repository.tsx": {
+      "sha256": "881ae377e8e2f0a934538bb2f8f9fa189df9a01c32f4bffd226dfbf534c2ecc0",
+      "bytes": 53108
+    },
+    "app/src/pages/context.tsx": {
+      "sha256": "ed9a20d22f50588faf0fe1780b9f1e433d95bd952f901e4d719fb6fccf767f88",
+      "bytes": 10150
+    },
+    "app/src/styles.css": {
+      "sha256": "e7ccd8256f62380b1f9a3cd8cc06ac05125c7e06b36ee1b635a998f302be3f1b",
+      "bytes": 68627
+    },
+    "e2e/connections.spec.ts": {
+      "sha256": "5e123ccf2c68aa03a21a4db0df254139943cf747f53563528fc9f1a908815ba7",
+      "bytes": 5635
+    },
+    "e2e/developer-tools.spec.ts": {
+      "sha256": "d1587d8eef1446ae98dfc4373623380a519ea72bdbb4094ab69b028e5d4fa2f6",
+      "bytes": 5810
+    },
+    "e2e/journeys.spec.ts": {
+      "sha256": "cf8f7465128b020d8820c461593f38eda3ac5454ace43da1e8f4b0ced2597583",
+      "bytes": 19200
+    },
+    "tests/test_admin_agent.py": {
+      "sha256": "e8efed96ce71b260fbedf63badb096dbc5adc7192cf84e98cf8f3d8ec1cc7858",
+      "bytes": 4421
+    },
+    "tests/test_artifacts.py": {
+      "sha256": "d3258138c789ea7886267702b567242255c1a225ed646509d7564b2edfd9afa5",
+      "bytes": 9821
+    },
+    "tests/test_context.py": {
+      "sha256": "c5c3c4ba0aad654b03dce51ea303f0e023071e28e7fd3f6e18aecac38c59c264",
+      "bytes": 6459
+    },
+    "tests/test_mcp.py": {
+      "sha256": "717634adfd6724014a65a3be12913daca0acd5ee85243a3c0c75e7dd842db034",
+      "bytes": 7241
+    },
+    "tests/test_retrieval_benchmark.py": {
+      "sha256": "d3e2c4bbba134b26c4f0980adda4828a21a70b9e4a8bc4450dd2b845c1893d21",
+      "bytes": 6592
+    },
+    "api/services/source_ranges.py": {
+      "sha256": "3ffae23ddd28d4cbedab90ae60bdf14098ea043f1843cf823fafe2b6feca9cc9",
+      "bytes": 13958
+    },
+    "api/services/source_search.py": {
+      "sha256": "baefd920d58a658c8d8c11cc2287e9f217e1b19429c649f309ebe7c068beb90d",
+      "bytes": 12641
+    },
+    "e2e/content-evidence.spec.ts": {
+      "sha256": "931d81e6ad79519eccc915b13fa7e5951dcbbd637345a279651f317e3d314855",
+      "bytes": 10479
+    },
+    "tests/test_content_search.py": {
+      "sha256": "8b55bbfb8494e9a549af36dbd24a94fcab97819afe9967e815b2ddbf01523647",
+      "bytes": 34268
+    },
+    "tests/test_correctness_contracts.py": {
+      "sha256": "4923395df391891b030bc6cf776bd341ad68b1a699cc5ba3193606c57b189092",
+      "bytes": 21079
+    }
+  },
+  "screenshots": [
+    {
+      "path": "screenshots/source-content-desktop.png",
+      "sha256": "36fe6a68e51133efa05c4b666bfc96d1832bbd6d1af8b529ce3c49a4283aaaa2",
+      "source": "parent independent Playwright probe against owned local fixture, Chromium, loopback :5189",
+      "kind": "verification capture, not product raster asset",
+      "dimensions_px": [
+        1440,
+        1406
+      ]
+    },
+    {
+      "path": "screenshots/source-content-mobile.png",
+      "sha256": "fe2ca7f1d63acb417fa5d60d7066904056a168af6343c0913dac5f257abf791b",
+      "source": "parent independent Playwright probe against owned local fixture, Chromium, loopback :5189",
+      "kind": "verification capture, not product raster asset",
+      "dimensions_px": [
+        390,
+        2276
+      ]
+    },
+    {
+      "path": "screenshots/source-ask-desktop.png",
+      "sha256": "6d2afc6ace00d422997ca6c9744597dd785fe36b238fdb5f11517de7400a045b",
+      "source": "parent independent Playwright probe against owned local fixture, Chromium, loopback :5189",
+      "kind": "verification capture, not product raster asset",
+      "dimensions_px": [
+        1440,
+        2363
+      ]
+    },
+    {
+      "path": "screenshots/source-ask-mobile.png",
+      "sha256": "dec7ab48f2a5c5f7efa7690eaf3620e25392f368b7c82cf16d3b9a5ccb8f9d8d",
+      "source": "parent independent Playwright probe against owned local fixture, Chromium, loopback :5189",
+      "kind": "verification capture, not product raster asset",
+      "dimensions_px": [
+        390,
+        2648
+      ]
+    },
+    {
+      "path": "screenshots/source-empty-desktop.png",
+      "sha256": "ab8bb8f28af2d51f92ba07c8437efbbf4e5f739a7460ca0cb297a5773a19d14d",
+      "source": "parent independent Playwright probe against owned local fixture, Chromium, loopback :5189",
+      "kind": "verification capture, not product raster asset",
+      "dimensions_px": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "path": "screenshots/source-partial-desktop.png",
+      "sha256": "440eb907c51f703d78b74a7d5b46822491360ac02a02adbcc1b190d674911160",
+      "source": "parent independent Playwright probe against owned local fixture, Chromium, loopback :5189",
+      "kind": "verification capture, not product raster asset",
+      "dimensions_px": [
+        1440,
+        1000
+      ]
+    }
+  ],
+  "visual_scope": "Code literal hits/evidence desktop and mobile, Ask pinned citation desktop and mobile, content empty and partial desktop; fresh reviewer inspected captures and relevant code, not comprehensive app/a11y certification",
+  "browser_method": "real Chromium through Playwright; CUA unavailable because request-header policy failed to load",
+  "verification_isolation": {
+    "postgres_container": "graphpilot-implementation-postgres",
+    "postgres_port": 55439,
+    "falkor_container": "graphpilot-implementation-falkor",
+    "falkor_port": 56389,
+    "api_port": 8019,
+    "vite_port": 5189,
+    "database_separation": "graphpilot_test, graphpilot_browser (independent probes), graphpilot_release_browser (clean final suite)",
+    "source_roots": [
+      "/tmp/graphpilot-implementation/browser-data",
+      "/tmp/graphpilot-implementation/browser-release-data"
+    ],
+    "existing_demo_services": "untouched"
+  },
+  "remaining": [
+    "bounded scan; no durable lexical index",
+    "manifest cap precedes path filtering",
+    "cooperative deadlines, not hard CPU preemption",
+    "existing approved-manifest policy is not a universal secret detector",
+    "reindex required for python-ast-4 semantics",
+    "JS/TS definitions, context export, comparisons and team workflows remain future slices"
+  ],
+  "no_commit_push_deploy": true,
+  "cleanup": {
+    "stopped_owned_processes": [
+      {
+        "pid": 172655,
+        "service": "vite"
+      },
+      {
+        "pid": 172656,
+        "service": "vite"
+      },
+      {
+        "pid": 290569,
+        "service": "api/worker"
+      },
+      {
+        "pid": 290570,
+        "service": "api/worker"
+      },
+      {
+        "pid": 290575,
+        "service": "api/worker"
+      },
+      {
+        "pid": 290576,
+        "service": "api/worker"
+      }
+    ],
+    "removed_owned_containers": [
+      "graphpilot-implementation-postgres",
+      "graphpilot-implementation-falkor"
+    ],
+    "remaining_containers": [
+      "graphpilot-demo-web-1 Up 7 hours",
+      "graphpilot-demo-worker-1 Up 7 hours",
+      "graphpilot-demo-api-1 Up 7 hours (healthy)",
+      "graphpilot-demo-postgres-1 Up 7 hours (healthy)",
+      "graphpilot-demo-falkordb-1 Up 7 hours (healthy)"
+    ],
+    "baseline_and_evidence_preserved": true
+  }
+}

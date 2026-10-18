@@ -1,0 +1,168 @@
+{
+  "scope": "Research-only isolated local indexes; named-query behavior and small synthetic timing observations, not a product benchmark or deployment recommendation.",
+  "falkor_fulltext_behavior": [
+    {
+      "query": "normalize_url",
+      "substring_ids": [
+        "snake"
+      ],
+      "name_fulltext_ids": [],
+      "terms_fulltext_ids": []
+    },
+    {
+      "query": "normalizeUrl",
+      "substring_ids": [
+        "camel"
+      ],
+      "name_fulltext_ids": [],
+      "terms_fulltext_ids": []
+    },
+    {
+      "query": "url",
+      "substring_ids": [
+        "camel",
+        "snake",
+        "swapped"
+      ],
+      "name_fulltext_ids": [],
+      "terms_fulltext_ids": []
+    },
+    {
+      "query": "normalize",
+      "substring_ids": [
+        "camel",
+        "snake",
+        "swapped"
+      ],
+      "name_fulltext_ids": [],
+      "terms_fulltext_ids": []
+    },
+    {
+      "query": "X-CSRF-Token",
+      "substring_ids": [],
+      "name_fulltext_ids": [],
+      "terms_fulltext_ids": []
+    }
+  ],
+  "sqlite_fts5_trigram": [
+    {
+      "query": "X-CSRF-Token",
+      "result_count": 10,
+      "expected_literal_file_count": 10,
+      "all_expected_returned": true,
+      "returned_nonliteral_files": [],
+      "paths": [
+        "scripts/smoke_gateway.py",
+        "scripts/verify-live.py",
+        "scripts/verify_capacity.py",
+        "scripts/benchmark.py",
+        "scripts/verify_history.py",
+        "api/main.py",
+        "app/src/lib/api.ts",
+        "scripts/artifact_browser.py",
+        "scripts/verify_restore.py",
+        "api/auth.py"
+      ]
+    },
+    {
+      "query": "Request origin is not allowed",
+      "result_count": 2,
+      "expected_literal_file_count": 2,
+      "all_expected_returned": true,
+      "returned_nonliteral_files": [],
+      "paths": [
+        "api/main.py",
+        "api/mcp_server.py"
+      ]
+    },
+    {
+      "query": "python-ast-3",
+      "result_count": 1,
+      "expected_literal_file_count": 1,
+      "all_expected_returned": true,
+      "returned_nonliteral_files": [],
+      "paths": [
+        "api/ingestion/python.py"
+      ]
+    },
+    {
+      "query": "graph_queries",
+      "result_count": 4,
+      "expected_literal_file_count": 4,
+      "all_expected_returned": true,
+      "returned_nonliteral_files": [],
+      "paths": [
+        "api/search/retrieval.py",
+        "api/routes/context.py",
+        "app/src/lib/api.ts",
+        "app/src/pages/context.tsx"
+      ]
+    },
+    {
+      "query": "xy",
+      "result_count": 0,
+      "expected_literal_file_count": 4,
+      "all_expected_returned": false,
+      "returned_nonliteral_files": [],
+      "paths": []
+    }
+  ],
+  "sqlite_version": "3.53.1",
+  "synthetic_lookup_timings": [
+    {
+      "nodes": 1000,
+      "mode": "substring",
+      "returned": 1,
+      "measured_repeats": 20,
+      "warmups": 2,
+      "median_ms": 0.843,
+      "p95_nearest_rank_ms": 1.161
+    },
+    {
+      "nodes": 1000,
+      "mode": "exact",
+      "returned": 1,
+      "measured_repeats": 20,
+      "warmups": 2,
+      "median_ms": 0.128,
+      "p95_nearest_rank_ms": 0.316
+    },
+    {
+      "nodes": 10000,
+      "mode": "substring",
+      "returned": 1,
+      "measured_repeats": 20,
+      "warmups": 2,
+      "median_ms": 4.739,
+      "p95_nearest_rank_ms": 5.744
+    },
+    {
+      "nodes": 10000,
+      "mode": "exact",
+      "returned": 1,
+      "measured_repeats": 20,
+      "warmups": 2,
+      "median_ms": 0.125,
+      "p95_nearest_rank_ms": 0.162
+    },
+    {
+      "nodes": 50000,
+      "mode": "substring",
+      "returned": 1,
+      "measured_repeats": 20,
+      "warmups": 2,
+      "median_ms": 23.019,
+      "p95_nearest_rank_ms": 24.507
+    },
+    {
+      "nodes": 50000,
+      "mode": "exact",
+      "returned": 1,
+      "measured_repeats": 20,
+      "warmups": 2,
+      "median_ms": 0.129,
+      "p95_nearest_rank_ms": 0.22
+    }
+  ],
+  "falkor_fulltext_behavior_validity": "Inconclusive: first spike did not verify asynchronous index readiness before queries. Empty results must not be treated as a fulltext capability failure. Superseded by fulltext-check.json, which records OPERATIONAL state and successful normalized-name queries."
+}

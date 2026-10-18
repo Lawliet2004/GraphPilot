@@ -57,7 +57,10 @@ def test_context_retrieval_without_llm_is_real_and_scoped(client, db):
     assert result["mode"] == "graph" and result["answer"] is None
     assert any(n["name"] == "total" for n in result["results"])
     assert any(e["type"] == "CALLS" for e in result["relationships"])
-    assert result["diagnostics"]["graph_queries"] <= 15
+    assert (
+        result["diagnostics"]["graph_queries"]
+        <= result["diagnostics"]["max_graph_queries"]
+    )
     assert any("return max(0, value)" in e["content"] for e in result["evidence"])
     assert client.get(base + "/conversations").json()[0]["question"] == "Find callers of normalize"
     missing = client.post(

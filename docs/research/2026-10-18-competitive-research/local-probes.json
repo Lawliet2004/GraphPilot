@@ -1,0 +1,265 @@
+{
+  "scope": "Synthetic parser/graph-builder and question interpreter only; no database or vendor runtime benchmark",
+  "parser_cases": [
+    {
+      "case": "direct_python",
+      "stats": {
+        "resolved_calls": 1,
+        "unresolved_calls": 0,
+        "parse_errors": [],
+        "files": 1,
+        "functions": 2,
+        "classes": 0,
+        "nodes": 5,
+        "edges": 5
+      },
+      "symbols": [
+        "m.py:normalize",
+        "m.py:checkout"
+      ],
+      "calls": [
+        {
+          "source": "m.py:checkout",
+          "target": "m.py:normalize",
+          "line": 4
+        }
+      ],
+      "tests": []
+    },
+    {
+      "case": "local_import",
+      "stats": {
+        "resolved_calls": 0,
+        "unresolved_calls": 1,
+        "parse_errors": [],
+        "files": 2,
+        "functions": 2,
+        "classes": 0,
+        "nodes": 6,
+        "edges": 5
+      },
+      "symbols": [
+        "m.py:normalize",
+        "service.py:checkout"
+      ],
+      "calls": [],
+      "tests": []
+    },
+    {
+      "case": "parameter_dispatch",
+      "stats": {
+        "resolved_calls": 0,
+        "unresolved_calls": 1,
+        "parse_errors": [],
+        "files": 1,
+        "functions": 2,
+        "classes": 1,
+        "nodes": 6,
+        "edges": 5
+      },
+      "symbols": [
+        "m.py:Normalizer",
+        "m.py:Normalizer.normalize",
+        "m.py:checkout"
+      ],
+      "calls": [],
+      "tests": []
+    },
+    {
+      "case": "non_python",
+      "stats": {
+        "resolved_calls": 0,
+        "unresolved_calls": 0,
+        "parse_errors": [],
+        "files": 1,
+        "functions": 0,
+        "classes": 0,
+        "nodes": 3,
+        "edges": 2
+      },
+      "symbols": [],
+      "calls": [],
+      "tests": []
+    },
+    {
+      "case": "inherited_dispatch",
+      "stats": {
+        "resolved_calls": 0,
+        "unresolved_calls": 1,
+        "parse_errors": [],
+        "files": 1,
+        "functions": 2,
+        "classes": 2,
+        "nodes": 7,
+        "edges": 6
+      },
+      "symbols": [
+        "m.py:Base",
+        "m.py:Base.normalize",
+        "m.py:Child",
+        "m.py:Child.checkout"
+      ],
+      "calls": [],
+      "tests": []
+    },
+    {
+      "case": "static_test_relation",
+      "stats": {
+        "resolved_calls": 2,
+        "unresolved_calls": 0,
+        "parse_errors": [],
+        "files": 1,
+        "functions": 3,
+        "classes": 0,
+        "nodes": 6,
+        "edges": 8
+      },
+      "symbols": [
+        "m.py:normalize",
+        "m.py:helper",
+        "m.py:test_checkout"
+      ],
+      "calls": [
+        {
+          "source": "m.py:helper",
+          "target": "m.py:normalize",
+          "line": 4
+        },
+        {
+          "source": "m.py:test_checkout",
+          "target": "m.py:helper",
+          "line": 6
+        }
+      ],
+      "tests": [
+        {
+          "source": "m.py:test_checkout",
+          "target": "m.py:helper"
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "question": "Where is X-CSRF-Token validated?",
+      "interpretation": [
+        "lookup",
+        [
+          [
+            "X-CSRF-Token",
+            "",
+            ""
+          ],
+          [
+            "validated",
+            "",
+            ""
+          ]
+        ]
+      ]
+    },
+    {
+      "question": "How is payment failure handled?",
+      "interpretation": [
+        "ci_failure",
+        [
+          [
+            "",
+            "WorkflowRun",
+            "failure"
+          ],
+          [
+            "handled",
+            "",
+            ""
+          ],
+          [
+            "payment",
+            "",
+            ""
+          ]
+        ]
+      ]
+    },
+    {
+      "question": "Trace checkout to normalize",
+      "interpretation": [
+        "lookup",
+        [
+          [
+            "normalize",
+            "",
+            ""
+          ],
+          [
+            "checkout",
+            "",
+            ""
+          ],
+          [
+            "Trace",
+            "",
+            ""
+          ]
+        ]
+      ]
+    },
+    {
+      "question": "Find callers of normalize",
+      "interpretation": [
+        "dependency",
+        [
+          [
+            "normalize",
+            "",
+            ""
+          ]
+        ]
+      ]
+    },
+    {
+      "question": "Which tests cover normalize?",
+      "interpretation": [
+        "lookup",
+        [
+          [
+            "normalize",
+            "",
+            ""
+          ],
+          [
+            "cover",
+            "",
+            ""
+          ]
+        ]
+      ]
+    },
+    {
+      "question": "Find service.ts",
+      "interpretation": [
+        "lookup",
+        [
+          [
+            "service.ts",
+            "",
+            ""
+          ]
+        ]
+      ]
+    },
+    {
+      "question": "Explain the architecture",
+      "interpretation": [
+        "overview",
+        [
+          [
+            "architecture",
+            "",
+            ""
+          ]
+        ]
+      ]
+    }
+  ]
+}

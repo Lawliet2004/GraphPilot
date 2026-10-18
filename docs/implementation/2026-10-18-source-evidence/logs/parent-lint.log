@@ -1,0 +1,7 @@
+uv run ruff check api tests scripts migrations
+All checks passed!
+npm --prefix app run typecheck
+
+> graphpilot-app@0.1.0 typecheck
+> tsc -b
+

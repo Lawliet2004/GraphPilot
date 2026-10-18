@@ -1,0 +1,24 @@
+{
+  "observed_at_utc": "2026-10-18T06:26:32.492684+00:00",
+  "scope": "One unauthenticated HTTP check per URL; does not establish uptime, worker health, successful login or task completion.",
+  "results": [
+    {
+      "url": "http://127.0.0.1:8080/api/health/ready",
+      "status": 404,
+      "elapsed_ms": 8.0
+    },
+    {
+      "url": "https://gp-code.vercel.app",
+      "status": 200,
+      "final_url": "https://gp-code.vercel.app",
+      "content_type": "text/html; charset=utf-8",
+      "body_excerpt": null,
+      "elapsed_ms": 2076.1
+    },
+    {
+      "url": "https://gp-code.vercel.app/api/health/ready",
+      "status": 404,
+      "elapsed_ms": 2433.5
+    }
+  ]
+}

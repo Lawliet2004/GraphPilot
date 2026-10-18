@@ -81,7 +81,7 @@ export function ConnectLink() {
   return (
     <Link className="button primary" to="/connect">
       <Plus size={16} />
-      Connect repository
+      Add repository
     </Link>
   );
 }

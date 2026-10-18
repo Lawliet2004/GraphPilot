@@ -8,7 +8,7 @@ import {
   Network,
   Search,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { api, date, number, scoped, type Node, type Repo } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -23,6 +23,10 @@ import {
 } from "../components/ui";
 export function Dashboard() {
   const { user } = useAuth();
+  const location = useLocation();
+  const verificationEmailSent = (
+    location.state as { verificationEmailSent?: boolean | null } | null
+  )?.verificationEmailSent ?? null;
   const [search, setSearch] = useState("");
   const query = useQuery({
     queryKey: ["repositories"],
@@ -75,6 +79,13 @@ export function Dashboard() {
         description={`Welcome back, ${user?.name.split(" ")[0]}. Pick a repository and follow the connections.`}
         action={<ConnectLink />}
       />
+      {verificationEmailSent !== null && (
+        <p className="notice" role="status">
+          {verificationEmailSent
+            ? "Account created. Check your inbox to verify your email."
+            : "Account created, but the verification email could not be sent. You can request another from Settings."}
+        </p>
+      )}
       <div className="workspace-summary">
         <div>
           <FolderGit2 size={19} />
@@ -124,9 +135,15 @@ export function Dashboard() {
             title="Every connection starts with a repository."
             action={<ConnectLink />}
           >
-            Connect a public GitHub project, upload a source archive, or use an
-            allowed server-local Git repository. Your graph will be built from
-            the actual source.
+            Add a public GitHub project or upload a source archive. GraphPilot
+            builds the graph from the actual source.
+            <span className="empty-cli-hint">
+              Prefer the terminal? Sign in with the CLI, then run{" "}
+              <code>graphpilot repos connect &lt;github-url&gt;</code>.{" "}
+              <Link className="empty-tools-link" to="/tools">
+                Set up the CLI
+              </Link>
+            </span>
           </Empty>
         ) : !shown.length ? (
           <Empty title="No matching repositories">
@@ -135,11 +152,7 @@ export function Dashboard() {
         ) : (
           <div className="repo-grid">
             {shown.map((repo) => (
-              <Link
-                to={`/repositories/${repo.id}`}
-                className="repo-card"
-                key={repo.id}
-              >
+              <article className="repo-card" key={repo.id}>
                 <div className="repo-card-top">
                   <span className="repo-icon">
                     <FolderGit2 size={23} strokeWidth={1.4} />
@@ -147,8 +160,10 @@ export function Dashboard() {
                   <Status status={repo.status} />
                 </div>
                 <h3>
-                  {repo.name}
-                  <ArrowUpRight size={18} />
+                  <Link to={`/repositories/${repo.id}`} className="repo-title">
+                    {repo.name}
+                    <ArrowUpRight size={18} />
+                  </Link>
                 </h3>
                 <p className="repo-source">
                   {repo.source_url?.replace("https://github.com/", "") ||
@@ -170,12 +185,22 @@ export function Dashboard() {
                 </div>
                 <div className="repo-card-footer">
                   <Branch name={repo.branch} />
-                  <span>
+                  <span title={repo.commit_sha ?? undefined}>
                     <GitCommitHorizontal size={13} />
-                    {repo.commit_sha?.slice(0, 7) || "Awaiting index"}
+                    {repo.commit_sha?.slice(0, 7) || "Not indexed yet"}
+                  </span>
+                  <span>
+                    {repo.indexed_at
+                      ? "Indexed " + date(repo.indexed_at)
+                      : "Waiting for first index"}
                   </span>
                 </div>
-              </Link>
+                <div className="repo-card-actions">
+                  <Link to={`/repositories/${repo.id}`}>Ask</Link>
+                  <Link to={`/repositories/${repo.id}/code`}>Graph</Link>
+                  <Link to={`/repositories/${repo.id}/activity`}>History</Link>
+                </div>
+              </article>
             ))}
           </div>
         )}

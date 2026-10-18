@@ -526,3 +526,24 @@ uv run python -m scripts.verify_capacity   # Labeled synthetic sources, real HTT
 8001 relationships, with an 80-node initial graph response. The 1.08-second native
 observation used 0.57 s worker CPU and a 106.03 MiB sampled worker RSS peak; it
 excludes separate graph-process CPU. These are baseline observations, not SLAs.
+
+## Developer tools and daily workflow
+
+Open **Developer tools** in the workspace for copy-ready commands and current
+API readiness. **Ctrl/Cmd+K** finds repositories and workspace actions. Repository
+work stays in **Ask**, **Code**, and **Activity**.
+
+The real CLI adds repository questions/jobs, a local daily Git workflow and named
+profiles for controlling an existing GitHub Codespace:
+
+```bash
+./scripts/graphpilot git daily --path .
+./scripts/graphpilot runner status
+./scripts/graphpilot ask REPOSITORY_ID "What should I investigate next?"
+```
+
+Git and runner commands work independently of website login. Runner control uses
+your installed GitHub CLI account. Questions and cancellation use GraphPilot
+login with `--write`; listing and source reads can use read-only access.
+See [developer tooling](docs/DEVELOPER_TOOLS.md) for the exact command families
+and [competitor research](docs/COMPETITOR_RESEARCH.md) for the design rationale.

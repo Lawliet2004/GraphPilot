@@ -49,6 +49,14 @@ export type Node = {
   summary?: string;
   timestamp?: string;
   log_status?: string;
+  /** Exact literal-match position when this node came from a content scan. */
+  match?: {
+    line: number;
+    column: number;
+    end_column: number;
+    snippet?: string;
+    snippet_column?: number;
+  };
 };
 export type Edge = {
   id: string;
@@ -77,6 +85,14 @@ export type Job = {
   finished_at: string | null;
   cancel_requested: boolean;
 };
+/** A served excerpt that is a bounded character window of one long line. */
+export type LineExcerpt = {
+  line: number;
+  start_column: number;
+  end_column: number;
+  line_length: number;
+  partial: boolean;
+};
 export type Evidence = {
   node: Node;
   content: string;
@@ -85,6 +101,12 @@ export type Evidence = {
   commit: string;
   url: string | null;
   truncated?: boolean;
+  /** True when the final served line is cut mid-line; null/absent for non-source evidence. */
+  end_line_partial?: boolean | null;
+  /** Present when one served line is a partial column window of a longer line. */
+  line_excerpt?: LineExcerpt | null;
+  /** Manifest content hash the served bytes were verified against. */
+  content_hash?: string | null;
   notice?: string;
   download_url?: string;
 };
@@ -98,6 +120,86 @@ export type Citation = {
   content: string;
   url: string | null;
   commit: string;
+  /** Absent on responses saved before excerpt metadata existed: completeness is unknown. */
+  truncated?: boolean;
+  /** True when the final served line is cut mid-line; null for non-source evidence. */
+  end_line_partial?: boolean | null;
+  /** True when the asker pinned this exact source selection. */
+  pinned?: boolean;
+  /** Present when one served line is a partial column window of a longer line. */
+  line_excerpt?: LineExcerpt | null;
+  /** Exact literal-match position behind this citation, when known. */
+  match?: Node["match"];
+  /** Manifest hash the served source bytes were verified against. */
+  content_hash?: string | null;
+};
+export type ContentHit = {
+  node_id: string;
+  node: Node;
+  path: string;
+  line: number;
+  column: number;
+  end_column: number;
+  snippet: string;
+  snippet_column: number;
+  snippet_start_partial: boolean;
+  snippet_end_partial: boolean;
+  line_length: number;
+  /** Manifest hash the matched bytes were verified against. */
+  content_hash?: string | null;
+};
+export type ContentSearch = {
+  results: ContentHit[];
+  returned: number;
+  limit: number;
+  /** Exact match count, or null when the scan stopped before finishing. */
+  total: number | null;
+  /** True only when the whole approved manifest was scanned successfully. */
+  scan_complete: boolean;
+  truncated: boolean;
+  has_more: boolean;
+  completion_reason: string;
+  scan: {
+    files_scanned: number;
+    files_skipped: number;
+    skip_reasons: Record<string, number>;
+    bytes_scanned: number;
+    elapsed_ms: number;
+    manifest_entries: number;
+    manifest_incomplete: boolean;
+  };
+  graph_queries: number;
+  scope: {
+    branch: string;
+    snapshot_id: string | null;
+    commit: string;
+    historical: boolean;
+    manifest: string;
+    case_sensitive: boolean;
+    filters?: { path?: string | null; suffix?: string | null };
+  };
+};
+export type RepoPage = {
+  repositories: Repo[];
+  limit: number;
+  offset: number;
+  returned: number;
+  has_more: boolean;
+  next_offset: number | null;
+};
+export type ImpactResult = {
+  results: { node: Node; distance: number; classification: string }[];
+  unknown: string;
+  max_depth?: number;
+  returned?: number;
+  limit?: number;
+  /** Exact reachable-caller count within depth; null when traversal stopped early. */
+  total?: number | null;
+  truncated?: boolean;
+  /** False when a bounded stop interrupted exploration of a caller layer. */
+  traversal_complete?: boolean;
+  has_more?: boolean;
+  completion_reason?: string;
 };
 export type ContextResult = {
   branch: string;
@@ -182,25 +284,39 @@ export function csrf() {
       .join("=") || ""
   );
 }
+function unavailable(status: number) {
+  return `The GraphPilot backend is unavailable (HTTP ${status}). Check your connection — if the Codespace runner is stopped, start it, then retry.`;
+}
 export async function api<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch("/api" + path, {
-    ...options,
-    credentials: "include",
-    headers: {
-      ...(options.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" }),
-      "X-CSRF-Token": csrf(),
-      ...options.headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch("/api" + path, {
+      ...options,
+      credentials: "include",
+      headers: {
+        ...(options.body instanceof FormData
+          ? {}
+          : { "Content-Type": "application/json" }),
+        "X-CSRF-Token": csrf(),
+        ...options.headers,
+      },
+    });
+  } catch {
+    // Network-level failure: the API origin is unreachable, not a bad request.
+    throw new ApiError(
+      0,
+      "The GraphPilot backend could not be reached. Check your connection — if the Codespace runner is stopped, start it, then try again.",
+    );
+  }
   if (!response.ok) {
-    let message = "The request failed. Please try again.";
+    let message: string | undefined;
+    let parsed = false;
     try {
       const body = await response.json();
+      parsed = true;
       message =
         typeof body.detail === "string"
           ? body.detail
@@ -208,13 +324,26 @@ export async function api<T>(
             ? body.detail
                 .map((e: { msg: string }) => e.msg.replace("Value error, ", ""))
                 .join(". ")
-            : message;
+            : undefined;
     } catch {
-      /* retain readable fallback */
+      /* gateway or proxy responses are often HTML; never echo raw bodies */
     }
+    message ??= [502, 503, 504].includes(response.status)
+      ? unavailable(response.status)
+      : parsed
+        ? "The request failed. Please try again."
+        : `The server returned an unreadable response (HTTP ${response.status}). Try again in a moment.`;
     throw new ApiError(response.status, message);
   }
-  return response.json();
+  if (response.status === 204) return undefined as T;
+  try {
+    return await response.json();
+  } catch {
+    throw new ApiError(
+      response.status,
+      "The server returned an unreadable response. Try again in a moment.",
+    );
+  }
 }
 export const post = <T>(path: string, body?: unknown) =>
   api<T>(path, {

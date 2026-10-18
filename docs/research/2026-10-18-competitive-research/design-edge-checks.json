@@ -1,0 +1,38 @@
+{
+  "scope": "Pure standard-library/source-text research checks; no repository fixture code imported or executed.",
+  "source_reader_fidelity": {
+    "raw_bytes": 31,
+    "raw_lf_terminated_lines": 3,
+    "current_reader_lines": 4,
+    "current_reader_rewrites_crlf": true,
+    "current_reader_rewrites_unicode_separator": true,
+    "served_is_raw_byte_substring": false
+  },
+  "trailing_newline_formula": {
+    "source": "line1\nline2\n",
+    "intended_last_nonempty_line": 2,
+    "start_plus_newline_count": 3
+  },
+  "relative_import_boundary": [
+    {
+      "package": "pkg",
+      "relative": "..target",
+      "error_type": "ImportError"
+    },
+    {
+      "package": "pkg",
+      "relative": ".target",
+      "resolved": "pkg.target"
+    },
+    {
+      "package": "pkg.sub",
+      "relative": "..target",
+      "resolved": "pkg.target"
+    },
+    {
+      "package": "pkg.sub",
+      "relative": "...target",
+      "error_type": "ImportError"
+    }
+  ]
+}

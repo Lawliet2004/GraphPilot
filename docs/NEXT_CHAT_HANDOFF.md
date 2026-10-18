@@ -6,6 +6,17 @@ identity. Author and committer are `Lawliet2004
 <168631200+Lawliet2004@users.noreply.github.com>`, with no extra co-authors.
 Do not introduce an agent author/co-author or another branch.
 
+## Latest continuation — free local HTTPS testing
+
+Oracle signup was rejected during card verification. The user authorized switching
+to a Cloudflare Quick Tunnel on this computer. The isolated Docker demo and tunnel
+are running; public browser/authentication verification is still pending.
+
+**Read the local ignored `.data/quick-tunnel/HANDOFF.md` before continuing.** It
+contains current runtime state, controller commands and the remaining checks. Its
+hosting status supersedes the older hosting-deferred notes below. Do not commit
+private credentials, tunnel logs or other ignored operational files.
+
 ## Current verified result
 
 - All six remote CI jobs pass: **111 backend/release tests**, **three browser

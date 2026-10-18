@@ -1,3 +1,4 @@
+import { LoaderCircle } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, post, date } from "../lib/api";
@@ -25,7 +26,7 @@ export function CliAccess() {
   return (
     <main className="page cli-authorization">
       <Brand />
-      <h1>Connect your command line.</h1>
+      <h1>Approve CLI access</h1>
       {auth.loading ? (
         <Loading />
       ) : auth.error ? (
@@ -71,10 +72,17 @@ export function CliAccess() {
                   {request.data.scopes.includes("repositories:write") && (
                     <li>
                       Connect repositories, upload source, request indexing or
-                      history sync, and remove repositories you own.
+                      history sync, ask questions, and remove repositories you
+                      own.
                     </li>
                   )}
                 </ul>
+                {request.data.scopes.includes("repositories:write") && (
+                  <p>
+                    Questions use your saved model credentials when configured,
+                    with the same provider charges as questions on the website.
+                  </p>
+                )}
                 <p>
                   Access expires in seven days. You can revoke it in Settings.
                   It cannot administer users or run shell commands.
@@ -84,8 +92,12 @@ export function CliAccess() {
                   <button
                     className="button primary"
                     disabled={decision.isPending}
+                    aria-busy={decision.isPending}
                     onClick={() => decision.mutate(true)}
                   >
+                    {decision.isPending && decision.variables && (
+                      <LoaderCircle className="spin" size={16} />
+                    )}
                     Approve CLI
                   </button>
                   <button
@@ -150,13 +162,13 @@ export function CliCredentials() {
                 <strong>{t.name}</strong>
                 <p>
                   {t.scopes.includes("repositories:write")
-                    ? "Read & manage repositories"
+                    ? "Read, ask & manage repositories"
                     : "Read only"}{" "}
                   · Expires {date(t.expires_at)}
                 </p>
               </div>
               <button
-                className="button"
+                className="button danger small-button"
                 disabled={t.revoked || revoke.isPending}
                 onClick={() => revoke.mutate(t.id)}
               >

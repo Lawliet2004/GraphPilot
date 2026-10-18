@@ -69,7 +69,7 @@ class Login(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
-def current_session(request: Request, db: Session = Depends(db_session)):
+def current_session(request: Request, response: Response, db: Session = Depends(db_session)):
     authorization = request.headers.get("authorization", "")
     if authorization:
         from api.models import AgentToken
@@ -118,12 +118,16 @@ def current_session(request: Request, db: Session = Depends(db_session)):
         if not csrf or not hmac.compare_digest(session.csrf_hash, digest(csrf)):
             raise HTTPException(403, "Invalid CSRF token. Refresh the page and try again.")
     if user.firebase_identity:
-        provider = firebase_auth.account(request.cookies.get("gp_firebase", ""))
+        provider, renewed = firebase_auth.session_account(
+            request.cookies.get("gp_firebase", ""), request.cookies.get("gp_firebase_refresh", "")
+        )
         if (
             provider["identity"] != user.firebase_identity
             or int(session.created_at.timestamp()) < provider["valid_since"]
         ):
             raise HTTPException(401, "Please log in to continue")
+        if renewed:
+            firebase_cookies(response, renewed["id_token"], renewed["refresh_token"])
         request.state.firebase = provider
     request.state.user = user
     request.state.session = session
@@ -136,11 +140,35 @@ def admin(user: User = Depends(current_session)):
     return user
 
 
+def firebase_cookies(response, id_token, refresh_token):
+    cfg = settings()
+    max_age = cfg.session_hours * 3600
+    response.set_cookie(
+        "gp_firebase",
+        id_token,
+        httponly=True,
+        secure=cfg.cookie_secure,
+        samesite="lax",
+        max_age=max_age,
+        path="/",
+    )
+    if refresh_token:
+        response.set_cookie(
+            "gp_firebase_refresh",
+            refresh_token,
+            httponly=True,
+            secure=cfg.cookie_secure,
+            samesite="lax",
+            max_age=max_age,
+            path="/",
+        )
+    else:
+        response.delete_cookie("gp_firebase_refresh", path="/")
+
+
 def create_session(db, user, response, request, firebase=None):
     token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
     expires = utcnow() + timedelta(hours=settings().session_hours)
-    if firebase:
-        expires = min(expires, utcnow() + timedelta(seconds=firebase["expires_in"]))
     db.add(
         LoginSession(
             id=digest(token),
@@ -161,35 +189,32 @@ def create_session(db, user, response, request, firebase=None):
             path="/",
         )
     if firebase:
-        response.set_cookie(
-            "gp_firebase",
-            firebase["id_token"],
-            httponly=True,
-            secure=settings().cookie_secure,
-            samesite="lax",
-            max_age=firebase["expires_in"],
-            path="/",
-        )
+        firebase_cookies(response, firebase["id_token"], firebase.get("refresh_token"))
     else:
         response.delete_cookie("gp_firebase", path="/")
+        response.delete_cookie("gp_firebase_refresh", path="/")
     return {"user": public_user(user), "csrf": csrf}
 
 
-def auth_rate_limit(db, request):
+AUTH_LIMITS = {"login": 30, "register": 30, "reset": 30, "verify": 30, "cli": 60}
+
+
+def auth_rate_limit(db, request, bucket):
     # Durable across API workers/restarts. Store a one-way IP digest, never raw addresses.
     ip = digest(request.client.host if request.client else "unknown")
+    action = "auth.attempt." + bucket
     count = db.scalar(
         select(func.count())
         .select_from(Audit)
         .where(
-            Audit.action == "auth.attempt",
+            Audit.action == action,
             Audit.target == ip,
             Audit.created_at > utcnow() - timedelta(minutes=10),
         )
     )
-    if count >= 30:
+    if count >= AUTH_LIMITS[bucket]:
         raise HTTPException(429, "Too many attempts. Try again in 10 minutes.")
-    audit(db, None, "auth.attempt", ip)
+    audit(db, None, action, ip)
     db.commit()
 
 
@@ -197,7 +222,7 @@ def auth_rate_limit(db, request):
 def register(
     body: Registration, request: Request, response: Response, db: Session = Depends(db_session)
 ):
-    auth_rate_limit(db, request)
+    auth_rate_limit(db, request, "register")
     if db.scalar(select(User.id).where(User.email == body.email)):
         raise HTTPException(409, "An account with that email already exists")
     firebase = None
@@ -234,7 +259,7 @@ def register(
 
 @router.post("/login")
 def login(body: Login, request: Request, response: Response, db: Session = Depends(db_session)):
-    auth_rate_limit(db, request)
+    auth_rate_limit(db, request, "login")
     user = db.scalar(select(User).where(User.email == body.email.strip().lower()))
     firebase = None
     # Existing native accounts keep their login until explicitly linked by the
@@ -304,7 +329,7 @@ def request_verification(
 ):
     if not user.firebase_identity:
         raise HTTPException(409, "This account is not linked to Firebase")
-    auth_rate_limit(db, request)
+    auth_rate_limit(db, request, "verify")
     firebase_auth.send_verification(request.cookies.get("gp_firebase", ""))
     audit(db, user.id, "account.verification_requested", user.id)
     db.commit()
@@ -324,6 +349,7 @@ def logout(
     response.delete_cookie("gp_session", path="/")
     response.delete_cookie("gp_csrf", path="/")
     response.delete_cookie("gp_firebase", path="/")
+    response.delete_cookie("gp_firebase_refresh", path="/")
     return {"message": "Logged out"}
 
 
@@ -386,14 +412,14 @@ class ResetRequest(BaseModel):
 def request_reset(body: ResetRequest, request: Request, db: Session = Depends(db_session)):
     cfg = settings()
     if firebase_auth.enabled():
-        auth_rate_limit(db, request)
+        auth_rate_limit(db, request, "reset")
         firebase_auth.send_password_reset(body.email.strip().lower())
         return {"message": "If the account exists, a reset email has been sent."}
     if not cfg.smtp_host or not cfg.smtp_from:
         raise HTTPException(
             503, "Password reset email is not configured. Contact your administrator."
         )
-    auth_rate_limit(db, request)
+    auth_rate_limit(db, request, "reset")
     user = db.scalar(
         select(User).where(User.email == body.email.strip().lower(), User.disabled.is_(False))
     )

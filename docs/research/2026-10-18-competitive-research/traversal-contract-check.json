@@ -1,0 +1,14 @@
+{
+  "scope": "Exhaustive four-node simple directed graphs without self loops; research model of stop-on-partial-layer cap semantics. Not product code, database validation, resource bounds, or a release test. Parallel relationship rows and races are not modeled.",
+  "directed_graphs": 4096,
+  "cap_variants": [
+    1,
+    2,
+    3
+  ],
+  "checks": 12288,
+  "reference": "Independent Floyd-Warshall all-pairs shortest distances",
+  "all_returned_distances_equal_full_reference": true,
+  "disclosed_cap_matches_reference": true,
+  "required_followup": "Real FalkorDB incoming single-hop queries need edge/work budgets and timeout handling. Stop after an incomplete earlier layer, or explicitly label later distances provisional. Do not assume algo.BFS supports the required direction/type filters or a result LIMIT bounds its internal work."
+}

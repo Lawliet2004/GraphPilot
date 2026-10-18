@@ -7,7 +7,7 @@ from pathlib import PurePosixPath
 from api.graph.limits import MAX_EDGES, MAX_NODES
 from api.ingestion.sources import SourceError
 
-PARSER_VERSION = "python-ast-3"
+PARSER_VERSION = "python-ast-4"
 
 
 def stable_id(repo_id: str, branch: str, kind: str, key: str) -> str:
@@ -34,6 +34,19 @@ def parse_file(path: str, source: str) -> dict:
     }
     if not path.endswith(".py"):
         return result
+    if "\r" in source.replace("\r\n", ""):
+        # CPython counts a standalone CR as a newline while the served
+        # source-range protocol numbers lines by LF only. Rather than emit
+        # definitions/calls pinned to line numbers the reader cannot
+        # reproduce, withhold semantic results; the file stays searchable.
+        result["errors"].append(
+            {
+                "path": path,
+                "line": None,
+                "message": "Unsupported standalone-CR newlines; definitions and calls were not analyzed",
+            }
+        )
+        return result
     try:
         tree = ast.parse(source, filename=path)
     except (SyntaxError, ValueError, RecursionError) as exc:
@@ -54,19 +67,124 @@ def parse_file(path: str, source: str) -> dict:
         else result["module"].split(".")[:-1]
     )
 
+    class ModuleBindings(ast.NodeVisitor):
+        """Binding events in the module namespace only.
+
+        def/class declarations, plain stores/deletes and import aliases are
+        recorded separately with their line numbers so a call can be matched
+        to the binding in effect at its site. Function/class/lambda bodies
+        bind in their own scope and are not descended into.
+        """
+
+        def __init__(self):
+            self.stores = {}
+            self.defs = {}
+            self.imports = {}
+            self.sequence = 0
+
+        def event(self, lineno):
+            """(line, source-order) identity for deterministic binding order."""
+            self.sequence += 1
+            return (lineno, self.sequence)
+
+        def visit_FunctionDef(self, node):
+            self.defs.setdefault(node.name, []).append(self.event(node.lineno))
+
+        visit_AsyncFunctionDef = visit_FunctionDef
+        visit_ClassDef = visit_FunctionDef
+
+        def visit_Lambda(self, node):
+            pass  # Lambda bodies and defaults bind in their own scope.
+
+        def visit_comprehension(self, node):
+            # Comprehension targets bind in the comprehension's own scope;
+            # only iterables and conditions see module bindings.
+            self.visit(node.iter)
+            for condition in node.ifs:
+                self.visit(condition)
+
+        def visit_Import(self, node):
+            for alias in node.names:
+                name = alias.asname or alias.name.split(".")[0]
+                qualified = alias.name if alias.asname else alias.name.split(".")[0]
+                self.imports.setdefault(name, []).append(
+                    (*self.event(node.lineno), qualified)
+                )
+
+        def visit_ImportFrom(self, node):
+            for alias in node.names:
+                if alias.name == "*":
+                    continue
+                name = alias.asname or alias.name
+                qualified = None
+                if node.level <= len(package):
+                    prefix = (
+                        package[: len(package) - node.level + 1] if node.level else []
+                    )
+                    mod = ".".join([*prefix, *([node.module] if node.module else [])])
+                    qualified = f"{mod}.{alias.name}".strip(".")
+                # An escaping relative import still binds a name at its line;
+                # its target stays unknowable (qualified=None).
+                self.imports.setdefault(name, []).append(
+                    (*self.event(node.lineno), qualified)
+                )
+
+        def visit_Name(self, node):
+            if isinstance(node.ctx, (ast.Store, ast.Del)):
+                self.stores.setdefault(node.id, []).append(
+                    self.event(node.lineno)
+                )
+
+    module_bindings = ModuleBindings()
+    for statement in tree.body:
+        module_bindings.visit(statement)
+    module_stores = module_bindings.stores  # name -> [(line, seq)]
+    module_defs = module_bindings.defs  # name -> [(line, seq)]
+    module_imports = module_bindings.imports  # name -> [(line, seq, qualified|None)]
+
+    def module_binding(name, line, deferred):
+        """The module-level binding in effect for ``name`` at a call on ``line``.
+
+        Module statements execute top to bottom, so a module-level call sees
+        the last binding event at or before its line. Calls inside def/class
+        bodies run after the module finished loading, so they see the last
+        event overall. Returns "def", "store", "import" or None.
+        """
+        events = (
+            [(*seen, "def") for seen in module_defs.get(name, ())]
+            + [(*seen, "store") for seen in module_stores.get(name, ())]
+            + [(seen[0], seen[1], "import") for seen in module_imports.get(name, ())]
+        )
+        live = [event for event in events if deferred or event[0] <= line]
+        return max(live)[2] if live else None
+
+    def live_import_target(name, line, deferred):
+        """The qualified target of the import binding in effect, if resolvable."""
+        candidates = [
+            seen
+            for seen in module_imports.get(name, ())
+            if deferred or seen[0] <= line
+        ]
+        return max(candidates)[2] if candidates else None
+
     class Visitor(ast.NodeVisitor):
         def __init__(self):
             self.scope = []
             self.class_scope = []
             self.shadowed = []
+            self.assigned = []
 
         def bindings(self, root):
             bound = set()
 
             class Bindings(ast.NodeVisitor):
+                def __init__(self):
+                    self.assigned = set()
+
                 def visit_Name(self, child):
                     if isinstance(child.ctx, (ast.Store, ast.Del)):
                         bound.add(child.id)
+                        self.assigned.add(child.id)
 
                 def visit_FunctionDef(self, child):
                     pass
@@ -76,10 +194,14 @@ def parse_file(path: str, source: str) -> dict:
                 visit_Lambda = visit_FunctionDef
 
                 def visit_Import(self, child):
-                    bound.update(a.asname or a.name.split(".")[0] for a in child.names)
+                    names = {a.asname or a.name.split(".")[0] for a in child.names}
+                    bound.update(names)
+                    self.assigned.update(names)
 
                 def visit_ImportFrom(self, child):
-                    bound.update(a.asname or a.name for a in child.names)
+                    names = {a.asname or a.name for a in child.names}
+                    bound.update(names)
+                    self.assigned.update(names)
 
             visitor = Bindings()
             for statement in root.body:
@@ -91,7 +213,7 @@ def parse_file(path: str, source: str) -> dict:
                     bound.add(args.vararg.arg)
                 if args.kwarg:
                     bound.add(args.kwarg.arg)
-            return bound
+            return bound, visitor.assigned
 
         def definition(self, node, kind):
             if len(result["definitions"]) >= 2000:
@@ -110,11 +232,14 @@ def parse_file(path: str, source: str) -> dict:
                 }
             )
             self.scope.append(node.name)
-            self.shadowed.append(self.bindings(node))
+            bound, assigned = self.bindings(node)
+            self.shadowed.append(bound)
+            self.assigned.append(assigned)
             for stmt in node.body:
                 self.visit(stmt)
             self.scope.pop()
             self.shadowed.pop()
+            self.assigned.pop()
 
         def visit_ClassDef(self, node):
             self.class_scope.append(".".join([*self.scope, node.name]))
@@ -137,11 +262,54 @@ def parse_file(path: str, source: str) -> dict:
         def visit_ImportFrom(self, node):
             if self.scope:
                 return
+            if node.level > len(package):
+                # importlib.util.resolve_name raises ImportError here: the
+                # relative import escapes the top-level package. Guessing a
+                # same-named top-level module would produce false edges.
+                result["errors"].append(
+                    {
+                        "path": path,
+                        "line": node.lineno,
+                        "message": "Relative import escapes the top-level package; imported names are unresolved",
+                    }
+                )
+                return
             prefix = package[: len(package) - node.level + 1] if node.level else []
             mod = ".".join([*prefix, *([node.module] if node.module else [])])
             for alias in node.names:
                 if alias.name != "*":
                     result["imports"][alias.asname or alias.name] = f"{mod}.{alias.name}".strip(".")
+
+        def call_target(self, parts, line):
+            """Resolve the dotted call name, or abstain when the binding is unsafe."""
+            first = parts[0]
+            if first in {"self", "cls"}:
+                # Parameters bind self/cls without shadowing; an actual
+                # statement rebinding makes the later attribute call's target
+                # unknowable without tracking the assigned value.
+                if any(first in bound for bound in self.assigned):
+                    return "<shadowed>", False, None
+            elif any(first in bound for bound in self.shadowed):
+                return "<shadowed>", False, None
+            else:
+                deferred = bool(self.scope or self.class_scope)
+                binding = module_binding(first, line, deferred)
+                if binding == "store":
+                    # A store/delete supersedes an earlier declaration: the
+                    # earlier def is stale by this call site.
+                    return "<shadowed>", False, None
+                if binding == "import":
+                    # An import supersedes an earlier declaration. Resolve
+                    # through the import event in effect at this site, never
+                    # the stale local symbol or a later overwritten alias.
+                    qualified = live_import_target(first, line, deferred)
+                    if qualified is None:
+                        # An escaping relative or otherwise unresolvable
+                        # import: the binding exists but its target is
+                        # unknowable.
+                        return "<shadowed>", False, None
+                    return ".".join(parts), True, qualified
+            return ".".join(parts), False, None
 
         def visit_Call(self, node):
             if len(result["calls"]) >= 10000:
@@ -152,13 +320,15 @@ def parse_file(path: str, source: str) -> dict:
                 value = value.value
             if isinstance(value, ast.Name):
                 parts.insert(0, value.id)
+                target, prefer_import, import_target = self.call_target(
+                    parts, node.lineno
+                )
                 result["calls"].append(
                     {
                         "scope": ".".join(self.scope),
-                        "target": "<shadowed>"
-                        if any(parts[0] in bound for bound in self.shadowed)
-                        and parts[0] not in {"self", "cls"}
-                        else ".".join(parts),
+                        "target": target,
+                        "prefer_import": prefer_import,
+                        "import_target": import_target,
                         "class": self.class_scope[-1] if self.class_scope else "",
                         "line": node.lineno,
                     }
@@ -168,6 +338,8 @@ def parse_file(path: str, source: str) -> dict:
                     {
                         "scope": ".".join(self.scope),
                         "target": "<dynamic>",
+                        "prefer_import": False,
+                        "import_target": None,
                         "class": "",
                         "line": node.lineno,
                     }
@@ -328,6 +500,10 @@ def build_graph(
                 segments = scope.split(".") if scope else []
                 # Lexical resolution only. No unrelated global name fallback.
                 for length in range(len(segments), -1, -1):
+                    if length == 0 and call.get("prefer_import"):
+                        # The live module binding is an import; the earlier
+                        # same-named module declaration is stale at this site.
+                        continue
                     if (
                         ".".join(segments[:length]) == call["class"]
                         and scope != call["class"]
@@ -339,7 +515,7 @@ def build_graph(
                         break
             if not dest:
                 first, *rest = target.split(".")
-                imported = parsed["imports"].get(first)
+                imported = call.get("import_target") or parsed["imports"].get(first)
                 if imported:
                     full = ".".join([imported, *rest])
                     candidate = find_module(full, allow_exact=False)

@@ -14,7 +14,13 @@ from api.auth import audit, current_session
 from api.config import settings
 from api.db import SessionLocal, db_session
 from api.graph import store
-from api.ingestion.sources import SourceError, github_url, local_path, validate_branch
+from api.ingestion.sources import (
+    SourceError,
+    default_branch,
+    github_url,
+    local_path,
+    validate_branch,
+)
 from api.models import (
     Audit,
     Conversation,
@@ -25,14 +31,23 @@ from api.models import (
     Snapshot,
     User,
 )
+from api.services import source_search
 from api.services.permissions import indexed, repository_access
 from api.services.revisions import RepositoryView, read_repository, state_for_branch
+from api.services.source_ranges import (
+    CONTEXT_LINES,
+    bounded_slice,
+    read_source_range,
+    snapshot_root,
+)
 
 router = APIRouter(prefix="/api", tags=["repositories"])
 
 
-def repository_json(repo):
+def repository_json(repo, snapshot_id=None):
     # Never disclose server-local filesystem locations or archive storage paths.
+    if snapshot_id is None:
+        snapshot_id = getattr(repo, "snapshot_id", None)
     return {
         k: getattr(repo, k)
         for k in (
@@ -49,9 +64,20 @@ def repository_json(repo):
         )
     } | {
         "source_url": repo.source if repo.source_type == "github" else None,
-        "snapshot_id": getattr(repo, "snapshot_id", None),
+        "snapshot_id": snapshot_id,
         "historical": getattr(repo, "historical", False),
         "permission": getattr(repo, "permission", None),
+    }
+
+
+def snapshot_handles(db, repos):
+    """Map each repository's current immutable graph to its snapshot handle."""
+    names = [r.graph_name for r in repos if r.graph_name]
+    if not names:
+        return {}
+    return {
+        s.graph_name: s.id
+        for s in db.scalars(select(Snapshot).where(Snapshot.graph_name.in_(names)))
     }
 
 
@@ -78,7 +104,7 @@ def job_json(job):
 class ConnectRepository(BaseModel):
     source_type: Literal["github", "local"]
     source: str = Field(min_length=1, max_length=2000)
-    branch: str = Field(default="main", pattern=r"^[A-Za-z0-9_][A-Za-z0-9_./-]{0,199}$")
+    branch: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_][A-Za-z0-9_./-]{0,199}$")
 
 
 def add_repository(
@@ -118,17 +144,18 @@ def connect(
     db: Session = Depends(db_session),
 ):
     try:
-        validate_branch(body.branch)
         if body.source_type == "github":
             source = github_url(body.source)
             name = source.rsplit("/", 1)[-1]
         else:
             path = local_path(body.source)
             source, name = str(path), path.name
+        branch = body.branch or default_branch(body.source_type, source) or "main"
+        validate_branch(branch)
     except (SourceError, OSError, ValueError) as exc:
         message = str(exc) if isinstance(exc, SourceError) else "Source directory is unavailable"
         raise HTTPException(422, message) from None
-    return add_repository(db, user, body.source_type, source, body.branch, name)
+    return add_repository(db, user, body.source_type, source, branch, name)
 
 
 @router.post("/repositories/upload", status_code=201)
@@ -171,14 +198,44 @@ def upload(
 
 
 @router.get("/repositories")
-def repositories(user: User = Depends(current_session), db: Session = Depends(db_session)):
-    rows = db.scalars(
+def repositories(
+    limit: int | None = Query(None, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    q: str | None = Query(None, max_length=200),
+    user: User = Depends(current_session),
+    db: Session = Depends(db_session),
+):
+    statement = (
         select(Repository)
         .join(Membership)
         .where(Membership.user_id == user.id, Repository.status != "deleting")
-        .order_by(Repository.created_at.desc())
     )
-    return [repository_json(repo) for repo in rows]
+    if q:
+        pattern = "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+        statement = statement.where(Repository.name.ilike(pattern, escape="\\"))
+    statement = statement.order_by(Repository.created_at.desc(), Repository.id)
+    if limit is None and offset == 0 and not q:
+        # Legacy unpaginated response for clients that predate pagination.
+        page = list(db.scalars(statement))
+        handles = snapshot_handles(db, page)
+        return [
+            repository_json(repo, snapshot_id=handles.get(repo.graph_name))
+            for repo in page
+        ]
+    rows = list(db.scalars(statement.offset(offset).limit((limit or 100) + 1)))
+    page, has_more = rows[: (limit or 100)], len(rows) > (limit or 100)
+    handles = snapshot_handles(db, page)
+    return {
+        "repositories": [
+            repository_json(repo, snapshot_id=handles.get(repo.graph_name))
+            for repo in page
+        ],
+        "limit": limit or 100,
+        "offset": offset,
+        "returned": len(page),
+        "has_more": has_more,
+        "next_offset": offset + len(page) if has_more else None,
+    }
 
 
 @router.get("/repositories/{repository_id}")
@@ -362,6 +419,37 @@ def search(
     }
 
 
+@router.get("/repositories/{repository_id}/search/content")
+def content_search(
+    repository_id: str,
+    q: str = Query(min_length=1, max_length=source_search.QUERY_MAX),
+    case: bool = False,
+    path: str | None = Query(None, max_length=500),
+    suffix: str | None = Query(None, max_length=20),
+    limit: int = Query(source_search.RESULT_LIMIT, ge=1, le=source_search.RESULT_LIMIT),
+    user: User = Depends(current_session),
+    db: Session = Depends(db_session),
+    repo: RepositoryView = Depends(read_repository),
+):
+    """Literal search over the pinned snapshot's approved source manifest."""
+    try:
+        path_prefix, suffix = source_search.validate_filters(path, suffix)
+        source_search.validate_query(q)
+    except SourceError as exc:
+        raise HTTPException(422, str(exc)) from None
+    try:
+        return source_search.search_source(
+            repo,
+            q,
+            case_sensitive=case,
+            limit=limit,
+            path_prefix=path_prefix,
+            suffix=suffix,
+        )
+    except SourceError as exc:
+        raise HTTPException(404, str(exc)) from None
+
+
 @router.get("/repositories/{repository_id}/impact/{node_id}")
 def impact(
     repository_id: str,
@@ -373,7 +461,15 @@ def impact(
 ):
     if not store.find_node(indexed(repo), node_id):
         raise HTTPException(404, "Node not found")
-    return store.impact(repo.graph_name, node_id, depth)
+    result = store.impact(repo.graph_name, node_id, depth)
+    # The existence lookup above is a real graph query — count it.
+    result["graph_queries"] = result.get("graph_queries", 0) + 1
+    result["scope"] = (result.get("scope") or {}) | {
+        "branch": repo.branch,
+        "snapshot_id": repo.snapshot_id,
+        "commit": repo.commit_sha,
+    }
+    return result
 
 
 @router.get("/repositories/{repository_id}/paths")
@@ -396,15 +492,34 @@ def paths(
 def evidence(
     repository_id: str,
     node_id: str,
+    start: int | None = Query(None, ge=1),
+    end: int | None = Query(None, ge=1),
+    around: int | None = Query(None, ge=1),
+    column: int | None = Query(None, ge=1),
+    end_column: int | None = Query(None, ge=1),
     user: User = Depends(current_session),
     db: Session = Depends(db_session),
     repo: RepositoryView = Depends(read_repository),
 ):
-    return read_evidence(repo, node_id)
+    if end is not None and start is not None and end < start:
+        raise HTTPException(422, "end must be at least start")
+    return read_evidence(
+        repo, node_id, start=start, end=end, around=around, column=column, end_column=end_column
+    )
 
 
-def read_evidence(repo, node_id):
+def read_evidence(
+    repo,
+    node_id,
+    start=None,
+    end=None,
+    around=None,
+    column=None,
+    end_column=None,
+    max_chars=None,
+):
     found = store.find_node(indexed(repo), node_id)
+    queries = 1
     if not found:
         raise HTTPException(404, "Node not found")
     if found.get("type") == "LogArtifact" and found.get("artifact_id"):
@@ -413,22 +528,28 @@ def read_evidence(repo, node_id):
         with SessionLocal() as db:
             try:
                 _, content = read_log(db, repo, found["artifact_id"], known_node=found)
-                excerpt = content[:12000]
+                # Character-capped preview: a mid-line final line is disclosed,
+                # and only content actually longer than the cap is truncated.
+                excerpt = bounded_slice(
+                    content, 1 if content else None, None, min(max_chars or 12000, 12000)
+                )
                 notice = "Automated redaction is best effort. Unknown secret formats may remain."
             except HTTPException as exc:
                 if exc.status_code not in {404, 410}:
                     raise
-                excerpt, notice = "", str(exc.detail)
+                excerpt = bounded_slice("", None, None, 0)
+                notice = str(exc.detail)
         return {
             "node": found,
-            "content": excerpt,
-            "start_line": 1 if excerpt else None,
-            "end_line": len(excerpt.splitlines()) if excerpt else None,
+            "content": excerpt["content"],
+            "start_line": excerpt["start_line"],
+            "end_line": excerpt["end_line"],
             "commit": found.get("commit") or repo.commit_sha,
             "snapshot_id": repo.snapshot_id,
             "historical": repo.historical,
             "url": found.get("url"),
-            "truncated": len(excerpt) == 12000,
+            "truncated": excerpt["truncated"],
+            "end_line_partial": excerpt["end_line_partial"],
             "notice": notice,
             "download_url": f"/api/repositories/{repo.id}/artifacts/{found['artifact_id']}",
         }
@@ -444,28 +565,81 @@ def read_evidence(repo, node_id):
             else repo.commit_sha,
             "snapshot_id": repo.snapshot_id,
             "historical": repo.historical,
+            "truncated": False,
+            "end_line_partial": None,
         }
-    root = settings().data_dir.resolve() / "snapshots" / repo.id / repo.stats["tree_hash"]
-    path = (root / found["path"]).resolve()
-    if not path.is_relative_to(root) or not path.is_file() or path.is_symlink():
-        raise HTTPException(404, "Source artifact is unavailable")
-    content = path.read_text().splitlines()
-    start = max(1, found.get("line", 1) - 3)
-    end = min(len(content), found.get("end_line", start) + 3, start + 199)
+    # Served source must come from the approved File manifest: resolve the
+    # File node for this path and hash-verify the retained bytes under the
+    # pinned snapshot, so a modified artifact cannot masquerade as the
+    # indexed immutable revision.
+    approved = found if found.get("type") == "File" else store.find_file(
+        indexed(repo), found["path"]
+    )
+    if found.get("type") != "File":
+        queries += 1
+    if not approved or not approved.get("content_hash"):
+        raise HTTPException(404, "Path is not an approved file in this snapshot")
+    try:
+        root = snapshot_root(repo)
+        if start is not None or end is not None:
+            # An exact bounded range read for text an excerpt omitted.
+            served = read_source_range(
+                root,
+                found["path"],
+                start or 1,
+                end,
+                context=0,
+                content_hash=approved["content_hash"],
+                column=column,
+                end_column=end_column,
+                max_chars=max_chars or 12000,
+            )
+        elif around is not None:
+            # A caller-anchored hit (e.g. a literal match): the declared span
+            # is the hit line, padded once, column-anchored when given.
+            served = read_source_range(
+                root,
+                found["path"],
+                around,
+                around,
+                context=CONTEXT_LINES,
+                content_hash=approved["content_hash"],
+                column=column,
+                end_column=end_column,
+                max_chars=max_chars or 12000,
+            )
+        else:
+            line = found.get("line") or 1
+            served = read_source_range(
+                root,
+                found["path"],
+                line,
+                found.get("end_line"),
+                context=CONTEXT_LINES,
+                content_hash=approved["content_hash"],
+                max_chars=max_chars or 12000,
+            )
+    except SourceError as exc:
+        status = 409 if "integrity" in str(exc) else 404
+        raise HTTPException(status, str(exc)) from None
     url = (
-        f"{repo.source}/blob/{repo.commit_sha}/{quote(found['path'], safe='/')}#L{start}"
+        f"{repo.source}/blob/{repo.commit_sha}/{quote(found['path'], safe='/')}#L{served['start_line']}"
         if repo.source_type == "github"
         else None
     )
     return {
         "node": found,
-        "content": "\n".join(content[start - 1 : end]),
-        "start_line": start,
-        "end_line": end,
-        "truncated": end < found.get("end_line", 0),
+        "content": served["content"],
+        "start_line": served["start_line"],
+        "end_line": served["end_line"],
+        "truncated": served["truncated"],
+        "end_line_partial": served["end_line_partial"],
+        "line_excerpt": served.get("line_excerpt"),
+        "content_hash": approved["content_hash"],
         "commit": repo.commit_sha,
         "snapshot_id": repo.snapshot_id,
         "historical": repo.historical,
+        "graph_queries": queries,
         "url": url,
     }
 

@@ -157,6 +157,21 @@ def git(path: Path, *args, timeout=30, raw=False, auth_token=None):
             process.wait()
 
 
+def default_branch(source_type: str, source: str) -> str | None:
+    """Resolve the remote or local HEAD branch; None when it cannot be determined."""
+    try:
+        with tempfile.TemporaryDirectory() as scratch:
+            if source_type == "github":
+                output = git(Path(scratch), "ls-remote", "--symref", source, "HEAD", timeout=15)
+                match = re.search(r"^ref: refs/heads/(\S+)\tHEAD$", output, re.MULTILINE)
+                name = match[1] if match else None
+            else:
+                name = git(Path(source), "symbolic-ref", "--short", "HEAD", timeout=15)
+        return validate_branch(name) if name else None
+    except (SourceError, OSError):
+        return None
+
+
 def extract_zip(archive: Path, destination: Path):
     cfg = settings()
     destination.mkdir(parents=True, exist_ok=True)

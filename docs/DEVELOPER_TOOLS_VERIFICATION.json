@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-18",
+  "scope": "Local working tree; application changes have not been deployed",
+  "implementation": {
+    "agents": 3,
+    "tool": "Devin CLI",
+    "model": "swe-2-max",
+    "workstreams": ["official competitor research", "CLI workflows", "developer workspace UI"],
+    "integration": "Parent reviewed contracts, fixed integration defects and performed verification"
+  },
+  "checks": {
+    "backend": {"command": "uv run pytest -q -rs", "passed": 225, "skipped": 1, "skip": "Optional Firebase Auth emulator was not running"},
+    "lint": "uv run ruff check api tests scripts migrations passed",
+    "frontend_build": "npm --prefix app run build passed after final changes",
+    "frontend_transport": {"command": "npm --prefix app test", "passed": 6},
+    "browser_test_collection": {"command": "npx playwright test --list", "collected": 7, "executed": false},
+    "repository_scan": "Current Git candidates passed scripts.verify_repository; no history or remote scan",
+    "diff_whitespace": "git diff --check passed",
+    "design_detector": "No findings in changed UI targets",
+    "format_note": "Changed Python files were formatted; repository-wide format check also reports a pre-existing issue in scripts/uptime_check.py"
+  },
+  "live_smoke": {
+    "local_cli": "Temporary scoped credential: whoami, ask and jobs list passed; credential revoked afterward",
+    "source_context": {"mode": "graph", "source_excerpts": 6, "provider_called": false},
+    "codespace_profile": "cloud",
+    "codespace_lifecycle": "Existing Codespace started through the new CLI; state became Available",
+    "codespace_health": "runner check cloud passed: API, worker, web, PostgreSQL and FalkorDB running; database checks ready",
+    "stopped_runner_reads": "runner check refused while Shutdown without starting SSH; state remained Shutdown",
+    "public_backend": "Existing port 18080 restored to its previous public setting after restart; public API health returned ready",
+    "stop": "Unit-tested with fixed gh arguments; live Codespace was not stopped"
+  },
+  "browser": {
+    "method": "CUA browser interaction against the local preview",
+    "desktop": "1482x818 viewport; no horizontal overflow",
+    "mobile": "390x844 viewport; no horizontal overflow; viewport override reset",
+    "verified": ["real API readiness and credential state", "question command quoting", "invalid UUID and workspace disable Copy", "successful clipboard command and Copied feedback", "newline-separated Git paths preserve spaces and apostrophes", "palette filters authorized repositories", "arrow and Enter navigate to Code", "Ctrl+K opens palette", "Escape closes and restores focus", "workspace links and landing copy"],
+    "screenshots": ["/tmp/graphpilot-developer-tools-desktop.png", "/tmp/graphpilot-developer-tools-mobile.png"]
+  },
+  "limits": ["Full Playwright journeys were collected but not executed in this session", "No paid model request was made during verification", "Repository questions use bounded source evidence and do not run repository tests", "No commit, push or application deployment performed"]
+}

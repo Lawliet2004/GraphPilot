@@ -1,0 +1,84 @@
+{
+  "scope": "Synthetic parser/graph-builder probes, no source execution and no database. Assess expected static binding behavior manually; no corpus-wide accuracy claim.",
+  "cases": [
+    {
+      "case": "rebound_self",
+      "sources": {
+        "m.py": "class Other:\n    def target(self):\n        return \"other\"\nclass Caller:\n    def target(self):\n        return \"caller\"\n    def run(self):\n        self = Other()\n        return self.target()\n"
+      },
+      "calls": [
+        {
+          "source": "m.py:Caller.run",
+          "target": "m.py:Other",
+          "line": 8,
+          "provenance": "static"
+        },
+        {
+          "source": "m.py:Caller.run",
+          "target": "m.py:Caller.target",
+          "line": 9,
+          "provenance": "static"
+        }
+      ],
+      "resolved_calls": 2,
+      "unresolved_calls": 0,
+      "parse_errors": []
+    },
+    {
+      "case": "module_rebound_function",
+      "sources": {
+        "m.py": "def target():\n    return \"old\"\ntarget = lambda: \"replacement\"\ntarget()\n"
+      },
+      "calls": [
+        {
+          "source": "m.py",
+          "target": "m.py:target",
+          "line": 4,
+          "provenance": "static"
+        }
+      ],
+      "resolved_calls": 1,
+      "unresolved_calls": 0,
+      "parse_errors": []
+    },
+    {
+      "case": "function_local_rebound_control",
+      "sources": {
+        "m.py": "def target():\n    return \"old\"\ndef run():\n    target = lambda: \"replacement\"\n    return target()\n"
+      },
+      "calls": [],
+      "resolved_calls": 0,
+      "unresolved_calls": 1,
+      "parse_errors": []
+    },
+    {
+      "case": "missing_import_unique_name_control",
+      "sources": {
+        "unrelated.py": "def target():\n    return \"unrelated\"\n",
+        "caller.py": "from missing_package import target\ndef run():\n    return target()\n"
+      },
+      "calls": [],
+      "resolved_calls": 0,
+      "unresolved_calls": 1,
+      "parse_errors": []
+    },
+    {
+      "case": "escaped_relative_import",
+      "sources": {
+        "target.py": "def target():\n    return \"top-level\"\n",
+        "caller.py": "from ...target import target\ndef run():\n    return target()\n"
+      },
+      "calls": [
+        {
+          "source": "caller.py:run",
+          "target": "target.py:target",
+          "line": 3,
+          "provenance": "static"
+        }
+      ],
+      "resolved_calls": 1,
+      "unresolved_calls": 0,
+      "parse_errors": []
+    }
+  ]
+}

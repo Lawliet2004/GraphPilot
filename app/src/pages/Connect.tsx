@@ -57,7 +57,7 @@ export function Connect() {
         Repositories
       </Link>
       <Heading
-        title="Give your code some context."
+        title="Add a repository."
         description="Connect a source. We’ll map the files, symbols and relationships."
       />
       <div className="connect-layout">

@@ -1,4 +1,9 @@
 #!/bin/sh
 set -eu
 task_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-exec uv run --project "$task_root" python -m api.client "$@"
+exec uv run --project "$task_root" python -I -c '
+import runpy
+import sys
+sys.path.insert(0, sys.argv.pop(1))
+runpy.run_module("api.client", run_name="__main__")
+' "$task_root" "$@"

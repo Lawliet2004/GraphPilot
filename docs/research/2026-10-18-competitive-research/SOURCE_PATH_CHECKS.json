@@ -1,0 +1,434 @@
+[
+  {
+    "repo": "aider",
+    "path": "LICENSE.txt",
+    "status": "local_file",
+    "url": "https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/LICENSE.txt"
+  },
+  {
+    "repo": "aider",
+    "path": "aider/repomap.py",
+    "status": "local_file",
+    "url": "https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/repomap.py"
+  },
+  {
+    "repo": "aider",
+    "path": "aider/queries/tree-sitter-language-pack",
+    "status": "local_directory",
+    "url": "https://github.com/Aider-AI/aider/tree/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/queries/tree-sitter-language-pack"
+  },
+  {
+    "repo": "continue",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/LICENSE"
+  },
+  {
+    "repo": "continue",
+    "path": "core/indexing/refreshIndex.ts",
+    "status": "local_file",
+    "url": "https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/indexing/refreshIndex.ts"
+  },
+  {
+    "repo": "continue",
+    "path": "core/indexing/FullTextSearchCodebaseIndex.ts",
+    "status": "local_file",
+    "url": "https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/indexing/FullTextSearchCodebaseIndex.ts"
+  },
+  {
+    "repo": "continue",
+    "path": "core/context/retrieval/pipelines/NoRerankerRetrievalPipeline.ts",
+    "status": "local_file",
+    "url": "https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/context/retrieval/pipelines/NoRerankerRetrievalPipeline.ts"
+  },
+  {
+    "repo": "zoekt",
+    "path": "LICENSE",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/sourcegraph/zoekt/blob/0e68f41329d9c37f46942d4731495fa05b07882a/LICENSE"
+  },
+  {
+    "repo": "zoekt",
+    "path": "doc/design.md",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/sourcegraph/zoekt/blob/0e68f41329d9c37f46942d4731495fa05b07882a/doc/design.md"
+  },
+  {
+    "repo": "zoekt",
+    "path": "index/score.go",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/sourcegraph/zoekt/blob/0e68f41329d9c37f46942d4731495fa05b07882a/index/score.go"
+  },
+  {
+    "repo": "zoekt",
+    "path": "index/contentprovider.go",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/sourcegraph/zoekt/blob/0e68f41329d9c37f46942d4731495fa05b07882a/index/contentprovider.go"
+  },
+  {
+    "repo": "scip",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip/blob/fcb3cb3c679fe2da18141550f864b9e67afab297/LICENSE"
+  },
+  {
+    "repo": "scip",
+    "path": "scip.proto",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip/blob/fcb3cb3c679fe2da18141550f864b9e67afab297/scip.proto"
+  },
+  {
+    "repo": "scip",
+    "path": "docs/scip.md",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip/blob/fcb3cb3c679fe2da18141550f864b9e67afab297/docs/scip.md"
+  },
+  {
+    "repo": "scip-python",
+    "path": "LICENSE.txt",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip-python/blob/8b60bbce1f2a4c7a517776cb395bbafb2e731e4f/LICENSE.txt"
+  },
+  {
+    "repo": "scip-python",
+    "path": "packages/pyright-scip/src/treeVisitor.ts",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip-python/blob/8b60bbce1f2a4c7a517776cb395bbafb2e731e4f/packages/pyright-scip/src/treeVisitor.ts"
+  },
+  {
+    "repo": "scip-python",
+    "path": "packages/pyright-scip/src/virtualenv/PythonEnvironment.ts",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip-python/blob/8b60bbce1f2a4c7a517776cb395bbafb2e731e4f/packages/pyright-scip/src/virtualenv/PythonEnvironment.ts"
+  },
+  {
+    "repo": "scip-typescript",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip-typescript/blob/e6d730c32189f14553d315b697f19bd8b60db65e/LICENSE"
+  },
+  {
+    "repo": "scip-typescript",
+    "path": "src/ProjectIndexer.ts",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip-typescript/blob/e6d730c32189f14553d315b697f19bd8b60db65e/src/ProjectIndexer.ts"
+  },
+  {
+    "repo": "scip-typescript",
+    "path": "src/FileIndexer.ts",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip-typescript/blob/e6d730c32189f14553d315b697f19bd8b60db65e/src/FileIndexer.ts"
+  },
+  {
+    "repo": "scip-typescript",
+    "path": "src/main.ts",
+    "status": "local_file",
+    "url": "https://github.com/sourcegraph/scip-typescript/blob/e6d730c32189f14553d315b697f19bd8b60db65e/src/main.ts"
+  },
+  {
+    "repo": "repomix",
+    "path": "LICENSE",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/yamadashy/repomix/blob/55c6de6aebde4c38877fbcaf005c4cc396bf6e2d/LICENSE"
+  },
+  {
+    "repo": "repomix",
+    "path": "src/core/metrics/TokenCounter.ts",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/yamadashy/repomix/blob/55c6de6aebde4c38877fbcaf005c4cc396bf6e2d/src/core/metrics/TokenCounter.ts"
+  },
+  {
+    "repo": "repomix",
+    "path": "src/core/treeSitter/parseStrategies/PythonParseStrategy.ts",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/yamadashy/repomix/blob/55c6de6aebde4c38877fbcaf005c4cc396bf6e2d/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts"
+  },
+  {
+    "repo": "repomix",
+    "path": "src/core/security/securityCheck.ts",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/yamadashy/repomix/blob/55c6de6aebde4c38877fbcaf005c4cc396bf6e2d/src/core/security/securityCheck.ts"
+  },
+  {
+    "repo": "ast-grep",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/ast-grep/ast-grep/blob/14934d690a547abce8576baff9a1856a10ae7da8/LICENSE"
+  },
+  {
+    "repo": "ast-grep",
+    "path": "crates/core/src/matcher/pattern.rs",
+    "status": "local_file",
+    "url": "https://github.com/ast-grep/ast-grep/blob/14934d690a547abce8576baff9a1856a10ae7da8/crates/core/src/matcher/pattern.rs"
+  },
+  {
+    "repo": "ast-grep",
+    "path": "crates/core/src/meta_var.rs",
+    "status": "local_file",
+    "url": "https://github.com/ast-grep/ast-grep/blob/14934d690a547abce8576baff9a1856a10ae7da8/crates/core/src/meta_var.rs"
+  },
+  {
+    "repo": "ast-grep",
+    "path": "crates/core/src/match_tree/strictness.rs",
+    "status": "local_file",
+    "url": "https://github.com/ast-grep/ast-grep/blob/14934d690a547abce8576baff9a1856a10ae7da8/crates/core/src/match_tree/strictness.rs"
+  },
+  {
+    "repo": "dependency-cruiser",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/sverweij/dependency-cruiser/blob/c580daf6477aa5619bacad9c9091c9b7cc81882d/LICENSE"
+  },
+  {
+    "repo": "dependency-cruiser",
+    "path": "src/validate/index.mjs",
+    "status": "local_file",
+    "url": "https://github.com/sverweij/dependency-cruiser/blob/c580daf6477aa5619bacad9c9091c9b7cc81882d/src/validate/index.mjs"
+  },
+  {
+    "repo": "dependency-cruiser",
+    "path": "src/validate/match-dependency-rule.mjs",
+    "status": "local_file",
+    "url": "https://github.com/sverweij/dependency-cruiser/blob/c580daf6477aa5619bacad9c9091c9b7cc81882d/src/validate/match-dependency-rule.mjs"
+  },
+  {
+    "repo": "dependency-cruiser",
+    "path": "src/validate/match-module-rule.mjs",
+    "status": "local_file",
+    "url": "https://github.com/sverweij/dependency-cruiser/blob/c580daf6477aa5619bacad9c9091c9b7cc81882d/src/validate/match-module-rule.mjs"
+  },
+  {
+    "repo": "code-graph",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/FalkorDB/code-graph/blob/f5e72c074bf8b529d71472162e6d43cd6caaa5b6/LICENSE"
+  },
+  {
+    "repo": "code-graph",
+    "path": "api/analyzers/python/ts_resolver.py",
+    "status": "local_file",
+    "url": "https://github.com/FalkorDB/code-graph/blob/f5e72c074bf8b529d71472162e6d43cd6caaa5b6/api/analyzers/python/ts_resolver.py"
+  },
+  {
+    "repo": "code-graph",
+    "path": "api/analyzers/python/analyzer.py",
+    "status": "local_file",
+    "url": "https://github.com/FalkorDB/code-graph/blob/f5e72c074bf8b529d71472162e6d43cd6caaa5b6/api/analyzers/python/analyzer.py"
+  },
+  {
+    "repo": "code-graph",
+    "path": "api/mcp/tools/structural.py",
+    "status": "local_file",
+    "url": "https://github.com/FalkorDB/code-graph/blob/f5e72c074bf8b529d71472162e6d43cd6caaa5b6/api/mcp/tools/structural.py"
+  },
+  {
+    "repo": "code-graph",
+    "path": "api/graph.py",
+    "status": "local_file",
+    "url": "https://github.com/FalkorDB/code-graph/blob/f5e72c074bf8b529d71472162e6d43cd6caaa5b6/api/graph.py"
+  },
+  {
+    "repo": "GitNexus",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/abhigyanpatwari/GitNexus/blob/b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19/LICENSE"
+  },
+  {
+    "repo": "GitNexus",
+    "path": "gitnexus/src/core/ingestion/scope-resolution/resolution-outcome.ts",
+    "status": "local_file",
+    "url": "https://github.com/abhigyanpatwari/GitNexus/blob/b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19/gitnexus/src/core/ingestion/scope-resolution/resolution-outcome.ts"
+  },
+  {
+    "repo": "GitNexus",
+    "path": "gitnexus/src/core/ingestion/process-processor.ts",
+    "status": "local_file",
+    "url": "https://github.com/abhigyanpatwari/GitNexus/blob/b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19/gitnexus/src/core/ingestion/process-processor.ts"
+  },
+  {
+    "repo": "GitNexus",
+    "path": "gitnexus/src/core/ingestion/community-processor.ts",
+    "status": "local_file",
+    "url": "https://github.com/abhigyanpatwari/GitNexus/blob/b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19/gitnexus/src/core/ingestion/community-processor.ts"
+  },
+  {
+    "repo": "GitNexus",
+    "path": "gitnexus-shared/src/scope-resolution/evidence-weights.ts",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/abhigyanpatwari/GitNexus/blob/b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19/gitnexus-shared/src/scope-resolution/evidence-weights.ts"
+  },
+  {
+    "repo": "GitNexus",
+    "path": "gitnexus/bench/impact-pdg/README.md",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/abhigyanpatwari/GitNexus/blob/b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19/gitnexus/bench/impact-pdg/README.md"
+  },
+  {
+    "repo": "CodeGraphContext",
+    "path": "LICENSE",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/CodeGraphContext/CodeGraphContext/blob/1b595a61663d60862ac20aca2422ea187671c01c/LICENSE"
+  },
+  {
+    "repo": "CodeGraphContext",
+    "path": "src/codegraphcontext/tools/indexing/pipeline.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/CodeGraphContext/CodeGraphContext/blob/1b595a61663d60862ac20aca2422ea187671c01c/src/codegraphcontext/tools/indexing/pipeline.py"
+  },
+  {
+    "repo": "CodeGraphContext",
+    "path": "src/codegraphcontext/tools/indexing/scip_pipeline.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/CodeGraphContext/CodeGraphContext/blob/1b595a61663d60862ac20aca2422ea187671c01c/src/codegraphcontext/tools/indexing/scip_pipeline.py"
+  },
+  {
+    "repo": "CodeGraphContext",
+    "path": "src/codegraphcontext/tools/indexing/resolution/calls.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/CodeGraphContext/CodeGraphContext/blob/1b595a61663d60862ac20aca2422ea187671c01c/src/codegraphcontext/tools/indexing/resolution/calls.py"
+  },
+  {
+    "repo": "CodeGraphContext",
+    "path": "src/codegraphcontext/core/watcher.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/CodeGraphContext/CodeGraphContext/blob/1b595a61663d60862ac20aca2422ea187671c01c/src/codegraphcontext/core/watcher.py"
+  },
+  {
+    "repo": "codebase-memory-mcp",
+    "path": "LICENSE",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/354ccecbe612a9fdb624396a6738fa87f2617434/LICENSE"
+  },
+  {
+    "repo": "codebase-memory-mcp",
+    "path": "src/pipeline/pipeline.c",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/354ccecbe612a9fdb624396a6738fa87f2617434/src/pipeline/pipeline.c"
+  },
+  {
+    "repo": "codebase-memory-mcp",
+    "path": "src/pipeline/pass_tests.c",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/354ccecbe612a9fdb624396a6738fa87f2617434/src/pipeline/pass_tests.c"
+  },
+  {
+    "repo": "codebase-memory-mcp",
+    "path": "src/pipeline/pass_configlink.c",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/354ccecbe612a9fdb624396a6738fa87f2617434/src/pipeline/pass_configlink.c"
+  },
+  {
+    "repo": "codebase-memory-mcp",
+    "path": "src/pipeline/artifact.c",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/354ccecbe612a9fdb624396a6738fa87f2617434/src/pipeline/artifact.c"
+  },
+  {
+    "repo": "codebase-memory-mcp",
+    "path": "docs/INDEX_RESOURCE_LIMITS.md",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/354ccecbe612a9fdb624396a6738fa87f2617434/docs/INDEX_RESOURCE_LIMITS.md"
+  },
+  {
+    "repo": "codebase-memory-mcp",
+    "path": "docs/MEASURING_SAVINGS.md",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/354ccecbe612a9fdb624396a6738fa87f2617434/docs/MEASURING_SAVINGS.md"
+  },
+  {
+    "repo": "serena",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/oraios/serena/blob/d9e4c796fae0207ba6848d1df4b331122a5567b5/LICENSE"
+  },
+  {
+    "repo": "serena",
+    "path": "src/serena/tools/symbol_tools.py",
+    "status": "local_file",
+    "url": "https://github.com/oraios/serena/blob/d9e4c796fae0207ba6848d1df4b331122a5567b5/src/serena/tools/symbol_tools.py"
+  },
+  {
+    "repo": "serena",
+    "path": "src/solidlsp",
+    "status": "local_directory",
+    "url": "https://github.com/oraios/serena/tree/d9e4c796fae0207ba6848d1df4b331122a5567b5/src/solidlsp"
+  },
+  {
+    "repo": "serena",
+    "path": "LICENSES",
+    "status": "local_directory",
+    "url": "https://github.com/oraios/serena/tree/d9e4c796fae0207ba6848d1df4b331122a5567b5/LICENSES"
+  },
+  {
+    "repo": "LightRAG",
+    "path": "LICENSE",
+    "status": "local_file",
+    "url": "https://github.com/HKUDS/LightRAG/blob/aaebfe1bb8d55deb6a4304d357a3bf4c92fcd40a/LICENSE"
+  },
+  {
+    "repo": "LightRAG",
+    "path": "lightrag/operate.py",
+    "status": "local_file",
+    "url": "https://github.com/HKUDS/LightRAG/blob/aaebfe1bb8d55deb6a4304d357a3bf4c92fcd40a/lightrag/operate.py"
+  },
+  {
+    "repo": "deepwiki-open",
+    "path": "LICENSE",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/AsyncFuncAI/deepwiki-open/blob/d92819a9c9f3b99416e3580ff235fc9d3adf8b89/LICENSE"
+  },
+  {
+    "repo": "deepwiki-open",
+    "path": "api/services/wiki/structure.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/AsyncFuncAI/deepwiki-open/blob/d92819a9c9f3b99416e3580ff235fc9d3adf8b89/api/services/wiki/structure.py"
+  },
+  {
+    "repo": "deepwiki-open",
+    "path": "api/services/wiki/content.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/AsyncFuncAI/deepwiki-open/blob/d92819a9c9f3b99416e3580ff235fc9d3adf8b89/api/services/wiki/content.py"
+  },
+  {
+    "repo": "deepwiki-open",
+    "path": "api/services/wiki/tasks.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/AsyncFuncAI/deepwiki-open/blob/d92819a9c9f3b99416e3580ff235fc9d3adf8b89/api/services/wiki/tasks.py"
+  },
+  {
+    "repo": "deepwiki-open",
+    "path": "api/rag/rag.py",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/AsyncFuncAI/deepwiki-open/blob/d92819a9c9f3b99416e3580ff235fc9d3adf8b89/api/rag/rag.py"
+  },
+  {
+    "repo": "sourcebot",
+    "path": "LICENSE.md",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/sourcebot-dev/sourcebot/blob/a5fcd2703e605c08d49ebda9b965997eaf00c21b/LICENSE.md"
+  },
+  {
+    "repo": "sourcebot",
+    "path": "README.md",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/sourcebot-dev/sourcebot/blob/a5fcd2703e605c08d49ebda9b965997eaf00c21b/README.md"
+  },
+  {
+    "repo": "sourcebot",
+    "path": "docker-compose.yml",
+    "status": "pinned_raw_file",
+    "url": "https://github.com/sourcebot-dev/sourcebot/blob/a5fcd2703e605c08d49ebda9b965997eaf00c21b/docker-compose.yml"
+  },
+  {
+    "repo": "sourcebot",
+    "path": "schemas",
+    "status": "api_tree_directory",
+    "url": "https://github.com/sourcebot-dev/sourcebot/tree/a5fcd2703e605c08d49ebda9b965997eaf00c21b/schemas"
+  },
+  {
+    "repo": "sourcebot",
+    "path": "tools",
+    "status": "api_tree_directory",
+    "url": "https://github.com/sourcebot-dev/sourcebot/tree/a5fcd2703e605c08d49ebda9b965997eaf00c21b/tools"
+  }
+]

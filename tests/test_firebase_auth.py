@@ -1,4 +1,7 @@
+import base64
 import json
+import time
+import urllib.parse
 from datetime import timedelta
 from types import SimpleNamespace
 
@@ -16,22 +19,71 @@ from api.services import firebase_auth
 from tests.conftest import register
 
 
+def fake_jwt(uid, exp):
+    payload = base64.urlsafe_b64encode(json.dumps({"sub": uid, "exp": exp}).encode())
+    return "header." + payload.decode().rstrip("=") + ".signature"
+
+
+def jwt_exp(token):
+    return json.loads(base64.urlsafe_b64decode(token.split(".")[1] + "=="))["exp"]
+
+
+def set_cookie(client, name, value):
+    client.cookies.set(name, value, domain="testserver.local", path="/")
+
+
 @pytest.fixture
 def provider(monkeypatch):
     cfg = settings()
     monkeypatch.setattr(cfg, "firebase_project_id", "demo-graphpilot")
     monkeypatch.setattr(cfg, "firebase_api_key", "test-api-key")
-    state = {"users": {}, "emails": [], "error": None}
+    firebase_auth.clear_cache()
+    state = {
+        "users": {},
+        "emails": [],
+        "error": None,
+        "tokens": {},
+        "refresh": {},
+        "lookups": 0,
+        "refreshes": 0,
+        "issued": 0,
+    }
+
+    def issue(uid):
+        state["issued"] += 1
+        token = fake_jwt(uid, int(time.time()) + 3600 + state["issued"])
+        state["tokens"][token] = uid
+        return token
+
+    def by_uid(uid):
+        return next(r for r in state["users"].values() if r["localId"] == uid)
 
     def handle(request):
         assert request.url.scheme == "https"
-        assert request.url.host == "identitytoolkit.googleapis.com"
+        assert request.url.host in {
+            "identitytoolkit.googleapis.com",
+            "securetoken.googleapis.com",
+        }
         assert request.url.params["key"] == "test-api-key"
+        if request.url.host == "securetoken.googleapis.com":
+            form = urllib.parse.parse_qs(request.content.decode())
+            assert form["grant_type"] == ["refresh_token"]
+            state["refreshes"] += 1
+            uid = state["refresh"].get(form["refresh_token"][0])
+            if not uid:
+                return error("INVALID_REFRESH_TOKEN")
+            if by_uid(uid)["disabled"]:
+                return error("USER_DISABLED")
+            return httpx.Response(
+                200,
+                json={
+                    "id_token": issue(uid),
+                    "refresh_token": form["refresh_token"][0],
+                    "expires_in": "3600",
+                },
+            )
         body = json.loads(request.content)
         action = request.url.path.rsplit(":", 1)[1]
-
-        def error(code, status=400):
-            return httpx.Response(status, json={"error": {"message": code}})
 
         if state["error"]:
             return error(*state["error"])
@@ -55,27 +107,26 @@ def provider(monkeypatch):
                 return error("INVALID_LOGIN_CREDENTIALS")
             if row["disabled"]:
                 return error("USER_DISABLED")
+            refresh = f"refresh-{row['localId']}-{len(state['refresh'])}"
+            state["refresh"][refresh] = row["localId"]
             return httpx.Response(
                 200,
                 json={
                     "localId": row["localId"],
-                    "idToken": "test-token-" + row["localId"],
+                    "idToken": issue(row["localId"]),
+                    "refreshToken": refresh,
                     "expiresIn": "3600",
                 },
             )
         if action == "lookup":
-            row = next(
-                (
-                    r
-                    for r in state["users"].values()
-                    if "test-token-" + r["localId"] == body["idToken"]
-                ),
-                None,
-            )
-            if not row:
+            state["lookups"] += 1
+            uid = state["tokens"].get(body["idToken"])
+            if not uid:
                 return error("INVALID_ID_TOKEN")
+            if jwt_exp(body["idToken"]) <= time.time():
+                return error("TOKEN_EXPIRED")
             return httpx.Response(
-                200, json={"users": [{**row, "passwordHash": "private-provider-hash"}]}
+                200, json={"users": [{**by_uid(uid), "passwordHash": "private-provider-hash"}]}
             )
         if action == "sendOobCode":
             state["emails"].append(body)
@@ -83,6 +134,9 @@ def provider(monkeypatch):
                 return error("EMAIL_NOT_FOUND")
             return httpx.Response(200, json={})
         raise AssertionError("Unexpected Firebase operation")
+
+    def error(code, status=400):
+        return httpx.Response(status, json={"error": {"message": code}})
 
     transport = httpx.MockTransport(handle)
     monkeypatch.setattr(
@@ -94,7 +148,8 @@ def provider(monkeypatch):
             HTTPError=httpx.HTTPError,
         ),
     )
-    return state
+    yield state
+    firebase_auth.clear_cache()
 
 
 def signup(client, email="managed@example.com"):
@@ -115,6 +170,7 @@ def test_managed_registration_session_permissions_verification_and_logout(client
     assert result.json()["verification_email_sent"]
     assert provider["emails"][0]["requestType"] == "VERIFY_EMAIL"
     assert "gp_firebase=" in result.headers["set-cookie"]
+    assert "gp_firebase_refresh=" in result.headers["set-cookie"]
     session = client.get("/api/auth/session")
     assert session.json()["auth_provider"] == "firebase" and not session.json()["email_verified"]
     assert all(
@@ -128,11 +184,13 @@ def test_managed_registration_session_permissions_verification_and_logout(client
     )
     assert client.post("/api/auth/email-verification").status_code == 200
     provider["users"][user.email]["emailVerified"] = True
+    firebase_auth.clear_cache()
     assert client.get("/api/auth/session").json()["email_verified"]
     row = db.get(LoginSession, digest(client.cookies["gp_session"]))
-    assert row.expires_at <= utcnow() + timedelta(hours=1)
+    assert row.expires_at > utcnow() + timedelta(hours=1)
     assert client.post("/api/auth/logout").status_code == 200
     assert not client.cookies.get("gp_firebase")
+    assert not client.cookies.get("gp_firebase_refresh")
     assert client.get("/api/auth/session").status_code == 401
 
 
@@ -150,7 +208,71 @@ def test_provider_changes_are_checked_on_existing_sessions(client, provider, res
         client.cookies.set("gp_firebase", "unknown-identity")
     else:
         client.cookies.delete("gp_firebase")
+    firebase_auth.clear_cache()
     assert client.get("/api/auth/session").status_code == 401
+
+
+def test_expired_id_token_refreshes_once_and_renews_cookies(client, provider):
+    signup(client)
+    uid = provider["users"]["managed@example.com"]["localId"]
+    expired = fake_jwt(uid, int(time.time()) - 5)
+    provider["tokens"][expired] = uid
+    set_cookie(client, "gp_firebase", expired)
+    response = client.get("/api/auth/session")
+    assert response.status_code == 200
+    cookies = response.headers.get_list("set-cookie")
+    renewed = next(c for c in cookies if c.startswith("gp_firebase=") and "Max-Age=604800" in c)
+    renewed = renewed.split(";")[0].split("=", 1)[1]
+    assert renewed != expired and jwt_exp(renewed) > time.time()
+    assert any(c.startswith("gp_firebase_refresh=") and "Max-Age=604800" in c for c in cookies)
+    assert provider["refreshes"] == 1
+    assert client.get("/api/auth/session").status_code == 200
+    assert provider["refreshes"] == 1
+
+
+def test_failed_or_unneeded_refresh_ends_the_session(client, provider):
+    signup(client)
+    uid = provider["users"]["managed@example.com"]["localId"]
+    expired = fake_jwt(uid, int(time.time()) - 5)
+    provider["tokens"][expired] = uid
+    set_cookie(client, "gp_firebase", expired)
+    set_cookie(client, "gp_firebase_refresh", "revoked-refresh-credential")
+    assert client.get("/api/auth/session").status_code == 401
+    assert provider["refreshes"] == 1
+    set_cookie(client, "gp_firebase", "not-a-token")
+    assert client.get("/api/auth/session").status_code == 401
+    assert provider["refreshes"] == 1
+
+
+def test_disabled_account_is_not_renewed(client, provider):
+    signup(client)
+    user = provider["users"]["managed@example.com"]
+    expired = fake_jwt(user["localId"], int(time.time()) - 5)
+    provider["tokens"][expired] = user["localId"]
+    user["disabled"] = True
+    set_cookie(client, "gp_firebase", expired)
+    assert client.get("/api/auth/session").status_code == 401
+
+
+def test_account_lookups_are_cached_for_a_short_ttl(client, provider):
+    signup(client)
+    before = provider["lookups"]
+    for _ in range(3):
+        assert client.get("/api/auth/session").status_code == 200
+    assert provider["lookups"] - before == 1
+
+
+def test_account_cache_is_bounded(provider, monkeypatch):
+    monkeypatch.setattr(firebase_auth, "ACCOUNT_CACHE_LIMIT", 2)
+    tokens = []
+    for i in range(3):
+        signed = firebase_auth.password_sign_in(
+            f"cache{i}@example.com", "strong-managed-password", create=True
+        )
+        tokens.append(signed["id_token"])
+    for token in tokens:
+        firebase_auth.account(token)
+    assert len(firebase_auth._accounts) == 2
 
 
 def test_existing_native_account_is_not_automatically_linked_by_email(client, db, monkeypatch):

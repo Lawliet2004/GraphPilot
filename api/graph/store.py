@@ -4,6 +4,7 @@ import hashlib
 import json
 import time
 from functools import lru_cache
+from pathlib import PurePosixPath
 
 from falkordb import FalkorDB
 from redis.exceptions import ResponseError
@@ -147,6 +148,16 @@ def find_node(name, node_id):
     return encode_node(rows[0][0]) if rows else None
 
 
+def find_file(name, path):
+    """The approved File node for a manifest path, or None."""
+    rows = query(
+        name,
+        "MATCH (n:File {path:$path}) RETURN n ORDER BY n.id LIMIT 1",
+        {"path": path},
+    )
+    return encode_node(rows[0][0]) if rows else None
+
+
 def neighbors(name, node_id, limit=50, relation=None):
     if relation and relation not in EDGE_TYPES:
         raise ValueError("Unsupported relationship filter")
@@ -170,7 +181,7 @@ def neighbors(name, node_id, limit=50, relation=None):
     }
 
 
-def search(name, term, limit=20, kind="", status=""):
+def search(name, term, limit=20, kind="", status="", include_docs=False):
     term = term.strip().lower()
     if kind and kind not in NODE_TYPES:
         raise ValueError("Unsupported entity type")
@@ -183,7 +194,8 @@ def search(name, term, limit=20, kind="", status=""):
         "AND ($term = '' OR toLower(n.name) CONTAINS $term "
         "OR toLower(n.path) CONTAINS $term OR toLower(n.original_id) CONTAINS $term "
         "OR toString(n.number) = $number OR toLower(n.sha) STARTS WITH $term "
-        "OR toLower(n.body) CONTAINS $term OR toLower(n.summary) CONTAINS $term) "
+        "OR toLower(n.body) CONTAINS $term OR toLower(n.summary) CONTAINS $term "
+        "OR ($include_docs AND toLower(n.doc) CONTAINS $term)) "
         "WITH n, CASE WHEN $term <> '' AND (toLower(n.name) = $term "
         "OR toLower(n.path) = $term OR toLower(n.original_id) = $term "
         "OR toString(n.number) = $number) THEN 1.0 "
@@ -198,6 +210,7 @@ def search(name, term, limit=20, kind="", status=""):
             "number": term.lstrip("#"),
             "kind": kind,
             "status": status,
+            "include_docs": include_docs,
             "limit": max(1, min(limit, 50)),
         },
     )
@@ -219,35 +232,194 @@ def search(name, term, limit=20, kind="", status=""):
     ]
 
 
-def impact(name, node_id, depth=2):
+def context_files(name, limit=8):
+    """A diverse, bounded source sample for questions without a known identifier."""
+    rows = query(name, "MATCH (n:File) RETURN n ORDER BY n.path LIMIT 5000")
+    groups = [[] for _ in range(7)]
+    manifests = {"package.json", "pyproject.toml", "cargo.toml", "go.mod", "requirements.txt"}
+    entries = {"main", "app", "index", "server", "cli", "__main__", "page", "layout"}
+    source_extensions = {".py", ".tsx", ".jsx", ".ts", ".js", ".go", ".rs", ".java", ".vue"}
+    limit = max(1, min(limit, 12))
+    for row in rows:
+        node = encode_node(row[0])
+        path = PurePosixPath(node.get("path", "").lower())
+        parts = set(path.parts)
+        if path.name.endswith((".lock", ".min.js")) or path.name == "package-lock.json":
+            continue
+        if path.stem == "readme":
+            group = 0
+        elif path.name in manifests:
+            group = 1
+        elif parts & {"test", "tests", "e2e", "__tests__"} or path.stem.startswith("test_"):
+            group = 5
+        elif path.stem in entries:
+            group = 2
+        elif parts & {"pages", "components", "views", "screens", "routes"}:
+            group = 3
+        elif path.suffix in source_extensions:
+            group = 4
+        else:
+            group = 6
+        groups[group].append(node)
+    for group in groups:
+        group.sort(key=lambda n: (len(PurePosixPath(n["path"]).parts), n["path"]))
+    chosen = []
+    while len(chosen) < limit and any(groups):
+        for group in groups:
+            if group and len(chosen) < limit:
+                chosen.append(
+                    {
+                        **group.pop(0),
+                        "score": 0.2,
+                        "score_meaning": "representative repository context, not a direct search match",
+                        "uncertainty": "A source sample; runtime behavior has not been verified.",
+                    }
+                )
+    return chosen
+
+
+# Impact traversal budgets. Every frontier query and the whole operation are
+# bounded: an interrupted layer stops deeper expansion because its successors
+# can no longer be proven nearest.
+IMPACT_RESULT_LIMIT = 100
+IMPACT_LAYER_EDGE_LIMIT = 1000  # incoming edge rows examined per frontier query
+IMPACT_EDGE_BUDGET = 20000  # total incoming edge rows examined per impact call
+IMPACT_MAX_QUERIES = 8  # graph queries per impact call (one per frontier)
+IMPACT_TIME_BUDGET_MS = 9000  # wall-clock across all frontier queries
+
+
+def impact(name, node_id, depth=2, limit=IMPACT_RESULT_LIMIT):
+    """Directed incoming callers at proven shortest distance.
+
+    Each depth level is one bounded ``incoming one-hop`` query over the
+    current frontier. A layer is only expanded when its frontier query
+    completed inside the per-query and total edge budgets; otherwise the
+    traversal stops and reports an incomplete result instead of guessing
+    distances. ``total`` stays null unless every layer up to ``depth``
+    (or exhaustion) completed.
+    """
     # Depth is a validated integer, never arbitrary query text.
     depth = max(1, min(int(depth), 3))
-    rows = query(
-        name,
-        f"MATCH p=(caller:Entity)-[:CALLS|IMPORTS*1..{depth}]->(target:Entity {{id:$id}}) RETURN nodes(p),relationships(p) LIMIT 100",
-        {"id": node_id},
-    )
-    results = {}
-    for path_nodes, path_edges in rows:
-        origin = encode_node(path_nodes[0])
-        distance = len(path_edges)
-        if origin["id"] == node_id:
-            continue
-        row = {
-            "node": origin,
-            "distance": distance,
-            "classification": "verified static direct dependency"
-            if distance == 1
-            else "possible indirect impact",
-            "path": [encode_node(n) for n in path_nodes],
-            "relationships": [edge_dict(e) for e in path_edges],
-        }
-        if origin["id"] not in results or distance < results[origin["id"]]["distance"]:
-            results[origin["id"]] = row
+    limit = max(1, min(int(limit), 500))
+    started = time.perf_counter()
+    queries = 0
+    queries += 1  # find_node issues one store.query; count every attempt.
+    try:
+        target_node = find_node(name, node_id)
+    except Exception:
+        target_node = None
+    visited = {node_id}
+    parents = {}  # discovered id -> (next hop id toward the target, edge row)
+    nodes_by_id = {node_id: target_node or {"id": node_id}}
+    frontier = [node_id]
+    found = {}
+    completion_reason = None
+    edges_examined = 0
+    for distance in range(1, depth + 1):
+        if not frontier:
+            completion_reason = "exhausted"
+            break
+        if edges_examined >= IMPACT_EDGE_BUDGET:
+            completion_reason = "edge_budget"
+            break
+        if queries >= IMPACT_MAX_QUERIES:
+            completion_reason = "query_cap"
+            break
+        if (time.perf_counter() - started) * 1000 > IMPACT_TIME_BUDGET_MS:
+            completion_reason = "time_budget"
+            break
+        fetch = min(IMPACT_LAYER_EDGE_LIMIT, IMPACT_EDGE_BUDGET - edges_examined) + 1
+        queries += 1  # count the attempt even when the query fails
+        try:
+            rows = query(
+                name,
+                "MATCH (caller:Entity)-[r:CALLS|IMPORTS]->(n:Entity) "
+                "WHERE n.id IN $ids RETURN n.id, caller, r LIMIT $limit",
+                {"ids": frontier, "limit": fetch},
+            )
+        except Exception as exc:
+            completion_reason = (
+                "time_budget"
+                if isinstance(exc, TimeoutError) or "timed out" in str(exc).lower()
+                else "query_failed"
+            )
+            break
+        if len(rows) >= fetch:
+            # The frontier's incoming edge scan was capped: this layer is
+            # incomplete, so deeper distances could no longer be proven
+            # shortest. Keep the verified rows, then stop.
+            completion_reason = "edge_limit"
+        frontier_next = []
+        for next_id, caller, rel in rows[: fetch - 1]:
+            edges_examined += 1
+            caller_id = caller.properties["id"]
+            if caller_id in visited:
+                continue
+            visited.add(caller_id)
+            nodes_by_id[caller_id] = encode_node(caller)
+            parents[caller_id] = (next_id, edge_dict(rel))
+            found[caller_id] = distance
+            frontier_next.append(caller_id)
+        frontier = frontier_next
+        if completion_reason:
+            break
+    if completion_reason is None:
+        # The loop ended at the requested depth or with an empty frontier.
+        completion_reason = "depth_limit" if frontier else "exhausted"
+    # Every layer finished only when no bounded stop fired; result-limit
+    # capping below still leaves traversal itself complete.
+    traversal_complete = completion_reason in {"exhausted", "depth_limit"}
+    truncated = completion_reason not in {"exhausted", "depth_limit"}
+
+    def witness(origin_id):
+        path_nodes, path_edges, cursor, hops = [nodes_by_id[origin_id]], [], origin_id, 0
+        while cursor != node_id and hops <= depth:
+            cursor, edge = parents[cursor]
+            path_edges.append(edge)
+            path_nodes.append(nodes_by_id[cursor])
+            hops += 1
+        return path_nodes, path_edges
+
+    results = []
+    for origin_id, distance in found.items():
+        path_nodes, path_edges = witness(origin_id)
+        results.append(
+            {
+                "node": nodes_by_id[origin_id],
+                "distance": distance,
+                "classification": "verified static direct dependency"
+                if distance == 1
+                else "possible indirect impact",
+                "path": path_nodes,
+                "relationships": path_edges,
+            }
+        )
+    results.sort(key=lambda r: (r["distance"], r["node"]["id"]))
+    discovered = len(results)
+    results = results[:limit]
+    if discovered > len(results) and traversal_complete:
+        # Traversal finished but the response cap omitted verified callers.
+        completion_reason = "result_limit"
+        truncated = True
     return {
-        "results": sorted(results.values(), key=lambda r: (r["distance"], r["node"]["id"])),
+        "results": results,
         "unknown": "Dynamic dispatch, external packages and unsupported languages are unverified.",
         "max_depth": depth,
+        "returned": len(results),
+        "limit": limit,
+        "total": discovered if traversal_complete else None,
+        "truncated": truncated,
+        "traversal_complete": traversal_complete,
+        "has_more": truncated,
+        "completion_reason": completion_reason,
+        "depth_explored": max(found.values(), default=0),
+        "edges_examined": edges_examined,
+        "graph_queries": queries,
+        "scope": {
+            "direction": "incoming",
+            "relationships": ["CALLS", "IMPORTS"],
+            "snapshot": "pinned graph for the selected branch and revision",
+        },
     }
 
 

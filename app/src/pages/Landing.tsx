@@ -11,6 +11,7 @@ import {
   GitBranch,
   Network,
   Search,
+  Terminal,
   Waypoints,
 } from "lucide-react";
 import { Brand } from "../components/ui";
@@ -49,9 +50,14 @@ export function Landing() {
         </nav>
         <div>
           {user ? (
-            <Link className="button primary" to="/workspace">
-              Open workspace <ArrowUpRight size={15} />
-            </Link>
+            <>
+              <Link className="login-link" to="/tools">
+                CLI & MCP
+              </Link>
+              <Link className="button primary" to="/workspace">
+                Open workspace <ArrowUpRight size={15} />
+              </Link>
+            </>
           ) : (
             <>
               <Link className="login-link" to="/login">
@@ -245,7 +251,7 @@ export function Landing() {
                   dependencies in an interactive, bounded graph.
                 </p>
               </div>
-              <span>Graph explorer</span>
+              <span>Code</span>
             </article>
             <article>
               <GitBranch size={25} />
@@ -256,7 +262,7 @@ export function Landing() {
                   workflow metadata into the investigation.
                 </p>
               </div>
-              <span>History & context</span>
+              <span>Jobs & activity</span>
             </article>
             <article>
               <Search size={25} />
@@ -267,7 +273,18 @@ export function Landing() {
                   model for cited synthesis when you want it.
                 </p>
               </div>
-              <span>Context explorer</span>
+              <span>Ask</span>
+            </article>
+            <article>
+              <Terminal size={25} />
+              <div>
+                <h3>Work from your terminal</h3>
+                <p>
+                  Ask questions, manage indexing jobs, drive a Codespace runner
+                  and run your daily Git flow through the GraphPilot CLI.
+                </p>
+              </div>
+              <span>CLI & MCP</span>
             </article>
           </div>
         </section>
@@ -325,14 +342,24 @@ export function Landing() {
             </h2>
             <p>
               Run GraphPilot locally, create an account and connect your first
-              repository. Basic indexing and search need no paid services.
+              repository. Investigate in the browser, or from your terminal with
+              the GraphPilot CLI — basic indexing and search need no paid
+              services.
             </p>
-            <Link
-              className="button primary"
-              to={user ? "/workspace" : "/signup"}
-            >
-              Create your workspace <ArrowUpRight size={16} />
-            </Link>
+            <div className="getting-started-actions">
+              <Link
+                className="button primary"
+                to={user ? "/workspace" : "/signup"}
+              >
+                {user ? "Open your workspace" : "Create your workspace"}{" "}
+                <ArrowUpRight size={16} />
+              </Link>
+              {user && (
+                <Link className="text-link" to="/tools">
+                  Open developer tools <ArrowRight size={15} />
+                </Link>
+              )}
+            </div>
           </div>
           <ol>
             <li>

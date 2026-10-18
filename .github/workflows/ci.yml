@@ -100,6 +100,7 @@ jobs:
         with: {node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json}
       - run: npm --prefix app ci
       - run: npm --prefix app run build
+      - run: npm --prefix app test
       - run: npm --prefix app audit --omit=dev
   e2e:
     runs-on: ubuntu-latest

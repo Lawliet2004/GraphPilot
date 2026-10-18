@@ -1,0 +1,207 @@
+{
+  "scope": "Isolated fulltext readiness/syntax check. No product database.",
+  "create": [],
+  "indexes_initial": [
+    [
+      "Entity",
+      [
+        "name",
+        "terms"
+      ],
+      {
+        "name": [
+          "FULLTEXT"
+        ],
+        "terms": [
+          "FULLTEXT"
+        ]
+      },
+      {
+        "name": {},
+        "terms": {}
+      },
+      "english",
+      [],
+      "NODE",
+      "OPERATIONAL",
+      {
+        "gcPolicy": 0,
+        "score": 1.0,
+        "lang": "english",
+        "fields": [
+          {
+            "path": "name",
+            "name": "name",
+            "options": 0,
+            "textWeight": 1.0,
+            "tagCaseSensitive": false
+          },
+          {
+            "path": "terms",
+            "name": "terms",
+            "options": 0,
+            "textWeight": 1.0,
+            "tagCaseSensitive": false
+          },
+          {
+            "path": "NONE_INDEXABLE_FIELDS",
+            "name": "NONE_INDEXABLE_FIELDS",
+            "options": 0,
+            "textWeight": 0.0,
+            "tagCaseSensitive": true
+          }
+        ],
+        "numDocuments": 2,
+        "maxDocId": 2,
+        "docTableSize": 148,
+        "sortablesSize": 0,
+        "docTrieSize": 58,
+        "numTerms": 5,
+        "numRecords": 8,
+        "invertedSize": 48,
+        "invertedCap": 0,
+        "skipIndexesSize": 0,
+        "scoreIndexesSize": 0,
+        "offsetVecsSize": 8,
+        "offsetVecRecords": 8,
+        "termsSize": 44,
+        "indexingFailures": 0,
+        "totalCollected": 0,
+        "numCycles": 0,
+        "totalMSRun": 0,
+        "lastRunTimeMs": 0
+      }
+    ]
+  ],
+  "indexes_after": [
+    [
+      "Entity",
+      [
+        "name",
+        "terms"
+      ],
+      {
+        "name": [
+          "FULLTEXT"
+        ],
+        "terms": [
+          "FULLTEXT"
+        ]
+      },
+      {
+        "name": {},
+        "terms": {}
+      },
+      "english",
+      [],
+      "NODE",
+      "OPERATIONAL",
+      {
+        "gcPolicy": 0,
+        "score": 1.0,
+        "lang": "english",
+        "fields": [
+          {
+            "path": "name",
+            "name": "name",
+            "options": 0,
+            "textWeight": 1.0,
+            "tagCaseSensitive": false
+          },
+          {
+            "path": "terms",
+            "name": "terms",
+            "options": 0,
+            "textWeight": 1.0,
+            "tagCaseSensitive": false
+          },
+          {
+            "path": "NONE_INDEXABLE_FIELDS",
+            "name": "NONE_INDEXABLE_FIELDS",
+            "options": 0,
+            "textWeight": 0.0,
+            "tagCaseSensitive": true
+          }
+        ],
+        "numDocuments": 2,
+        "maxDocId": 2,
+        "docTableSize": 148,
+        "sortablesSize": 0,
+        "docTrieSize": 58,
+        "numTerms": 5,
+        "numRecords": 8,
+        "invertedSize": 48,
+        "invertedCap": 0,
+        "skipIndexesSize": 0,
+        "scoreIndexesSize": 0,
+        "offsetVecsSize": 8,
+        "offsetVecRecords": 8,
+        "termsSize": 44,
+        "indexingFailures": 0,
+        "totalCollected": 0,
+        "numCycles": 0,
+        "totalMSRun": 0,
+        "lastRunTimeMs": 0
+      }
+    ]
+  ],
+  "queries": [
+    {
+      "query": "normalize",
+      "rows": [
+        [
+          "snake"
+        ],
+        [
+          "camel"
+        ]
+      ]
+    },
+    {
+      "query": "url",
+      "rows": [
+        [
+          "snake"
+        ],
+        [
+          "camel"
+        ]
+      ]
+    },
+    {
+      "query": "normalize_url",
+      "rows": [
+        [
+          "snake"
+        ]
+      ]
+    },
+    {
+      "query": "normalizeUrl",
+      "rows": [
+        [
+          "camel"
+        ]
+      ]
+    },
+    {
+      "query": "@terms:(normalize)",
+      "rows": [
+        [
+          "snake"
+        ],
+        [
+          "camel"
+        ]
+      ]
+    },
+    {
+      "query": "@name:(normalize_url)",
+      "rows": [
+        [
+          "snake"
+        ]
+      ]
+    }
+  ]
+}

@@ -106,7 +106,10 @@ def run_index(job_id: str, worker_id: str):
             else:
                 files[path] = {
                     "hash": content_hash,
-                    "lines": len(content.splitlines()),
+                    # LF-only line count, matching AST line numbers and the
+                    # shared source-range reader. U+2028/U+2029/CR stay inline.
+                    "lines": content.count("\n")
+                    + (0 if not content or content.endswith("\n") else 1),
                     "parser_version": PARSER_VERSION,
                     "parsed": parse_file(path, content),
                 }

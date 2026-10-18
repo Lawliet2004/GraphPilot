@@ -16,6 +16,7 @@ import { Settings } from "./pages/Settings";
 import { Admin } from "./pages/Admin";
 import { Activity } from "./pages/Activity";
 import { CliAccess } from "./pages/CliAccess";
+import { DeveloperTools } from "./pages/DeveloperTools";
 const cache = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, refetchOnWindowFocus: true },
@@ -37,6 +38,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route element={<Shell />}>
                 <Route path="/workspace" element={<Dashboard />} />
                 <Route path="/connect" element={<Connect />} />
+                <Route path="/tools" element={<DeveloperTools />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/activity" element={<Activity />} />
                 <Route path="/admin" element={<Admin />} />
@@ -47,6 +49,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   "history",
                   "impact",
                   "diagnostics",
+                  "code",
+                  "activity",
                 ].map((view) => (
                   <Route
                     key={view}

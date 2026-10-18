@@ -105,6 +105,66 @@ def test_cli_pending_verifier_poll_rate_and_expiry(client, db):
     assert client.post(endpoint, json=body).status_code == 410
 
 
+def test_device_verification_uri_follows_the_allowed_request_origin(client):
+    register(client)
+    verifier = secrets.token_urlsafe(48)
+    result = client.post(
+        "/api/cli/device",
+        json={"challenge": challenge(verifier)},
+        headers={"Origin": "http://testserver"},
+    )
+    assert result.status_code == 201
+    assert result.json()["verification_uri"].startswith("http://testserver/cli/authorize?code=")
+
+
+def test_cli_accepts_only_matching_or_loopback_authorization_urls():
+    from api.client import authorization_uri
+
+    code = "ABCD-1234"
+    assert authorization_uri(
+        "http://localhost:5173/cli/authorize?code=ABCD1234", "http://127.0.0.1:8000", code
+    )
+    assert authorization_uri(
+        "http://127.0.0.1:8000/cli/authorize?code=ABCD1234", "http://127.0.0.1:8000", code
+    )
+    for bad in [
+        "https://evil.example/cli/authorize?code=ABCD1234",
+        "javascript:alert(1)//cli/authorize?code=ABCD1234",
+        "http://127.0.0.1:8000/cli/authorize?code=EFEF5678",
+        "http://127.0.0.1:8000/other?code=ABCD1234",
+        "http://user:pw@127.0.0.1:8000/cli/authorize?code=ABCD1234",
+    ]:
+        with pytest.raises(ValueError):
+            authorization_uri(bad, "http://127.0.0.1:8000", code)
+
+
+def test_cli_errors_show_server_detail_without_credentials():
+    import httpx
+
+    from api.client import server_detail
+
+    denied = httpx.Response(403, json={"detail": "Read-only gp_mcp_secretvalue denied"})
+    assert server_detail(denied) == "Read-only [redacted] denied (HTTP 403)"
+    assert server_detail(httpx.Response(502, text="<html>")) == "HTTP 502"
+
+
+def test_auth_rate_limit_buckets_are_separate(client, monkeypatch):
+    from api import auth
+
+    monkeypatch.setitem(auth.AUTH_LIMITS, "login", 2)
+    wrong = {"email": "nobody@example.com", "password": "wrong-password-xyz"}
+    assert [client.post("/api/auth/login", json=wrong).status_code for _ in range(3)] == [
+        401,
+        401,
+        429,
+    ]
+    registered = client.post(
+        "/api/auth/register",
+        json={"name": "Fresh", "email": "fresh@example.com", "password": "correct-horse-battery"},
+    )
+    assert registered.status_code == 201
+
+
 def test_cli_files_are_private_and_server_origins_are_validated(tmp_path):
     path = tmp_path / "private" / "session.json"
     value = {"server": "https://graphpilot.example.com", "token": "gp_mcp_example"}
@@ -165,6 +225,7 @@ def test_actual_cli_commands_use_scoped_http_api(client, monkeypatch, tmp_path, 
         assert cli.main() == 0
         return json.loads(capsys.readouterr().out)
 
+    monkeypatch.setattr("api.routes.repositories.default_branch", lambda *args: "main")
     assert run("whoami")["id"] == user["id"]
     created = run("repos", "connect", "https://github.com/pallets/itsdangerous")
     repo_id = created["repository"]["id"]

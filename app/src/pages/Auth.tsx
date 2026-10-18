@@ -1,10 +1,22 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowRight, GitBranch, Network } from "lucide-react";
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  GitBranch,
+  LoaderCircle,
+  Network,
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { api, post } from "../lib/api";
+import { api, ApiError, post } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { Brand, ErrorNotice } from "../components/ui";
+
+type FieldErrors = Partial<Record<"name" | "email" | "password", string>>;
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function Auth({
   signup = false,
   reset = false,
@@ -29,12 +41,48 @@ export function Auth({
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const [message, setMessage] = useState("");
   if (auth.user && !reset) return <Navigate to={next} replace />;
+  const showEmail = !reset || !token;
+  const showPasswordField = !reset || !!token;
+  const newPassword = signup || reset;
+  const title = reset
+    ? "Reset password"
+    : signup
+      ? "Create account"
+      : "Log in";
+  const busyLabel = reset
+    ? "Sending…"
+    : signup
+      ? "Creating account…"
+      : "Logging in…";
+  const buttonLabel = reset
+    ? "Reset password"
+    : signup
+      ? "Create account"
+      : "Log in";
+  function validate() {
+    const errors: FieldErrors = {};
+    if (signup && !name.trim()) errors.name = "Enter your name.";
+    if (showEmail && !EMAIL.test(email.trim()))
+      errors.email = "Enter a valid email address.";
+    if (showPasswordField) {
+      if (newPassword && password.length < 12)
+        errors.password = "Use at least 12 characters.";
+      else if (!newPassword && !password)
+        errors.password = "Enter your password.";
+    }
+    return errors;
+  }
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    const errors = validate();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length) return;
     setBusy(true);
     setError(undefined);
     try {
@@ -45,15 +93,26 @@ export function Auth({
         );
         setMessage(result.message);
       } else {
-        await post(
+        const result = await post<{ verification_email_sent?: boolean }>(
           signup ? "/auth/register" : "/auth/login",
           signup ? { email, name, password } : { email, password },
         );
         await auth.refresh();
-        navigate(next, { replace: true });
+        navigate(next, {
+          replace: true,
+          state: signup
+            ? { verificationEmailSent: result.verification_email_sent ?? null }
+            : undefined,
+        });
       }
     } catch (e) {
-      setError(e);
+      setError(
+        !signup && !reset && e instanceof ApiError && e.status === 409
+          ? new Error(
+              "This account has not been linked to Firebase sign-in yet. Ask an administrator to link your account, then log in again.",
+            )
+          : e,
+      );
     } finally {
       setBusy(false);
     }
@@ -90,14 +149,8 @@ export function Auth({
           <Link className="back-link" to="/">
             Back to GraphPilot
           </Link>
-          <h1>
-            {reset
-              ? "Reset your password"
-              : signup
-                ? "Make room for clarity."
-                : "Good to see you."}
-          </h1>
-          <p>
+          <h1>{title}</h1>
+          <p className="auth-lede">
             {reset
               ? token
                 ? "Choose a new password for your account."
@@ -106,78 +159,118 @@ export function Auth({
                   : "We’ll send a one-time link when email delivery is configured."
               : signup
                 ? "Create your GraphPilot workspace."
-                : "Log in to pick up the thread."}
+                : "Welcome back. Pick up where you left off."}
           </p>
-          {error !== undefined && <ErrorNotice error={error} />}{" "}
+          {error !== undefined && <ErrorNotice error={error} />}
           {message ? (
-            <div className="notice">
+            <div className="notice" role="status">
               {message}
               <Link to="/login">
                 Go to login <ArrowRight size={16} />
               </Link>
             </div>
           ) : (
-            <form onSubmit={submit}>
+            <form onSubmit={submit} noValidate>
               {signup && (
-                <label>
-                  Your name
+                <div className="field">
+                  <label htmlFor="auth-name">Your name</label>
                   <input
+                    id="auth-name"
                     autoComplete="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    required
                     maxLength={80}
+                    aria-invalid={!!fieldErrors.name}
+                    aria-describedby={fieldErrors.name ? "auth-name-error" : undefined}
                   />
-                </label>
+                  {fieldErrors.name && (
+                    <p className="field-error" id="auth-name-error">
+                      {fieldErrors.name}
+                    </p>
+                  )}
+                </div>
               )}
-              {(!reset || !token) && (
-                <label>
-                  Email address
+              {showEmail && (
+                <div className="field">
+                  <label htmlFor="auth-email">Email address</label>
                   <input
+                    id="auth-email"
                     type="email"
                     autoComplete="email"
                     placeholder="you@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                     maxLength={254}
+                    aria-invalid={!!fieldErrors.email}
+                    aria-describedby={fieldErrors.email ? "auth-email-error" : undefined}
                   />
-                </label>
-              )}
-              {(!reset || token) && (
-                <label>
-                  Password
-                  <input
-                    aria-label="Password"
-                    type="password"
-                    autoComplete={
-                      signup || reset ? "new-password" : "current-password"
-                    }
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={signup || reset ? 12 : 1}
-                    maxLength={128}
-                  />
-                  {(signup || reset) && (
-                    <small>Use at least 12 characters.</small>
+                  {fieldErrors.email && (
+                    <p className="field-error" id="auth-email-error">
+                      {fieldErrors.email}
+                    </p>
                   )}
-                </label>
+                </div>
               )}
-              {!signup && !reset && (
-                <Link className="forgot-link" to="/reset-password">
-                  Forgot password?
-                </Link>
+              {showPasswordField && (
+                <div className="field">
+                  <div className="field-row">
+                    <label htmlFor="auth-password">Password</label>
+                    {!signup && !reset && (
+                      <Link className="forgot-link" to="/reset-password">
+                        Forgot password?
+                      </Link>
+                    )}
+                  </div>
+                  <div className="password-field">
+                    <input
+                      id="auth-password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete={newPassword ? "new-password" : "current-password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      maxLength={128}
+                      aria-invalid={!!fieldErrors.password}
+                      aria-describedby={
+                        fieldErrors.password
+                          ? "auth-password-error"
+                          : newPassword
+                            ? "auth-password-hint"
+                            : undefined
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-pressed={showPassword}
+                      onClick={() => setShowPassword((shown) => !shown)}
+                    >
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    </button>
+                  </div>
+                  {fieldErrors.password ? (
+                    <p className="field-error" id="auth-password-error">
+                      {fieldErrors.password}
+                    </p>
+                  ) : (
+                    newPassword && (
+                      <p className="field-hint" id="auth-password-hint">
+                        Use at least 12 characters.
+                      </p>
+                    )
+                  )}
+                </div>
               )}
-              <button className="button primary wide" disabled={busy}>
-                {busy
-                  ? "Working…"
-                  : reset
-                    ? "Reset password"
-                    : signup
-                      ? "Create workspace"
-                      : "Log in"}
-                <ArrowRight size={17} />
+              <button
+                className="button primary wide"
+                disabled={busy}
+                aria-busy={busy}
+              >
+                {busy ? (
+                  <LoaderCircle className="spin" size={17} />
+                ) : null}
+                {busy ? busyLabel : buttonLabel}
+                {!busy && <ArrowRight size={17} />}
               </button>
             </form>
           )}

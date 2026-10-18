@@ -1,0 +1,50 @@
+
+> graphpilot-app@0.1.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: successful requests retain session and CSRF headers
+ok 1 - successful requests retain session and CSRF headers
+  ---
+  duration_ms: 39.962703
+  type: 'test'
+  ...
+# Subtest: readable API details and field validation survive transport handling
+ok 2 - readable API details and field validation survive transport handling
+  ---
+  duration_ms: 1.386943
+  type: 'test'
+  ...
+# Subtest: gateway failures explain availability without exposing response bodies
+ok 3 - gateway failures explain availability without exposing response bodies
+  ---
+  duration_ms: 1.671892
+  type: 'test'
+  ...
+# Subtest: HTML login redirects and invalid JSON cannot look like a successful API response
+ok 4 - HTML login redirects and invalid JSON cannot look like a successful API response
+  ---
+  duration_ms: 1.09957
+  type: 'test'
+  ...
+# Subtest: offline failures have an actionable message and omit raw network diagnostics
+ok 5 - offline failures have an actionable message and omit raw network diagnostics
+  ---
+  duration_ms: 0.663645
+  type: 'test'
+  ...
+# Subtest: multipart uploads leave the content boundary to the browser
+ok 6 - multipart uploads leave the content boundary to the browser
+  ---
+  duration_ms: 1.220088
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 626.093605

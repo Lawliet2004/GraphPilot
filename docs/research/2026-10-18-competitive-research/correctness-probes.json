@@ -1,0 +1,32 @@
+{
+  "scope": "Synthetic route fixture with persistence/model/retrieval mocked; isolated UNIX-socket FalkorDBLite for graph queries. No product data or services.",
+  "citation_range": {
+    "input_characters": 8000,
+    "input_lines": 200,
+    "returned_characters": 3000,
+    "returned_lines_including_partial": 75,
+    "reported_start_line": 1,
+    "reported_end_line": 200,
+    "has_truncated_field": false,
+    "persistence": "FakeDB, no actual database"
+  },
+  "impact_order_trials": [
+    {
+      "mode": "direct_first",
+      "known_direct_callers": 111,
+      "returned_unique_origins": 51,
+      "caller_returned": true,
+      "caller_distance": 2,
+      "caller_classification": "possible indirect impact"
+    },
+    {
+      "mode": "direct_last",
+      "known_direct_callers": 111,
+      "returned_unique_origins": 51,
+      "caller_returned": true,
+      "caller_distance": 2,
+      "caller_classification": "possible indirect impact"
+    }
+  ],
+  "impact_interpretation": "Both tested insertion orders returned caller at distance2 although its direct edge exists. This reproduces a shortest-distance/classification failure caused by limiting paths before deduplication. Synthetic fixture, not a corpus error rate."
+}

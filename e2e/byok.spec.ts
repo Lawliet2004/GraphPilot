@@ -22,7 +22,7 @@ test("BYOK settings keep credentials private and support replace/remove", async 
   await page.goto("/settings");
   const section = page.locator("section.model-credentials");
   await expect(
-    section.getByRole("heading", { name: "AI synthesis with your own key" }),
+    section.getByRole("heading", { name: "AI answers (optional)" }),
   ).toBeVisible();
   const status = await page.request.get("/api/model");
   expect(status.status()).toBe(200);

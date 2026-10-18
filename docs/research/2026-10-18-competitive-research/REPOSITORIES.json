@@ -1,0 +1,279 @@
+[
+  {
+    "name": "aider",
+    "license": "Apache-2.0",
+    "license_file": "LICENSE.txt",
+    "source_paths": [
+      "aider/repomap.py",
+      "aider/queries/tree-sitter-language-pack"
+    ],
+    "note": "Definition/reference tags, personalized PageRank over file/name signals, and rank-then-pack repository maps. Parent and Swe2Max source inspection. Same-name ranking links should not become verified dependency facts.",
+    "url": "https://github.com/Aider-AI/aider",
+    "sha": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+    "license_files": [
+      "LICENSE.txt"
+    ]
+  },
+  {
+    "name": "continue",
+    "license": "Apache-2.0",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "core/indexing/refreshIndex.ts",
+      "core/indexing/FullTextSearchCodebaseIndex.ts",
+      "core/context/retrieval/pipelines/NoRerankerRetrievalPipeline.ts"
+    ],
+    "note": "Artifact-specific incremental indexing and a portfolio of retrieval sources. The inspected full-text implementation uses SQLite FTS5 with trigram tokenization. Editor recency and multiuser server snapshots have different semantics.",
+    "url": "https://github.com/continuedev/continue",
+    "sha": "5522c6f44ca0ac3528b37244818fbfa39b5af470",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "zoekt",
+    "license": "Apache-2.0",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "doc/design.md",
+      "index/score.go",
+      "index/contentprovider.go"
+    ],
+    "note": "Positional trigrams, candidate verification, and structured match scoring. Parent re-fetched commit-pinned design and scoring sources after initial clone failures. Its documented performance goals are not measurements reproduced here.",
+    "repo": "sourcegraph/zoekt",
+    "sha": "0e68f41329d9c37f46942d4731495fa05b07882a",
+    "url": "https://github.com/sourcegraph/zoekt"
+  },
+  {
+    "name": "scip",
+    "license": "Apache-2.0",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "scip.proto",
+      "docs/scip.md"
+    ],
+    "note": "Symbols, occurrences, roles, range encodings and symbol relationships. The protocol explicitly accommodates indexers at different precision levels. The format is not a correctness guarantee or a complete call graph.",
+    "url": "https://github.com/sourcegraph/scip",
+    "sha": "fcb3cb3c679fe2da18141550f864b9e67afab297",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "scip-python",
+    "license": "MIT",
+    "license_file": "LICENSE.txt",
+    "source_paths": [
+      "packages/pyright-scip/src/treeVisitor.ts",
+      "packages/pyright-scip/src/virtualenv/PythonEnvironment.ts"
+    ],
+    "note": "Type-aware occurrence generation using the Pyright analyzer. Inspected by Swe2Max in the pinned checkout. Ambient dependency/toolchain discovery is separate from importing a previously generated index.",
+    "url": "https://github.com/sourcegraph/scip-python",
+    "sha": "8b60bbce1f2a4c7a517776cb395bbafb2e731e4f",
+    "license_files": [
+      "LICENSE.txt"
+    ]
+  },
+  {
+    "name": "scip-typescript",
+    "license": "Apache-2.0",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "src/ProjectIndexer.ts",
+      "src/FileIndexer.ts",
+      "src/main.ts"
+    ],
+    "note": "TypeScript-checker-backed symbol occurrences and project handling. Inspected by Swe2Max; parent checked entry-point/project setup. Full precision can depend on the project environment.",
+    "url": "https://github.com/sourcegraph/scip-typescript",
+    "sha": "e6d730c32189f14553d315b697f19bd8b60db65e",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "repomix",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "src/core/metrics/TokenCounter.ts",
+      "src/core/treeSitter/parseStrategies/PythonParseStrategy.ts",
+      "src/core/security/securityCheck.ts"
+    ],
+    "note": "Context packaging, tokenizer abstraction, syntax-guided compression and worker-based security checks. Parent re-fetched the listed source at the pinned commit. Compression and secret scanning retain limitations; exact tokenizer-library claims from the first draft were not carried forward.",
+    "repo": "yamadashy/repomix",
+    "sha": "55c6de6aebde4c38877fbcaf005c4cc396bf6e2d",
+    "url": "https://github.com/yamadashy/repomix"
+  },
+  {
+    "name": "ast-grep",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "crates/core/src/matcher/pattern.rs",
+      "crates/core/src/meta_var.rs",
+      "crates/core/src/match_tree/strictness.rs"
+    ],
+    "note": "Syntax-pattern matching, metavariables and root-kind filtering. Source inspected by Swe2Max. A structural match establishes syntax, not the identity or runtime behavior of the target.",
+    "url": "https://github.com/ast-grep/ast-grep",
+    "sha": "14934d690a547abce8576baff9a1856a10ae7da8",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "dependency-cruiser",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "src/validate/index.mjs",
+      "src/validate/match-dependency-rule.mjs",
+      "src/validate/match-module-rule.mjs"
+    ],
+    "note": "Named allowed/forbidden/required dependency rules and explicit violations. Parent and Swe2Max source inspection. Adapt the rule concept to GraphPilot facts without running arbitrary repository-provided JavaScript configuration.",
+    "url": "https://github.com/sverweij/dependency-cruiser",
+    "sha": "c580daf6477aa5619bacad9c9091c9b7cc81882d",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "code-graph",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "api/analyzers/python/ts_resolver.py",
+      "api/analyzers/python/analyzer.py",
+      "api/mcp/tools/structural.py",
+      "api/graph.py"
+    ],
+    "note": "Static Python resolver option, cached lexical/graph ranking, full-text metadata lookup and structural MCP operations. Parent and Swe2Max inspection. Default environment/LSP behavior and cross-project bare-name fallback need separate treatment from GraphPilot safe ingestion.",
+    "url": "https://github.com/FalkorDB/code-graph",
+    "sha": "f5e72c074bf8b529d71472162e6d43cd6caaa5b6",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "GitNexus",
+    "license": "PolyForm Noncommercial 1.0.0",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "gitnexus/src/core/ingestion/scope-resolution/resolution-outcome.ts",
+      "gitnexus/src/core/ingestion/process-processor.ts",
+      "gitnexus/src/core/ingestion/community-processor.ts",
+      "gitnexus-shared/src/scope-resolution/evidence-weights.ts",
+      "gitnexus/bench/impact-pdg/README.md"
+    ],
+    "note": "Resolution-pass decomposition; resolved, suppressed and fallback-guessed outcomes; process/community views and change-oriented tools. Parent and Swe2Max source inspection. Numeric evidence weights are heuristics. This license is not an unrestricted commercial reuse grant; treat it as a source-available comparator.",
+    "url": "https://github.com/abhigyanpatwari/GitNexus",
+    "sha": "b961e695cabae1e0c2a0c1641fd0f6e2ffd15e19",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "CodeGraphContext",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "src/codegraphcontext/tools/indexing/pipeline.py",
+      "src/codegraphcontext/tools/indexing/scip_pipeline.py",
+      "src/codegraphcontext/tools/indexing/resolution/calls.py",
+      "src/codegraphcontext/core/watcher.py"
+    ],
+    "note": "Multi-language pipeline, parse-failure accounting, per-call resolution diagnostics and debounced watching. Parent source inspection via commit-pinned raw files. Its confidence tiers and fallback policies require evaluation rather than direct promotion to verified facts.",
+    "repo": "CodeGraphContext/CodeGraphContext",
+    "sha": "1b595a61663d60862ac20aca2422ea187671c01c",
+    "commit_date": "2026-10-15T14:46:53Z",
+    "tree_entries": 1416,
+    "truncated": false,
+    "url": "https://github.com/CodeGraphContext/CodeGraphContext"
+  },
+  {
+    "name": "codebase-memory-mcp",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "src/pipeline/pipeline.c",
+      "src/pipeline/pass_tests.c",
+      "src/pipeline/pass_configlink.c",
+      "src/pipeline/artifact.c",
+      "docs/INDEX_RESOURCE_LIMITS.md",
+      "docs/MEASURING_SAVINGS.md"
+    ],
+    "note": "Separate extraction/enrichment passes, static test relations, explicit resource-limit failure states, staged artifacts and evaluation guidance. Parent source/docs inspection. Test naming and key/symbol matches are heuristics; published token/speed outcomes were not reproduced.",
+    "repo": "DeusData/codebase-memory-mcp",
+    "sha": "354ccecbe612a9fdb624396a6738fa87f2617434",
+    "commit_date": "2026-10-18T00:32:00Z",
+    "tree_entries": 4139,
+    "truncated": false,
+    "url": "https://github.com/DeusData/codebase-memory-mcp"
+  },
+  {
+    "name": "serena",
+    "license": "GPL-3.0-or-later application; MIT SolidLSP",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "src/serena/tools/symbol_tools.py",
+      "src/solidlsp",
+      "LICENSES"
+    ],
+    "note": "Symbol-addressed navigation/reference tools over language servers. Swe2Max source inspection; parent read component licensing. Direct reuse requires checking the relevant component and obligations; a live LSP workspace is a different product mode from immutable archived-source analysis.",
+    "url": "https://github.com/oraios/serena",
+    "sha": "d9e4c796fae0207ba6848d1df4b331122a5567b5",
+    "license_files": [
+      "LICENSES",
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "LightRAG",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "lightrag/operate.py"
+    ],
+    "note": "Entity/relationship-oriented retrieval and context merging, inspected by Swe2Max. The relevant pattern is diversification. Model-authored graph facts and mandatory extraction-time model calls are not proposed for GraphPilot core indexing.",
+    "url": "https://github.com/HKUDS/LightRAG",
+    "sha": "aaebfe1bb8d55deb6a4304d357a3bf4c92fcd40a",
+    "license_files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "deepwiki-open",
+    "license": "MIT",
+    "license_file": "LICENSE",
+    "source_paths": [
+      "api/services/wiki/structure.py",
+      "api/services/wiki/content.py",
+      "api/services/wiki/tasks.py",
+      "api/rag/rag.py"
+    ],
+    "note": "Wiki organization, source-link presentation and task progress. Parent inspected commit-pinned sources. The wiki task registry is explicitly in-memory; source URLs in the inspected helper use a branch context, so retain GraphPilot durable jobs and commit-pinned evidence.",
+    "repo": "AsyncFuncAI/deepwiki-open",
+    "sha": "d92819a9c9f3b99416e3580ff235fc9d3adf8b89",
+    "commit_date": "2026-09-03T20:29:26Z",
+    "tree_entries": 231,
+    "truncated": false,
+    "url": "https://github.com/AsyncFuncAI/deepwiki-open"
+  },
+  {
+    "name": "sourcebot",
+    "license": "MIT for inspected public repository contents",
+    "license_file": "LICENSE.md",
+    "source_paths": [
+      "README.md",
+      "docker-compose.yml",
+      "schemas",
+      "tools"
+    ],
+    "note": "Public configuration/deployment/schema repository, with 68 tree entries at inspection and no application runtime source in that tree. Parent API-tree/raw inspection and Swe2Max verification. Product workflow claims come from official docs; the runtime license is not inferred from this MIT file.",
+    "repo": "sourcebot-dev/sourcebot",
+    "sha": "a5fcd2703e605c08d49ebda9b965997eaf00c21b",
+    "commit_date": "2026-10-16T00:55:13Z",
+    "tree_entries": 68,
+    "truncated": false,
+    "url": "https://github.com/sourcebot-dev/sourcebot"
+  }
+]

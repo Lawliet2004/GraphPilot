@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import {
   Link,
-  NavLink,
   useNavigate,
   useParams,
   useSearchParams,
@@ -29,9 +28,11 @@ import {
   safeUrl,
   scoped,
   type Branches,
+  type ContentSearch,
   type Snapshot,
   type Evidence,
   type Graph,
+  type ImpactResult,
   type Job,
   type Node,
   type Repo,
@@ -48,12 +49,19 @@ const GraphCanvas = lazy(() =>
   import("../components/GraphCanvas").then((m) => ({ default: m.GraphCanvas })),
 );
 import { ContextExplorer } from "./context";
-export function RepositoryPage({ view = "graph" }: { view?: string }) {
+export function RepositoryPage({ view = "context" }: { view?: string }) {
   const { id } = useParams();
   const base = `/repositories/${id}`;
   const [params, setParams] = useSearchParams();
   const branch = params.get("branch");
   const revision = params.get("revision");
+  const section =
+    ["graph", "code", "impact"].includes(view) || params.has("node")
+      ? "code"
+      : ["overview", "history", "diagnostics", "activity"].includes(view)
+        ? "activity"
+        : "ask";
+  const tab = view === "impact" ? "impact" : section;
   const selectedContext = { branch, revision };
   const cache = useQueryClient();
   const query = useQuery({
@@ -132,17 +140,20 @@ export function RepositoryPage({ view = "graph" }: { view?: string }) {
           {active ? "Job in progress" : "Sync source"}
         </button>
       </div>
-      <BranchControls
-        repo={repo}
-        revision={revision}
-        busy={!!active}
-        select={(branch, revision) => {
-          const next = new URLSearchParams();
-          next.set("branch", branch);
-          if (revision) next.set("revision", revision);
-          setParams(next);
-        }}
-      />
+      <details className="repository-options" open={!!branch || !!revision}>
+        <summary>Branch & saved versions</summary>
+        <BranchControls
+          repo={repo}
+          revision={revision}
+          busy={!!active}
+          select={(branch, revision) => {
+            const next = new URLSearchParams();
+            next.set("branch", branch);
+            if (revision) next.set("revision", revision);
+            setParams(next);
+          }}
+        />
+      </details>
       {revision && (
         <p className="notice subtle">
           Viewing a saved snapshot. Source and graph evidence stay at this
@@ -151,23 +162,19 @@ export function RepositoryPage({ view = "graph" }: { view?: string }) {
       )}
       <nav className="repo-tabs" aria-label="Repository navigation">
         {[
-          ["graph", "Graph explorer"],
-          ["overview", "Overview"],
-          ["context", "Context explorer"],
-          ["history", "History"],
-          ["impact", "Impact analysis"],
-          ["diagnostics", "Diagnostics"],
-        ].map(([key, label]) => (
-          <NavLink
+          ["ask", "Ask", ""],
+          ["code", "Graph", "/code"],
+          ["impact", "Impact", "/impact"],
+          ["activity", "History", "/activity"],
+        ].map(([key, label, path]) => (
+          <Link
             key={key}
-            end
-            to={scoped(
-              base + (key === "graph" ? "" : "/" + key),
-              selectedContext,
-            )}
+            className={tab === key ? "active" : undefined}
+            aria-current={tab === key ? "page" : undefined}
+            to={scoped(base + path, selectedContext)}
           >
             {label}
-          </NavLink>
+          </Link>
         ))}
       </nav>
       {enqueue.error && <ErrorNotice error={enqueue.error} />}{" "}
@@ -203,22 +210,32 @@ export function RepositoryPage({ view = "graph" }: { view?: string }) {
               : "Start an index to create real graph entities and source references."}
           </Empty>
         </>
-      ) : view === "graph" ? (
-        <GraphExplorer key={generation} repo={repo} />
-      ) : view === "context" ? (
+      ) : section === "ask" ? (
         <ContextExplorer key={generation} repo={repo} />
-      ) : view === "overview" ? (
-        <Overview repo={repo} jobs={selectedJobs} />
-      ) : view === "history" ? (
-        <Timeline
-          repo={repo}
-          sync={() => enqueue.mutate("github-sync")}
-          busy={locked || !!active || enqueue.isPending}
-        />
-      ) : view === "impact" ? (
-        <Impact key={generation} repo={repo} />
+      ) : section === "code" ? (
+        <>
+          <GraphExplorer key={generation} repo={repo} />
+          <details className="repository-detail" open={view === "impact"}>
+            <summary>Trace dependencies</summary>
+            <Impact key={generation} repo={repo} />
+          </details>
+        </>
       ) : (
-        <Diagnostics repo={repo} jobs={selectedJobs} />
+        <>
+          <Timeline
+            repo={repo}
+            sync={() => enqueue.mutate("github-sync")}
+            busy={locked || !!active || enqueue.isPending}
+          />
+          <details className="repository-detail" open={view === "overview"}>
+            <summary>Repository details & indexing jobs</summary>
+            <Overview repo={repo} jobs={selectedJobs} />
+          </details>
+          <details className="repository-detail" open={view === "diagnostics"}>
+            <summary>Index health</summary>
+            <Diagnostics repo={repo} jobs={selectedJobs} />
+          </details>
+        </>
       )}
     </div>
   );
@@ -351,10 +368,16 @@ function BranchControls({
 function GraphExplorer({ repo }: { repo: Repo }) {
   const read = <T,>(path: string) => api<T>(scoped(path, repo));
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [term, setTerm] = useState("");
   const [kind, setKind] = useState("");
   const [relation, setRelation] = useState("");
+  const [matchCase, setMatchCase] = useState(false);
+  const mode = params.get("mode") === "content" ? "content" : "symbols";
+  const around = params.get("around");
+  const column = params.get("column");
+  const endColumn = params.get("end_column");
   const [expanded, setExpanded] = useState<Graph>({
     nodes: [],
     edges: [],
@@ -385,6 +408,7 @@ function GraphExplorer({ repo }: { repo: Repo }) {
           "&relation=" +
           relation,
       ),
+    enabled: mode === "symbols",
   });
   const selectedQuery = useQuery({
     queryKey: [
@@ -406,9 +430,39 @@ function GraphExplorer({ repo }: { repo: Repo }) {
       repo.snapshot_id,
       selected,
       repo.commit_sha,
+      around,
+      column,
+      endColumn,
     ],
-    queryFn: () => read<Evidence>(base + "/evidence/" + selected),
+    queryFn: () => {
+      const query = new URLSearchParams();
+      if (around) query.set("around", around);
+      if (column) query.set("column", column);
+      if (endColumn) query.set("end_column", endColumn);
+      const suffix = query.size ? "?" + query.toString() : "";
+      return read<Evidence>(base + "/evidence/" + selected + suffix);
+    },
     enabled: !!selected,
+  });
+  const content = useQuery({
+    queryKey: [
+      "content-search",
+      repo.id,
+      repo.branch,
+      repo.snapshot_id,
+      term,
+      matchCase,
+    ],
+    queryFn: () =>
+      read<ContentSearch>(
+        base +
+          "/search/content?q=" +
+          encodeURIComponent(term) +
+          "&case=" +
+          matchCase +
+          "&limit=25",
+      ),
+    enabled: mode === "content" && !!term,
   });
   const expansion = useMutation({
     mutationFn: () =>
@@ -456,13 +510,239 @@ function GraphExplorer({ repo }: { repo: Repo }) {
       limit: 200,
     };
   }, [query.data, expanded, selectedQuery.data]);
-  function select(node: Node) {
+  function select(node: Node, anchor?: number, hitColumn?: number, hitEnd?: number) {
     setParams((previous) => {
       const next = new URLSearchParams(previous);
       next.set("node", node.id);
+      if (anchor) next.set("around", String(anchor));
+      else next.delete("around");
+      if (hitColumn) next.set("column", String(hitColumn));
+      else next.delete("column");
+      if (hitEnd) next.set("end_column", String(hitEnd));
+      else next.delete("end_column");
       return next;
     });
   }
+  const evidencePanel = (
+    <aside
+      className="evidence-panel"
+      id="source-panel"
+      tabIndex={-1}
+      aria-label="Node details"
+    >
+      {!selected ? (
+        <div className="node-empty">
+          <Network size={35} strokeWidth={1.2} />
+          <h2>Follow a connection.</h2>
+          <p>
+            Select a node to inspect its source, relationships and provenance.
+          </p>
+          <span>Pan to explore · Scroll to zoom</span>
+        </div>
+      ) : selectedQuery.isPending ? (
+        <Loading label="Loading node…" />
+      ) : selectedQuery.error ? (
+        <ErrorNotice error={selectedQuery.error} />
+      ) : (
+        <>
+          <button
+            className="icon-button panel-close"
+            aria-label="Clear selected node"
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.delete("node");
+              next.delete("around");
+              next.delete("column");
+              next.delete("end_column");
+              navigate(base + "/code" + (next.size ? "?" + next.toString() : ""));
+            }}
+          >
+            <X size={16} />
+          </button>
+          <h2>{selectedQuery.data?.name}</h2>
+          <p className="source-location">
+            <FileCode2 size={14} />
+            {selectedQuery.data?.type} ·{" "}
+            {selectedQuery.data?.path || "Historical evidence"}
+            {selectedQuery.data?.line && `:${selectedQuery.data.line}`}
+          </p>
+          {selectedQuery.data?.doc && (
+            <p className="node-doc">{selectedQuery.data.doc}</p>
+          )}
+          {selectedQuery.data?.log_status && (
+            <p className="notice subtle">{selectedQuery.data.log_status}</p>
+          )}
+          <div className="node-actions">
+            <button
+              className="button secondary small-button"
+              disabled={expansion.isPending || graph.nodes.length >= 200}
+              onClick={() => expansion.mutate()}
+            >
+              <Waypoints size={15} />
+              {expansion.isPending ? "Expanding…" : "Expand neighbors"}
+            </button>
+            <Link
+              className="text-link"
+              to={scoped(base + "/impact?node=" + selected, repo)}
+            >
+              Analyze impact <ArrowRight size={14} />
+            </Link>
+            {around && (
+              <Link
+                className="text-link"
+                to={scoped(
+                  base +
+                    "?pin=" +
+                    selected +
+                    "&line=" +
+                    around +
+                    (column ? "&column=" + column : "") +
+                    (endColumn ? "&end_column=" + endColumn : "") +
+                    "&q=" +
+                    encodeURIComponent("Explain this code"),
+                  repo,
+                )}
+              >
+                Ask about this <ArrowRight size={14} />
+              </Link>
+            )}
+          </div>
+          {expansion.error && <ErrorNotice error={expansion.error} />}
+          <h3>Connections in the loaded view</h3>
+          <div className="connection-entries">
+            {graph.edges
+              .filter((e) => e.source === selected || e.target === selected)
+              .map((e) => (
+                <p key={e.id}>
+                  <strong>{graph.nodes.find((n) => n.id === e.source)?.name}</strong>
+                  <span>{e.type} →</span>
+                  <strong>{graph.nodes.find((n) => n.id === e.target)?.name}</strong>
+                  <small>
+                    {e.source === selected ? "Outgoing" : "Incoming"}{" "}
+                    {e.provenance === "github-api"
+                      ? "GitHub metadata relationship"
+                      : "static relationship"}
+                  </small>
+                </p>
+              ))}
+            {!graph.edges.some(
+              (e) => e.source === selected || e.target === selected,
+            ) && (
+              <p>No connections loaded. Expand neighbors to inspect direct relationships.</p>
+            )}
+          </div>
+          <h3>Source evidence</h3>
+          {evidence.isPending ? (
+            <Loading label="Reading source…" />
+          ) : evidence.error ? (
+            <ErrorNotice error={evidence.error} />
+          ) : (
+            evidence.data && (
+              <>
+                {evidence.data.notice && (
+                  <p className="notice subtle">{evidence.data.notice}</p>
+                )}
+                <div className="code-block">
+                  {evidence.data.content ? (
+                    // A trailing LF belongs to the line it ends; it never
+                    // produces an extra numbered empty line.
+                    (evidence.data.content.endsWith("\n")
+                      ? evidence.data.content.slice(0, -1)
+                      : evidence.data.content
+                    )
+                      .split("\n")
+                      .map((line, i) => {
+                        const number = evidence.data!.start_line;
+                        const hit =
+                          number !== null &&
+                          around !== null &&
+                          number + i === Number(around);
+                        const excerpt = evidence.data!.line_excerpt;
+                        const partialLine =
+                          excerpt && number !== null && number + i === excerpt.line
+                            ? excerpt
+                            : null;
+                        return (
+                          <div
+                            className={"code-line" + (hit ? " match-line" : "")}
+                            key={i}
+                          >
+                            <span>{number !== null ? number + i : ""}</span>
+                            <code>
+                              {partialLine && partialLine.start_column > 1
+                                ? "…"
+                                : ""}
+                              {line || " "}
+                              {partialLine &&
+                              partialLine.end_column < partialLine.line_length
+                                ? "…"
+                                : ""}
+                            </code>
+                          </div>
+                        );
+                      })
+                  ) : (
+                    <p>No source excerpt is available for this entity.</p>
+                  )}
+                </div>
+                {evidence.data.truncated && (
+                  <p className="small muted">
+                    {selectedQuery.data?.type === "LogArtifact"
+                      ? "Log preview limited to 12,000 characters."
+                      : "Excerpt limited to 200 lines or 12,000 characters."}
+                    {evidence.data.end_line_partial
+                      ? " The final line shown is cut mid-line."
+                      : ""}
+                  </p>
+                )}
+                {evidence.data.line_excerpt?.partial && (
+                  <p className="small muted">
+                    Line {evidence.data.line_excerpt.line} is{" "}
+                    {evidence.data.line_excerpt.line_length} characters — showing
+                    columns {evidence.data.line_excerpt.start_column}–
+                    {evidence.data.line_excerpt.end_column} around the match.
+                  </p>
+                )}
+                {evidence.data.download_url && evidence.data.content && (
+                  <a
+                    className="text-link log-download"
+                    href={scoped(evidence.data.download_url, repo)}
+                    download
+                  >
+                    Download redacted log <ArrowRight size={13} />
+                  </a>
+                )}
+                {safeUrl(evidence.data.url) && (
+                  <a
+                    className="text-link"
+                    href={safeUrl(evidence.data.url)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open source on GitHub <ExternalLink size={13} />
+                  </a>
+                )}
+                <div className="evidence-provenance">
+                  <strong>
+                    {selectedQuery.data?.type === "LogArtifact"
+                      ? "Redacted CI log evidence"
+                      : selectedQuery.data?.provenance === "github-api"
+                        ? "GitHub API evidence"
+                        : "Static source evidence"}
+                  </strong>
+                  <p>
+                    {selectedQuery.data?.type === "LogArtifact"
+                      ? `Workflow commit ${evidence.data.commit.slice(0, 12)}. Archived text is subject to retention.`
+                      : `Commit ${evidence.data.commit.slice(0, 12)}. Static resolution does not prove runtime behavior.`}
+                  </p>
+                </div>
+              </>
+            )
+          )}
+        </>
+      )}
+    </aside>
+  );
   return (
     <>
       <div className="graph-toolbar">
@@ -476,70 +756,236 @@ function GraphExplorer({ repo }: { repo: Repo }) {
         >
           <Search size={17} />
           <input
-            aria-label="Search graph"
-            placeholder="Find a function, class or file…"
+            aria-label={mode === "content" ? "Search source text" : "Search graph"}
+            placeholder={
+              mode === "content"
+                ? "Find exact text in source…"
+                : "Find a function, class or file…"
+            }
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            maxLength={200}
           />
-          <button aria-label="Search symbols" className="icon-button">
+          <button
+            aria-label={mode === "content" ? "Search content" : "Search symbols"}
+            className="icon-button"
+          >
             <ArrowRight size={17} />
           </button>
         </form>
         <label className="inline-label">
-          Node type
+          Search
           <select
-            value={kind}
+            value={mode}
             onChange={(e) => {
               setExpanded({ nodes: [], edges: [], limit: 80, bounded: true });
-              setKind(e.target.value);
+              setParams((previous) => {
+                const next = new URLSearchParams(previous);
+                if (e.target.value === "content") next.set("mode", "content");
+                else next.delete("mode");
+                next.delete("node");
+                next.delete("around");
+                next.delete("column");
+                next.delete("end_column");
+                return next;
+              });
             }}
           >
-            <option value="">All types</option>
-            {[
-              "File",
-              "Function",
-              "Class",
-              "TestCase",
-              "Commit",
-              "Issue",
-              "PullRequest",
-              "WorkflowRun",
-              "LogArtifact",
-            ].map((t) => (
-              <option key={t}>{t}</option>
-            ))}
+            <option value="symbols">Symbols</option>
+            <option value="content">Content</option>
           </select>
         </label>
-        <label className="inline-label">
-          Relationship
-          <select
-            aria-label="Relationship type"
-            value={relation}
-            onChange={(e) => {
-              setExpanded({ nodes: [], edges: [], limit: 80, bounded: true });
-              setRelation(e.target.value);
-            }}
-          >
-            <option value="">All relationships</option>
-            {[
-              "CALLS",
-              "IMPORTS",
-              "DEFINES",
-              "TESTS",
-              "HAS_FILE",
-              "REFERENCES",
-              "MODIFIES",
-              "TRIGGERED_BY",
-            ].map((r) => (
-              <option key={r}>{r}</option>
-            ))}
-          </select>
-        </label>
+        {mode === "content" && (
+          <label className="inline-label checkbox-label">
+            <input
+              type="checkbox"
+              checked={matchCase}
+              onChange={(e) => setMatchCase(e.target.checked)}
+            />
+            Match case
+          </label>
+        )}
+        {mode === "symbols" && (
+          <>
+            <label className="inline-label">
+              Node type
+              <select
+                value={kind}
+                onChange={(e) => {
+                  setExpanded({ nodes: [], edges: [], limit: 80, bounded: true });
+                  setKind(e.target.value);
+                }}
+              >
+                <option value="">All types</option>
+                {[
+                  "File",
+                  "Function",
+                  "Class",
+                  "TestCase",
+                  "Commit",
+                  "Issue",
+                  "PullRequest",
+                  "WorkflowRun",
+                  "LogArtifact",
+                ].map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+            </label>
+            <label className="inline-label">
+              Relationship
+              <select
+                aria-label="Relationship type"
+                value={relation}
+                onChange={(e) => {
+                  setExpanded({ nodes: [], edges: [], limit: 80, bounded: true });
+                  setRelation(e.target.value);
+                }}
+              >
+                <option value="">All relationships</option>
+                {[
+                  "CALLS",
+                  "IMPORTS",
+                  "DEFINES",
+                  "TESTS",
+                  "HAS_FILE",
+                  "REFERENCES",
+                  "MODIFIES",
+                  "TRIGGERED_BY",
+                ].map((r) => (
+                  <option key={r}>{r}</option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
         <span className="small muted graph-count">
-          {graph.nodes.length} nodes loaded
+          {mode === "content" && content.data
+            ? `${content.data.returned} matches · ${content.data.scan.files_scanned} files`
+            : `${graph.nodes.length} nodes loaded`}
         </span>
       </div>
-      {query.isPending ? (
+      {mode === "content" ? (
+        !term ? (
+          <Empty title="Search the snapshot's source">
+            Exact text is matched against the indexed files in this pinned
+            snapshot — quote or paste the string, including punctuation.
+          </Empty>
+        ) : content.isPending ? (
+          <Loading label="Scanning retained source…" />
+        ) : content.error ? (
+          <ErrorNotice
+            error={content.error}
+            retry={() => void content.refetch()}
+          />
+        ) : (
+          content.data && (
+            <div className="graph-workspace">
+              <div className="graph-main">
+                {selectedQuery.data && (
+                  <div className="selected-summary">
+                    <span>
+                      <strong>{selectedQuery.data.name}</strong> ·{" "}
+                      {selectedQuery.data.type}
+                    </span>
+                    <button
+                      className="text-button"
+                      onClick={() => {
+                        const panel = document.getElementById("source-panel");
+                        panel?.scrollIntoView({
+                          behavior: matchMedia("(prefers-reduced-motion: reduce)")
+                            .matches
+                            ? "instant"
+                            : "smooth",
+                          block: "start",
+                        });
+                        panel?.focus({ preventScroll: true });
+                      }}
+                    >
+                      View source <ArrowRight size={14} />
+                    </button>
+                  </div>
+                )}
+                {content.data.truncated && (
+                  <p className="notice">
+                    {content.data.scan_complete
+                      ? "Results capped"
+                      : "Scan incomplete"}
+                    {content.data.scan.files_skipped
+                      ? ` — ${content.data.scan.files_skipped} files could not be verified`
+                      : ` — ${content.data.completion_reason.replaceAll("_", " ")}`}
+                    . Results below may be partial.
+                  </p>
+                )}
+                {!content.data.results.length ? (
+                  <Empty title="No matches">
+                    {content.data.truncated
+                      ? "No hits in the files that could be scanned — coverage was incomplete."
+                      : "No indexed file in this snapshot contains that text."}
+                  </Empty>
+                ) : (
+                  <ul className="match-list" aria-label="Content matches">
+                    {content.data.results.map((hit, i) => (
+                      <li key={i}>
+                        <button
+                          className={
+                            "match-row" +
+                            (selected === hit.node_id && around === String(hit.line)
+                              ? " active"
+                              : "")
+                          }
+                          onClick={() =>
+                            select(hit.node, hit.line, hit.column, hit.end_column)
+                          }
+                        >
+                          <span className="match-location">
+                            {hit.path}:{hit.line}:{hit.column}
+                          </span>
+                          <code>
+                            {hit.snippet_start_partial ? "…" : ""}
+                            {hit.snippet}
+                            {hit.snippet_end_partial ? "…" : ""}
+                          </code>
+                        </button>
+                        <Link
+                          className="text-link"
+                          to={scoped(
+                            base +
+                              "?pin=" +
+                              hit.node_id +
+                              "&line=" +
+                              hit.line +
+                              "&column=" +
+                              hit.column +
+                              "&end_column=" +
+                              hit.end_column +
+                              "&q=" +
+                              encodeURIComponent(`What does ${hit.path} do here?`),
+                            repo,
+                          )}
+                        >
+                          Ask <ArrowRight size={13} />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="small muted canvas-footnote">
+                  {content.data.scan.files_scanned} of{" "}
+                  {content.data.scan.manifest_entries} indexed files scanned ·{" "}
+                  {(content.data.scan.bytes_scanned / 1024).toFixed(0)} KB ·
+                  commit {content.data.scope.commit.slice(0, 8)}
+                  {content.data.scope.historical ? " · saved snapshot" : ""}
+                  {content.data.total !== null
+                    ? ` · ${content.data.total} total matches`
+                    : ""}
+                </p>
+              </div>
+              {evidencePanel}
+            </div>
+          )
+        )
+      ) : query.isPending ? (
         <Loading label="Loading bounded graph…" />
       ) : query.error ? (
         <ErrorNotice error={query.error} retry={() => void query.refetch()} />
@@ -616,191 +1062,14 @@ function GraphExplorer({ repo }: { repo: Repo }) {
                 <span>Typed relationships, inspectable evidence</span>
               </div>
             </div>
-            <aside
-              className="evidence-panel"
-              id="source-panel"
-              tabIndex={-1}
-              aria-label="Node details"
-            >
-              {!selected ? (
-                <div className="node-empty">
-                  <Network size={35} strokeWidth={1.2} />
-                  <h2>Follow a connection.</h2>
-                  <p>
-                    Select a node to inspect its source, relationships and
-                    provenance.
-                  </p>
-                  <span>Pan to explore · Scroll to zoom</span>
-                </div>
-              ) : selectedQuery.isPending ? (
-                <Loading label="Loading node…" />
-              ) : selectedQuery.error ? (
-                <ErrorNotice error={selectedQuery.error} />
-              ) : (
-                <>
-                  <button
-                    className="icon-button panel-close"
-                    aria-label="Clear selected node"
-                    onClick={() =>
-                      setParams((previous) => {
-                        const next = new URLSearchParams(previous);
-                        next.delete("node");
-                        return next;
-                      })
-                    }
-                  >
-                    <X size={16} />
-                  </button>
-                  <h2>{selectedQuery.data?.name}</h2>
-                  <p className="source-location">
-                    <FileCode2 size={14} />
-                    {selectedQuery.data?.type} ·{" "}
-                    {selectedQuery.data?.path || "Historical evidence"}
-                    {selectedQuery.data?.line && `:${selectedQuery.data.line}`}
-                  </p>
-                  {selectedQuery.data?.doc && (
-                    <p className="node-doc">{selectedQuery.data.doc}</p>
-                  )}
-                  {selectedQuery.data?.log_status && (
-                    <p className="notice subtle">
-                      {selectedQuery.data.log_status}
-                    </p>
-                  )}
-                  <div className="node-actions">
-                    <button
-                      className="button secondary small-button"
-                      disabled={
-                        expansion.isPending || graph.nodes.length >= 200
-                      }
-                      onClick={() => expansion.mutate()}
-                    >
-                      <Waypoints size={15} />
-                      {expansion.isPending ? "Expanding…" : "Expand neighbors"}
-                    </button>
-                    <Link
-                      className="text-link"
-                      to={scoped(base + "/impact?node=" + selected, repo)}
-                    >
-                      Analyze impact <ArrowRight size={14} />
-                    </Link>
-                  </div>
-                  {expansion.error && <ErrorNotice error={expansion.error} />}
-                  <h3>Connections in the loaded view</h3>
-                  <div className="connection-entries">
-                    {graph.edges
-                      .filter(
-                        (e) => e.source === selected || e.target === selected,
-                      )
-                      .map((e) => (
-                        <p key={e.id}>
-                          <strong>
-                            {graph.nodes.find((n) => n.id === e.source)?.name}
-                          </strong>
-                          <span>{e.type} →</span>
-                          <strong>
-                            {graph.nodes.find((n) => n.id === e.target)?.name}
-                          </strong>
-                          <small>
-                            {e.source === selected ? "Outgoing" : "Incoming"}{" "}
-                            {e.provenance === "github-api"
-                              ? "GitHub metadata relationship"
-                              : "static relationship"}
-                          </small>
-                        </p>
-                      ))}
-                    {!graph.edges.some(
-                      (e) => e.source === selected || e.target === selected,
-                    ) && (
-                      <p>
-                        No connections loaded. Expand neighbors to inspect
-                        direct relationships.
-                      </p>
-                    )}
-                  </div>
-                  <h3>Source evidence</h3>
-                  {evidence.isPending ? (
-                    <Loading label="Reading source…" />
-                  ) : evidence.error ? (
-                    <ErrorNotice error={evidence.error} />
-                  ) : (
-                    evidence.data && (
-                      <>
-                        {evidence.data.notice && (
-                          <p className="notice subtle">
-                            {evidence.data.notice}
-                          </p>
-                        )}
-                        <div className="code-block">
-                          {evidence.data.content ? (
-                            evidence.data.content.split("\n").map((line, i) => (
-                              <div className="code-line" key={i}>
-                                <span>
-                                  {evidence.data!.start_line !== null
-                                    ? evidence.data!.start_line + i
-                                    : ""}
-                                </span>
-                                <code>{line || " "}</code>
-                              </div>
-                            ))
-                          ) : (
-                            <p>
-                              No source excerpt is available for this entity.
-                            </p>
-                          )}
-                        </div>
-                        {evidence.data.truncated && (
-                          <p className="small muted">
-                            {selectedQuery.data?.type === "LogArtifact"
-                              ? "Log preview limited to 12,000 characters."
-                              : "Excerpt limited to 200 lines."}
-                          </p>
-                        )}
-                        {evidence.data.download_url &&
-                          evidence.data.content && (
-                            <a
-                              className="text-link log-download"
-                              href={scoped(evidence.data.download_url, repo)}
-                              download
-                            >
-                              Download redacted log <ArrowRight size={13} />
-                            </a>
-                          )}
-                        {safeUrl(evidence.data.url) && (
-                          <a
-                            className="text-link"
-                            href={safeUrl(evidence.data.url)}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Open source on GitHub <ExternalLink size={13} />
-                          </a>
-                        )}
-                        <div className="evidence-provenance">
-                          <strong>
-                            {selectedQuery.data?.type === "LogArtifact"
-                              ? "Redacted CI log evidence"
-                              : selectedQuery.data?.provenance === "github-api"
-                                ? "GitHub API evidence"
-                                : "Static source evidence"}
-                          </strong>
-                          <p>
-                            {selectedQuery.data?.type === "LogArtifact"
-                              ? `Workflow commit ${evidence.data.commit.slice(0, 12)}. Archived text is subject to retention.`
-                              : `Commit ${evidence.data.commit.slice(0, 12)}. Static resolution does not prove runtime behavior.`}
-                          </p>
-                        </div>
-                      </>
-                    )
-                  )}
-                </>
-              )}
-            </aside>
+            {evidencePanel}
           </div>
         </>
       )}
     </>
   );
 }
+
 function Overview({ repo, jobs }: { repo: Repo; jobs: Job[] }) {
   const [confirmation, setConfirmation] = useState("");
   const cache = useQueryClient();
@@ -1121,10 +1390,7 @@ function Impact({ repo }: { repo: Repo }) {
       depth,
     ],
     queryFn: () =>
-      read<{
-        results: { node: Node; distance: number; classification: string }[];
-        unknown: string;
-      }>(
+      read<ImpactResult>(
         "/repositories/" + repo.id + "/impact/" + selected + "?depth=" + depth,
       ),
     enabled: !!selected,
@@ -1208,6 +1474,13 @@ function Impact({ repo }: { repo: Repo }) {
               </tbody>
             </table>
           </div>
+          {result.data?.has_more && (
+            <p className="notice">
+              {result.data.total != null
+                ? `Showing ${result.data.returned ?? result.data.results.length} of ${result.data.total} inbound dependents within depth ${result.data.max_depth ?? depth}.`
+                : "Traversal stopped at a work limit before every caller layer completed, so more dependents may exist than shown."}
+            </p>
+          )}
           {!result.data?.results.length && (
             <p className="notice">
               No inbound dependencies were found within this depth. This does

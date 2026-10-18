@@ -27,7 +27,7 @@ class DeviceStart(BaseModel):
 
 @router.post("/device", status_code=201)
 def start(body: DeviceStart, request: Request, db=Depends(db_session)):
-    auth_rate_limit(db, request)
+    auth_rate_limit(db, request, "cli")
     db.execute(delete(AuthorizationRequest).where(AuthorizationRequest.expires_at < utcnow()))
     raw = secrets.token_urlsafe(32)
     code = secrets.token_hex(4).upper()
@@ -44,10 +44,12 @@ def start(body: DeviceStart, request: Request, db=Depends(db_session)):
         )
     )
     db.commit()
+    origin = request.headers.get("origin", "")
+    base = origin if origin in settings().origins else settings().public_url
     return {
         "device_code": raw,
         "user_code": code[:4] + "-" + code[4:],
-        "verification_uri": settings().public_url + "/cli/authorize?code=" + code,
+        "verification_uri": base + "/cli/authorize?code=" + code,
         "expires_in": 600,
         "interval": 5,
     }
@@ -69,7 +71,7 @@ def find_code(db, code):
 
 @router.get("/device/{code}")
 def inspect(code: str, request: Request, user=Depends(current_session), db=Depends(db_session)):
-    auth_rate_limit(db, request)
+    auth_rate_limit(db, request, "cli")
     row = find_code(db, code)
     return {"name": row.name, "scopes": row.scopes, "expires_at": row.expires_at}
 
@@ -86,7 +88,7 @@ def approve(
     user=Depends(current_session),
     db=Depends(db_session),
 ):
-    auth_rate_limit(db, request)
+    auth_rate_limit(db, request, "cli")
     row = find_code(db, code)
     row.status = "approved" if body.approve else "denied"
     row.user_id = user.id

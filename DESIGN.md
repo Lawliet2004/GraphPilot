@@ -336,6 +336,13 @@ Motion is restricted to short control transitions, the mobile drawer and a loadi
 
 ## Repository context extension
 
+Repository navigation now uses three primary areas: Ask, Code and Activity.
+Ask opens first and keeps the question form above recent answers in a single
+reading column, with suggested questions in the empty state. Source links and
+retrieval details remain inspectable below answers. Branch/version selection,
+dependency tracing and index health use native disclosures. The former overview,
+history, impact and diagnostics URLs remain compatible with these areas.
+
 Branch and snapshot selection use the existing labeled native selects, arranged
 as a wrapping row below repository identity. At widths up to 600px they stack at
 full width. A native details disclosure contains the existing-branch form; saved
@@ -357,3 +364,18 @@ space. It requires the exact repository name, explains scope and permanence, and
 uses the established error foreground/background pair. Admin removal jobs have
 retry controls after failure and no misleading cancel control. These are extensions
 of the incumbent Operate surface, not a new approved visual direction.
+
+## Developer workspace extension
+
+The workspace includes Developer tools at `/tools` and a keyboard command
+palette in the application shell. The palette searches authorized repositories
+and navigation actions; Ctrl/Cmd+K opens it, arrow keys select and Enter navigates.
+A native dialog provides focus containment and restoration. This extends the
+existing Manrope, indigo, warm-neutral and terracotta system.
+
+Developer tools uses three task sections: repository questions/jobs, named
+Codespace runner commands, and daily Git work. Inputs generate copyable commands
+for the real CLI. Status comes from API readiness and the signed-in user's CLI
+credentials; local Git and GitHub authentication remain on the user's machine.
+Forms, command text and copy feedback stack at mobile widths. The website does
+not present a simulated shell or infer a runner's local profile state.
