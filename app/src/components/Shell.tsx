@@ -68,6 +68,7 @@ export function Shell() {
   const inRepository = pathname.startsWith("/repositories/");
   const crumb = inRepository ? null : (CRUMBS[pathname] ?? "Workspace");
   const [open, setOpen] = useState(false);
+  useEffect(() => setOpen(false), [pathname]);
   const [palette, setPalette] = useState(false);
   const closePalette = useCallback(() => setPalette(false), []);
   const shortcut = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
@@ -134,7 +135,7 @@ export function Shell() {
           )}
         </nav>
         <div className="sidebar-bottom">
-          <nav aria-label="Account">
+          <nav aria-label="Account" onClick={() => setOpen(false)}>
             <NavLink to="/settings">
               <Settings size={18} />
               Settings

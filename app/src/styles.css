@@ -1806,6 +1806,24 @@ td select {
 .settings-layout > section > section {
   margin-top: 45px;
 }
+.settings-layout > section,
+.settings-layout form,
+.settings-layout .notice,
+.settings-layout input,
+.settings-layout .button,
+.settings-layout dd,
+.settings-layout label {
+  min-width: 0;
+  max-width: 100%;
+}
+.settings-layout .button {
+  white-space: normal;
+}
+.settings-layout .notice,
+.settings-layout dd,
+.settings-layout label {
+  overflow-wrap: anywhere;
+}
 .model-credentials .definition-list dd {
   overflow-wrap: anywhere;
 }
@@ -1820,6 +1838,7 @@ td select {
 }
 .theme-options {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   border: 0;
   padding: 0;
@@ -2672,7 +2691,7 @@ td select {
   .overview-layout,
   .diagnostics-grid,
   .settings-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 35px;
   }
   .repo-title-line h1 {
